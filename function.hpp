@@ -2,9 +2,9 @@
 #define __FUNCTION_HPP__
 
 #include <cstdio>
+#include <vector>
 
-#include "vector.hpp"
-#include "distance.hpp"
+#include "matrix.hpp"
 
 class Function
 {
@@ -13,9 +13,11 @@ public:
 	void write(FILE*);
 
 private:
-	Distance distance;
 	float exponent;
-	Vector origin;
+	std::vector<int> dimensions;
+	Matrix mean;
+	Matrix rotation;
+	Matrix multiplier;
 };
 
 #endif

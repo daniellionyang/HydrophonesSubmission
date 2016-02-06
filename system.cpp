@@ -23,8 +23,9 @@ void System::write(FILE* out)
 	std::fprintf(out, "\n");
 }
 
-Vector System::mode()
+Matrix System::mode()
 {
+	return Matrix();
 }
 
 System System::operator*=(const System& b)

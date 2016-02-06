@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "vector.hpp"
+#include "matrix.hpp"
 #include "distribution.hpp"
 
 class System
@@ -13,7 +13,7 @@ public:
 	System();
 
 	System(FILE*);
-	Vector mode();
+	Matrix mode();
 	System operator*=(const System&);
 	void write(FILE*);
 
