@@ -1,10 +1,16 @@
-int process(const std::istream& in, const std::ostream& out)
+#include <iostream>
+#include <thread>
+
+#include "interface/connection.hpp"
+#include "interface/functions.hpp"
+
+int process(std::istream& in, std::ostream& out)
 {
-	auto functions[] = {camera};
+	std::function<bool(FILE*, FILE*, Data*)> functions[] = {camera};
 
 	Data data;
 
-	std::vector<std::function<void(FILE*, FILE*, Data*)> > connections;
+	std::vector<Connection*> connections;
 
 	bool quit = false;
 	while (!quit)
@@ -15,36 +21,39 @@ int process(const std::istream& in, const std::ostream& out)
 		in >> in_name >> out_name >> func_idx;
 		if (!in.good())
 		{
-			out >> "failed to parse\n";
+			out << "failed to parse\n";
 			continue;
 		}
 
-		FILE* in_file = fopen(in_name, "r");
+		FILE* in_file = fopen(in_name.c_str(), "r");
 		if (!in_file)
 		{
-			out >> "failed to open input file\n";
+			out << "failed to open input file\n";
 			continue;
 		}
-		FILE* out_file = fopen(out_name, "w");
+		FILE* out_file = fopen(out_name.c_str(), "w");
 		if (!in_file)
 		{
-			out >> "failed to open output file\n";
+			out << "failed to open output file\n";
 			continue;
 		}
 		if (func_idx > sizeof(functions))
 		{
-			out >> "failed to open output file\n";
+			out << "failed to open output file\n";
 			continue;
 		}
 		
-		connections.push_back(Connection(in_file, out_file, functions[func_idx], &data));
+		connections.push_back(new Connection(in_file, out_file, functions[func_idx], &data));
 	}
+
+	for (auto c : connections)
+		delete c;
 
 	return 0;
 }
 
 int main()
 {
-	return process(stdin, stdout);
+	return process(std::cin, std::cout);
 }
 

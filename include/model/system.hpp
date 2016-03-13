@@ -1,11 +1,11 @@
-#ifndef __SYSTEM_HPP__
-#define __SYSTEM_HPP__
+#ifndef MODEL_SYSTEM_HPP
+#define MODEL_SYSTEM_HPP
 
 #include <cstdio>
 #include <vector>
 
-#include "modeling/matrix.hpp"
-#include "modeling/distribution.hpp"
+#include "model/matrix.hpp"
+#include "model/distribution.hpp"
 
 class System
 {

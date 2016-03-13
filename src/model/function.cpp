@@ -1,4 +1,4 @@
-#include "modeling/function.hpp"
+#include "model/function.hpp"
 
 // <distance> <exponent> <origin vector>
 Function::Function(FILE* in)

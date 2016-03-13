@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "modeling/system.hpp"
+#include "model/system.hpp"
 
 int bayesFilter(FILE* in, FILE* out)
 {

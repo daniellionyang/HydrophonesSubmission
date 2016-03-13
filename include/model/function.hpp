@@ -1,10 +1,10 @@
-#ifndef __FUNCTION_HPP__
-#define __FUNCTION_HPP__
+#ifndef MODEL_FUNCTION_HPP
+#define MODEL_FUNCTION_HPP
 
 #include <cstdio>
 #include <vector>
 
-#include "modeling/matrix.hpp"
+#include "model/matrix.hpp"
 
 class Function
 {

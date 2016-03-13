@@ -1,6 +1,6 @@
-#include "connection.hpp"
+#include "interface/connection.hpp"
 
-Connection::Connection(FILE* in, FILE* out, std::function<void(FILE*, FILE*, Data*)> function) :
+Connection::Connection(FILE* in, FILE* out, std::function<bool(FILE*, FILE*, Data*)> function, Data* data) :
 	in(in),
 	out(out),
 	function(function),

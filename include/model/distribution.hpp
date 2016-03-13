@@ -1,10 +1,10 @@
-#ifndef __DISTRIBUTION_HPP__
-#define __DISTRIBUTION_HPP__
+#ifndef MODEL_DISTRIBUTION_HPP
+#define MODEL_DISTRIBUTION_HPP
 
 #include <cstdio>
 #include <vector>
 
-#include "modeling/function.hpp"
+#include "model/function.hpp"
 
 class Distribution
 {
