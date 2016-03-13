@@ -3,7 +3,7 @@
 cv::Mat imageRead(FILE* in)
 {
 	char c;
-	fscanf(in, "%c", %c);
+	fscanf(in, "%c", &c);
 	if(c == 'i')
 	{
 		int rows, cols;
