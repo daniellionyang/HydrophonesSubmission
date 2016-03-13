@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "matrix.hpp"
+#include "modeling/matrix.hpp"
 
 class Function
 {

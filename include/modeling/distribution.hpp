@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <vector>
 
-#include "function.hpp"
+#include "modeling/function.hpp"
 
 class Distribution
 {

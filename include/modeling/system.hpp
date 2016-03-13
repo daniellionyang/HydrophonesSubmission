@@ -4,8 +4,8 @@
 #include <cstdio>
 #include <vector>
 
-#include "matrix.hpp"
-#include "distribution.hpp"
+#include "modeling/matrix.hpp"
+#include "modeling/distribution.hpp"
 
 class System
 {

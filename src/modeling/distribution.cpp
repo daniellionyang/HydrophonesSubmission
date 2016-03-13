@@ -1,4 +1,4 @@
-#include "distribution.hpp"
+#include "modeling/distribution.hpp"
 
 #include <algorithm>
 
