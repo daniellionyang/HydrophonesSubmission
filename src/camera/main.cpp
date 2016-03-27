@@ -22,6 +22,32 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 		return 1;
 	}
 
+	// start and stop capturing and disconnect and reconnect to clear buffer
+	error = cam.StartCapture();
+	if (error != FlyCapture2::PGRERROR_OK)
+	{
+		error.PrintErrorTrace();
+		return 1;
+	}
+	error = cam.StopCapture();
+	if (error != FlyCapture2::PGRERROR_OK)
+	{
+		error.PrintErrorTrace();
+		return 1;
+	}
+	error = cam.Disconnect();
+	if (error != FlyCapture2::PGRERROR_OK)
+	{
+		error.PrintErrorTrace();
+		return 1;
+	}
+	error = cam.Connect(&guid);
+	if (error != FlyCapture2::PGRERROR_OK)
+	{
+		error.PrintErrorTrace();
+		return 1;
+	}
+
 	// set mode (pixel format, fps)
 	FlyCapture2::Format7ImageSettings format;
 	unsigned int packetSize;
@@ -47,6 +73,11 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 		error.PrintErrorTrace();
 		return 1;
 	}
+	if (!valid)
+	{
+		fprintf(stderr, "error: invalid format\n");
+		return 1;
+	}
 
 	error = cam.SetFormat7Configuration(&format, packetInfo.recommendedBytesPerPacket);
 	if (error != FlyCapture2::PGRERROR_OK)
@@ -70,18 +101,17 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 		return 1;
 	}
 
-	FlyCapture2::Image fcImage;
 	bool quit = false;
 	while (!quit)
 	{
 		// wait for image request
-		char c;
-		fscanf(in, " %c ", &c);
+		int c = fgetc(in);
 		switch (c)
 		{
 			case 'i':
 			{
 				// get image
+				FlyCapture2::Image fcImage;
 				error = cam.RetrieveBuffer(&fcImage);
 				if (error != FlyCapture2::PGRERROR_OK)
 				{
@@ -105,9 +135,14 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 
 				// send image
 				imageWrite(out, image);
+
+				break;
 			}
 
-			case 'q': quit = true; break;
+			case 'q':
+			case EOF:
+				quit = true;
+				break;
 		}
 
 		// wait a bit
