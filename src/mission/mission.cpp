@@ -13,7 +13,7 @@ int mission(FILE* in, FILE* out, FILE* config)
 	fscanf(config, "%i", &numGoals);
 	auto goals = std::vector<Goal>();
 	for (size_t i = 0; i < numGoals; i++)
-		goals.push_back(Goal(in));
+		goals.push_back(Goal(config));
 
 	bool quit = false;
 	while (!quit)

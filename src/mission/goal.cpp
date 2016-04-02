@@ -2,8 +2,17 @@
 
 #include "mission/action.hpp"
 
-Goal::Goal(FILE* in)
+Goal::Goal(FILE* config)
 {
+	fscanf(config, "%f", &m_value);
+	fscanf(config, "%f", &m_time);
+	fscanf(config, "%f", &m_certainty);
+	int n;
+	fscanf(config, "%i", &n);
+	for(int i = 0; i < n; i++)
+	{
+		m_actions.push_back(getaction(config));
+	}
 }
 
 void Goal::write(FILE* out)
