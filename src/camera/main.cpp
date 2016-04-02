@@ -188,14 +188,38 @@ int main(int argc, char** argv)
 	}
 
 	FlyCapture2::PGRGuid guid;
-	error = busMgr.GetCameraFromIndex(0, &guid);
+
+	char c;
+	fscanf(stdin, "%c", &c);
+	switch (c)
+	{
+		case 'i': // index
+		{
+			error = busMgr.GetCameraFromIndex(0, &guid);
+			break;
+		}
+		case 'u': // usb serial number
+		{
+			unsigned int sn;
+			fscanf(stdin, "%i", &sn);
+			error = busMgr.GetCameraFromSerialNumber(sn, &guid);
+			break;
+		}
+		case 'n': // network ip address
+		{
+			unsigned int ip[4];
+			fscanf(stdin, "%i.%i.%i.%i", &ip[0], &ip[1], &ip[2], &ip[3]);
+			unsigned int ip32 = ip[0] * (1 << 24) + ip[1] * (1 << 16) + ip[2] * (1 << 8) + ip[3];
+			error = busMgr.GetCameraFromIPAddress(FlyCapture2::IPAddress(ip32), &guid);
+			break;
+		}
+	}
 	if (error != FlyCapture2::PGRERROR_OK)
 	{
+		fprintf(stderr, "error: failed to connect to the specified camera\n");
 		error.PrintErrorTrace();
 		return 1;
 	}
 
-	startCamera(stdin, stdout, stderr, guid);
-
-	return 0;
+	return startCamera(stdin, stdout, stderr, guid);
 }
