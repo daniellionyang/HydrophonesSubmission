@@ -13,6 +13,7 @@ cv::Mat imageRead(FILE* in)
 	std::string buffer = "";
 	while (true)
 	{
+		if (buffer.length() > 64) buffer = buffer.substr(32); // keep buffer relatively small
 		int c = fgetc(in);
 		if (c == EOF)
 		{
