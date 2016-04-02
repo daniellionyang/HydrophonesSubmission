@@ -11,7 +11,7 @@ public:
 	Matrix(const Matrix&);
 
 	Matrix(FILE*);
-	void write(FILE*);
+	void write(FILE*) const;
 
 	size_t rows() const;
 	size_t cols() const;
@@ -20,7 +20,9 @@ public:
 	float get(size_t, size_t) const;
 	float get(size_t) const;
 
-	Matrix operator*(const Matrix&);
+	float magnitude() const;
+
+	Matrix operator*(const Matrix&) const;
 	Matrix operator*=(const Matrix&);
 	Matrix operator+=(const Matrix&);
 	Matrix operator-=(const Matrix&);

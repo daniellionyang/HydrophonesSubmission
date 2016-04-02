@@ -30,6 +30,10 @@ INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main connection functions data)
 INTERFACE_CFLAGS = $(OPENCV_CFLAGS)
 INTERFACE_LFLAGS = $(OPENCV_LFLAGS)
 
+MISSION = $(patsubst %,$(BUILD)/mission/%.o, main mission command query task) $(MODEL) $(IMAGE)
+MISSION_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS) $(MODEL_CFLAGS)
+MISSION_LFLAGS = $(OPENCV_LFLAGS)
+
 CAMERA = $(patsubst %,$(BUILD)/camera/%.o,main) $(IMAGE)
 CAMERA_CFLAGS = $(OPENCV_CFLAGS) $(FLYCAP_CFLAGS)
 CAMERA_LFLAGS = $(OPENCV_LFLAGS) $(FLYCAP_LFLAGS)
@@ -43,13 +47,16 @@ IMAGE_SHOW_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_SHOW_LFLAGS = $(OPENCV_LFLAGS)
 
 
-all: modeling interface camera image_read image_show
+all: modeling interface mission camera image_read image_show
 
 modeling: $(MODELING)
 	$(CC) $^ $(LFLAGS) $(MODELING_LFLAGS) -o $@
 
 interface: $(INTERFACE)
 	$(CC) $^ $(LFLAGS) $(INTERFACE_LFLAGS) -o $@
+
+mission: $(MISSION)
+	$(CC) $^ $(LFLAGS) $(MISSION_LFLAGS) -o $@
 
 camera: $(CAMERA)
 	$(CC) $^ $(LFLAGS) $(CAMERA_LFLAGS) -o $@
@@ -72,6 +79,9 @@ $(BUILD)/modeling/%.o: $(SRC)/modeling/%.cpp
 $(BUILD)/interface/%.o: $(SRC)/interface/%.cpp
 	$(CC) $(CFLAGS) $(INTERFACE_CFLAGS) $< -o $@
 
+$(BUILD)/mission/%.o: $(SRC)/mission/%.cpp
+	$(CC) $(CFLAGS) $(MISSION_CFLAGS) $< -o $@
+
 $(BUILD)/camera/%.o: $(SRC)/camera/%.cpp
 	$(CC) $(CFLAGS) $(CAMERA_CFLAGS) $< -o $@
 
@@ -84,6 +94,7 @@ $(BUILD)/image_show/%.o: $(SRC)/image_show/%.cpp
 clean:
 	rm -f modeling
 	rm -f interface
+	rm -f mission
 	rm -f camera
 	rm -f image_read
 	rm -f image_show

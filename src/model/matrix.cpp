@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <cstring>
+#include <cmath>
 
 Matrix::Matrix()
 {
@@ -24,7 +25,7 @@ Matrix::Matrix(FILE* in)
 		std::fscanf(in, "%f", m_data[i]);
 }
 
-void Matrix::write(FILE* out)
+void Matrix::write(FILE* out) const
 {
 	std::fprintf(out, "%i %i ", m_rows, m_cols);
 	for (int i = 0; i < m_rows * m_cols; i++)
@@ -57,7 +58,15 @@ float Matrix::get(size_t i) const
 	return m_data[i];
 }
 
-Matrix Matrix::operator*(const Matrix& a)
+float Matrix::magnitude() const
+{
+	float sum = 0;
+	for (size_t i = 0; i < size(); i++)
+		sum += std::pow(get(i), 2);
+	return std::sqrt(sum);
+}
+
+Matrix Matrix::operator*(const Matrix& a) const
 {
 	if (cols() != a.rows()) throw std::runtime_error("incompatible size");
 
