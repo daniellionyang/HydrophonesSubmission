@@ -19,7 +19,8 @@ int mission(FILE* in, FILE* out, FILE* config)
 	while (!quit)
 	{
 		// get current state
-		Matrix location = getState(in, out);
+		State state = getState(in, out);
+		Matrix location = state.location();
 		Matrix model = model_mode(in, out);
 
 		// select goal

@@ -58,6 +58,16 @@ float Matrix::get(size_t i) const
 	return m_data[i];
 }
 
+float Matrix::set(size_t i, size_t j, float value)
+{
+	return m_data[i * m_cols + j] = value;
+}
+
+float Matrix::set(size_t i, float value)
+{
+	return m_data[i] = value;
+}
+
 float Matrix::magnitude() const
 {
 	float sum = 0;

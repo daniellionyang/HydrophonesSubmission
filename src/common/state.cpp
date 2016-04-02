@@ -7,6 +7,12 @@ State::State(FILE* in)
 	m_direction = Matrix(in);
 }
 
+State::State(const Matrix& location, const Matrix& direction) :
+	m_location(location),
+	m_direction(direction)
+{
+}
+
 void State::write(FILE* out) const
 {
 	fprintf(out, "s\n");

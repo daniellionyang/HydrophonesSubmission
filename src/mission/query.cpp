@@ -1,9 +1,9 @@
 #include "mission/query.hpp"
 
-Matrix getState(FILE* in, FILE* out)
+State getState(FILE* in, FILE* out)
 {
 	fprintf(out, "q s\n");
-	return Matrix(in);
+	return State(in);
 }
 
 cv::Mat image(FILE* in, FILE* out, char dir, float res, float hcrop, float vcrop)

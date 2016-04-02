@@ -10,6 +10,7 @@ class State
 {
 public:
 	State(FILE*);
+	State(const Matrix& location, const Matrix& direction);
 	void write(FILE*) const;
 
 	Matrix location() const;

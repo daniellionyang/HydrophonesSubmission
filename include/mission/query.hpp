@@ -4,10 +4,11 @@
 #include <cstdio>
 
 #include "common/matrix.hpp"
+#include "common/state.hpp"
 #include "model/system.hpp"
 #include "image/image.hpp"
 
-Matrix getState(FILE*, FILE*);
+State getState(FILE*, FILE*);
 
 cv::Mat image(FILE*, FILE*, char, float res = 1, float hcrop = 1, float vcrop = 1);
 
