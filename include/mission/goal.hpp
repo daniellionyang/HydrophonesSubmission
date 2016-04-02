@@ -1,12 +1,15 @@
-#ifndef MISSION_TASK_HPP
-#define MISSION_TASK_HPP
+#ifndef MISSION_GOAL_HPP
+#define MISSION_GOAL_HPP
+
+#include <functional>
+#include <vector>
 
 #include "model/matrix.hpp"
 
-class Task
+class Goal
 {
 public:
-	Task(FILE*);
+	Goal(FILE*);
 
 	void write(FILE*);
 
@@ -16,7 +19,7 @@ public:
 	float time() const;
 	float certainty() const;
 
-	bool run();
+	bool run(FILE*, FILE*);
 
 private:
 	float m_value;
@@ -27,6 +30,8 @@ private:
 
 	Matrix m_loc_transform;
 	Matrix m_loc_offset;
+
+	std::vector<std::function<bool(FILE*, FILE*)>> m_actions;
 };
 
 #endif

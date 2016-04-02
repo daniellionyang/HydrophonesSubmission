@@ -5,15 +5,15 @@
 
 #include "mission/command.hpp"
 #include "mission/query.hpp"
-#include "mission/task.hpp"
+#include "mission/goal.hpp"
 
 int mission(FILE* in, FILE* out, FILE* config)
 {
-	int numTasks = 0;
-	fscanf(config, "%i", &numTasks);
-	auto tasks = std::vector<Task>();
-	for (size_t i = 0; i < numTasks; i++)
-		tasks.push_back(Task(in));
+	int numGoals = 0;
+	fscanf(config, "%i", &numGoals);
+	auto goals = std::vector<Goal>();
+	for (size_t i = 0; i < numGoals; i++)
+		goals.push_back(Goal(in));
 
 	bool quit = false;
 	while (!quit)
@@ -22,29 +22,29 @@ int mission(FILE* in, FILE* out, FILE* config)
 		Matrix location = getState(in, out);
 		Matrix model = model_mode(in, out);
 
-		// select task
+		// select goal
 		float speed = 1;
-		std::sort(tasks.begin(), tasks.end(), [&](const Task& a, const Task& b)
+		std::sort(goals.begin(), goals.end(), [&](const Goal& a, const Goal& b)
 		{
-			auto value = [&](const Task& t)
+			auto value = [&](const Goal& t)
 			{
 				return t.value() * t.certainty() / (t.time() + (t.location(model) - location).magnitude() / speed);
 			};
 			return value(a) < value(b); // descending order
 		});
-		auto task = tasks.back();
+		auto goal = goals.back();
 
-		// if close enough, begin task
-		auto taskLoc = task.location(model);
-		if ((taskLoc - location).magnitude() < 10)
+		// if close enough, begin goal
+		auto goalLoc = goal.location(model);
+		if ((goalLoc - location).magnitude() < 10)
 		{
-			if (task.run()) tasks.pop_back();
+			if (goal.run(in, out)) goals.pop_back();
 		}
-		// otherwise approach task (but continue loop so we can switch later if we want)
+		// otherwise approach goal (but continue loop so we can switch later if we want)
 		else
-			move(out, location, taskLoc);
+			move(out, location, goalLoc);
 
-		if (tasks.empty()) quit = true;
+		if (goals.empty()) quit = true;
 	}
 
 	return 0;

@@ -1,0 +1,5 @@
+#ifndef MISSION_ACTION_HPP
+#define MISSION_ACTION_HPP
+
+#endif
+
