@@ -1,4 +1,4 @@
-#include "model/matrix.hpp"
+#include "common/matrix.hpp"
 
 #include <stdexcept>
 #include <cstring>

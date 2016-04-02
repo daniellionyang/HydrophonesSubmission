@@ -1,7 +1,7 @@
 #ifndef MISSION_ACTION_HPP
 #define MISSION_ACTION_HPP
 
-#include "model/matrix.hpp"
+#include "common/matrix.hpp"
 
 class Action
 {

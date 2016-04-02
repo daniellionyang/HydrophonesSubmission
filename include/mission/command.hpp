@@ -1,7 +1,7 @@
 #ifndef MISSION_COMMAND_HPP
 #define MISSION_COMMAND_HPP
 
-#include "model/matrix.hpp"
+#include "common/matrix.hpp"
 
 void move(FILE*, const Matrix&, const Matrix&); // wrapper for state
 void setState(FILE*, const Matrix&);

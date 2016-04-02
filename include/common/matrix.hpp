@@ -1,5 +1,5 @@
-#ifndef MODEL_MATRIX_HPP
-#define MODEL_MATRIX_HPP
+#ifndef COMMON_MATRIX_HPP
+#define COMMON_MATRIX_HPP
 
 #include <cstddef>
 #include <cstdio>
