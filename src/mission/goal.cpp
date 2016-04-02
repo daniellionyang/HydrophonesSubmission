@@ -22,7 +22,7 @@ void Goal::write(FILE* out)
 bool Goal::run(FILE* in, FILE* out)
 {
 	for (auto a : m_actions)
-		if (!a(in, out))
+		if (!a->run(in, out))
 			return false;
 	return true;
 }

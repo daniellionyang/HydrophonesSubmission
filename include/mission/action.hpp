@@ -1,10 +1,41 @@
 #ifndef MISSION_ACTION_HPP
 #define MISSION_ACTION_HPP
 
-#include <functional>
-#include <cstdio>
+#include <time.h>
 
-std::function<bool(FILE*, FILE*)> getaction(FILE*);
+#include "common/matrix.hpp"
+
+class Action
+{
+public:
+	virtual bool run(FILE*, FILE*) = 0;
+};
+
+class Wait : public virtual Action
+{
+public:
+	Wait(long long);
+	
+	virtual bool run(FILE*, FILE*);
+
+private:
+	clock_t start;
+	long long wtime;
+};
+
+class MoveTo : public virtual Action
+{
+public:
+	MoveTo(const Matrix&, float);
+
+	virtual bool run(FILE*, FILE*);
+
+private:
+	Matrix target;
+	float minDistance;
+};
+
+Action* getaction(FILE*);
 
 #endif
 

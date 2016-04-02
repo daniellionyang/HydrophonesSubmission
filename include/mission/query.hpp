@@ -3,7 +3,7 @@
 
 #include <cstdio>
 
-#include "model/matrix.hpp"
+#include "common/matrix.hpp"
 #include "model/system.hpp"
 #include "image/image.hpp"
 

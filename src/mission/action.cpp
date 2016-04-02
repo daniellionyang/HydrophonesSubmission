@@ -1,13 +1,50 @@
 #include "mission/action.hpp"
+#include "mission/command.hpp"
+#include "mission/query.hpp"
 
-std::function<bool(FILE*, FILE*)> getaction(FILE* config)
+Wait::Wait(long long time) :
+	wtime(time)
 {
-	int action;
-	fscanf(config, "%i", &action);
-	switch(action)
+}
+
+bool Wait::run(FILE* in, FILE* out)
+{
+	start = clock();
+	while((clock()-start) < wtime)
 	{
-	default:	
-		return [&] (FILE* a, FILE* b){return false;};
+		continue;
 	}
 }
 
+MoveTo::MoveTo(const Matrix& target, float minDistance) :
+	target(target),
+	minDistance(minDistance)
+{
+}
+
+bool MoveTo::run(FILE* in, FILE* out)
+{
+	bool close = false;
+	while (!close)
+	{
+		Matrix state = getState(in, out);
+		Matrix location; // get subarray of state (unimplemented)
+
+		move(out, location, target);
+
+		if ((target - location).magnitude() < minDistance)
+			close = true;
+	}
+	return true;
+}
+
+Action* getaction(FILE* config)
+{
+	int tnum;
+	fscanf(config, "%i", &tnum);
+	switch(tnum)
+	{
+	default:
+		return new Wait(0);
+	}
+}

@@ -4,7 +4,8 @@
 #include <functional>
 #include <vector>
 
-#include "model/matrix.hpp"
+#include "common/matrix.hpp"
+#include "mission/action.hpp"
 
 class Goal
 {
@@ -31,7 +32,7 @@ private:
 	Matrix m_loc_transform;
 	Matrix m_loc_offset;
 
-	std::vector<std::function<bool(FILE*, FILE*)>> m_actions;
+	std::vector<Action*> m_actions;
 };
 
 #endif
