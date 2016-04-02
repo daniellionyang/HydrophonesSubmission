@@ -2,7 +2,7 @@ CC = g++
 SRC = src
 BUILD = build
 
-CFLAGS = -ggdb -c -std=c++14 -Iinclude
+CFLAGS = -ggdb -c -std=c++1z -Iinclude
 LFLAGS = 
 
 THIRDPARTY = ./3rdparty/
