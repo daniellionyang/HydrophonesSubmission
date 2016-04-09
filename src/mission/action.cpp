@@ -27,8 +27,8 @@ bool MoveTo::run(FILE* in, FILE* out)
 	bool close = false;
 	while (!close)
 	{
-		Matrix state = getState(in, out);
-		Matrix location; // get subarray of state (unimplemented)
+		State state = getState(in, out);
+		Matrix location = state.location();
 
 		move(out, location, target);
 

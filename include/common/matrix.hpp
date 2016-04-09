@@ -20,6 +20,9 @@ public:
 	float get(size_t, size_t) const;
 	float get(size_t) const;
 
+	float set(size_t, size_t, float);
+	float set(size_t, float);
+
 	float magnitude() const;
 
 	Matrix operator*(const Matrix&) const;

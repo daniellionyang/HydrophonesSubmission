@@ -1,13 +1,21 @@
 #include "mission/command.hpp"
 
+#include <cmath>
+
+#include "common/state.hpp"
+
 void move(FILE* out, const Matrix& from, const Matrix& to)
 {
-	// construct state matrix from position
-	Matrix state;
-	setState(out, state);
+	Matrix dist = to - from;
+	Matrix direction;
+	direction.set(0, std::atan2(dist.get(1), dist.get(0)));
+	direction.set(1, 0);
+	direction.set(2, 0);
+
+	setState(out, State(to, direction));
 }
 
-void setState(FILE* out, const Matrix& state)
+void setState(FILE* out, const State& state)
 {
 	fprintf(out, "c s\n");
 	state.write(out);
