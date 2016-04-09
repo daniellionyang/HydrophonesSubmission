@@ -19,6 +19,7 @@ public:
 	float value() const;
 	float time() const;
 	float certainty() const;
+	void failed() {fails++;};
 
 	bool run(FILE*, FILE*);
 
@@ -28,6 +29,7 @@ private:
 	float m_certainty;
 
 	float m_time_limit;
+	int fails;
 
 	Matrix m_loc_transform;
 	Matrix m_loc_offset;

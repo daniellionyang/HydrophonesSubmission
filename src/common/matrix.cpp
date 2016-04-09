@@ -13,16 +13,17 @@ Matrix::Matrix(const Matrix& a) :
 	m_cols(a.cols()),
 	m_data(new float[a.size()])
 {
-	std::memcpy(m_data, a.m_data, size());
+	std::memcpy(m_data, a.m_data, size()*sizeof(float));
 }
 
 // <size> <element 1> <element 2> ...
 Matrix::Matrix(FILE* in)
 {
+	m_rows = m_cols = 0;
 	std::fscanf(in, "%i %i", &m_rows, &m_cols);
 	m_data = new float[m_rows * m_cols];
 	for (int i = 0; i < m_rows * m_cols; i++)
-		std::fscanf(in, "%f", m_data[i]);
+		std::fscanf(in, "%f", &m_data[i]);
 }
 
 void Matrix::write(FILE* out) const

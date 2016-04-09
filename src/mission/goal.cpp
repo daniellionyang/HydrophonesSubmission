@@ -2,7 +2,7 @@
 
 #include "mission/action.hpp"
 
-Goal::Goal(FILE* config)
+Goal::Goal(FILE* config) : fails(0)
 {
 	fscanf(config, "%f", &m_value);
 	fscanf(config, "%f", &m_time);
@@ -13,6 +13,8 @@ Goal::Goal(FILE* config)
 	{
 		m_actions.push_back(getaction(config));
 	}
+	m_loc_transform = Matrix();
+	m_loc_transform = Matrix();
 }
 
 void Goal::write(FILE* out)
@@ -44,6 +46,6 @@ float Goal::time() const
 
 float Goal::certainty() const
 {
-	return m_certainty;
+	return (fails > 0) ? 0.001 : m_certainty;
 }
 

@@ -11,9 +11,10 @@ int mission(FILE* in, FILE* out, FILE* config)
 {
 	int numGoals = 0;
 	fscanf(config, "%i", &numGoals);
-	auto goals = std::vector<Goal>();
+	if(numGoals < 1) return 0;
+	auto goals = std::vector<Goal*>();
 	for (size_t i = 0; i < numGoals; i++)
-		goals.push_back(Goal(config));
+		goals.push_back(new Goal(config));
 
 	bool quit = false;
 	while (!quit)
@@ -25,21 +26,22 @@ int mission(FILE* in, FILE* out, FILE* config)
 
 		// select goal
 		float speed = 1;
-		std::sort(goals.begin(), goals.end(), [&](const Goal& a, const Goal& b)
+		std::sort(goals.begin(), goals.end(), [&](const Goal* a, const Goal* b)
 		{
-			auto value = [&](const Goal& t)
+			auto value = [&](const Goal* t)
 			{
-				return t.value() * t.certainty() / (t.time() + (t.location(model) - location).magnitude() / speed);
+				return t->value() * t->certainty() / (t->time() + (t->location(model) - location).magnitude() / speed);
 			};
 			return value(a) < value(b); // descending order
 		});
-		auto goal = goals.back();
+		auto goal = *goals.back();
 
 		// if close enough, begin goal
 		auto goalLoc = goal.location(model);
 		if ((goalLoc - location).magnitude() < 10)
 		{
 			if (goal.run(in, out)) goals.pop_back();
+			else goal.failed();
 		}
 		// otherwise approach goal (but continue loop so we can switch later if we want)
 		else
