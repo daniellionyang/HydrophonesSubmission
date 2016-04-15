@@ -1,6 +1,7 @@
 CC = g++
 SRC = src
 BUILD = build
+BIN = bin
 
 CFLAGS = -ggdb -c -std=c++1z -Iinclude
 LFLAGS = 
@@ -50,24 +51,27 @@ IMAGE_SHOW_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_SHOW_LFLAGS = $(OPENCV_LFLAGS)
 
 
-all: modeling interface mission camera image_read image_show
+EXE_NAMES = modeling interface mission camera image_read image_show
+EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
-modeling: $(MODELING)
+all: $(EXE)
+
+$(BIN)/modeling: $(MODELING)
 	$(CC) $^ $(LFLAGS) $(MODELING_LFLAGS) -o $@
 
-interface: $(INTERFACE)
+$(BIN)/interface: $(INTERFACE)
 	$(CC) $^ $(LFLAGS) $(INTERFACE_LFLAGS) -o $@
 
-mission: $(MISSION)
+$(BIN)/mission: $(MISSION)
 	$(CC) $^ $(LFLAGS) $(MISSION_LFLAGS) -o $@
 
-camera: $(CAMERA)
+$(BIN)/camera: $(CAMERA)
 	$(CC) $^ $(LFLAGS) $(CAMERA_LFLAGS) -o $@
 
-image_read: $(IMAGE_READ)
+$(BIN)/image_read: $(IMAGE_READ)
 	$(CC) $^ $(LFLAGS) $(IMAGE_READ_LFLAGS) -o $@
 
-image_show: $(IMAGE_SHOW)
+$(BIN)/image_show: $(IMAGE_SHOW)
 	$(CC) $^ $(LFLAGS) $(IMAGE_SHOW_LFLAGS) -o $@
 
 $(BUILD)/common/%.o: $(SRC)/common/%.cpp
@@ -98,13 +102,6 @@ $(BUILD)/image_show/%.o: $(SRC)/image_show/%.cpp
 	$(CC) $(CFLAGS) $(IMAGE_SHOW_CFLAGS) $< -o $@
 
 clean:
-	rm -f modeling
-	rm -f interface
-	rm -f mission
-	rm -f camera
-	rm -f image_read
-	rm -f image_show
-	rm -f $(BUILD)/*/*/*.o
-	rm -f $(BUILD)/*/*.o
-	rm -f $(BUILD)/*.o
+	rm -f $(EXE)
+	rm -f $(BUILD)/**/*.o
 
