@@ -3,7 +3,12 @@
 
 #include "interface/data.hpp"
 
-bool camera(FILE*, FILE*, Data*);
+bool camera_f(FILE*, FILE*, Data*);
+bool camera_d(FILE*, FILE*, Data*);
+
+bool mission(FILE*, FILE*, Data*);
+bool modeling(FILE*, FILE*, Data*);
+bool control(FILE*, FILE*, Data*);
 
 #endif
 

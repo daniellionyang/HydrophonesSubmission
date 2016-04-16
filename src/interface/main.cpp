@@ -6,7 +6,13 @@
 
 int process(std::istream& in, std::ostream& out)
 {
-	std::function<bool(FILE*, FILE*, Data*)> functions[] = {camera};
+	std::function<bool(FILE*, FILE*, Data*)> functions[] = {
+		control,
+		mission,
+		modeling,
+		camera_f,
+		camera_d,
+	};
 
 	Data data;
 

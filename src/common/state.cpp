@@ -1,5 +1,11 @@
 #include "common/state.hpp"
 
+State::State() :
+	m_location(Matrix()),
+	m_direction(Matrix())
+{
+}
+
 State::State(FILE* in)
 {
 	fscanf(in, "s");
