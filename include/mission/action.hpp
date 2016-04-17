@@ -35,6 +35,17 @@ private:
 	float minDistance;
 };
 
+class DoBins : public virtual Action
+{
+public:
+	DoBins();
+	
+	virtual bool run(FILE*, FILE*);
+
+private:
+	void PosBin(const Matrix&);
+};
+
 Action* getaction(FILE*);
 
 #endif
