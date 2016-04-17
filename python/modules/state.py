@@ -4,7 +4,7 @@ import time
 
 class State(object):
 	def __init__(self, x, y, depth, yaw, pitch, roll):
-		self.x, self.y, self.depth, self.yaw, self.pitch, self.roll =
+		self.x, self.y, self.depth, self.yaw, self.pitch, self.roll = \
 			(x, y, depth, yaw, pitch, roll)
 
 def read(input):

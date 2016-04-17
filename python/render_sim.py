@@ -1,12 +1,13 @@
 #!/usb/bin/env blender -B render_sim.blend -P
 
 import numpy as np
+import threading 
+
+import state as st
+import image as im
 
 from bge import logic
 from bge import texture
-
-import lib.state as st
-import lib.image as im
 
 class RenderSim(threading.Thread):
 	def __init__(self):
@@ -16,6 +17,7 @@ class RenderSim(threading.Thread):
 		threading.Thread.__init__(self)
 
 	def run(self):
+		print("In 'run' function. Hi.")
 		path = logic.expandPath('//')
 
 		input = open(path + 'pipe/sim_in', 'rb')
