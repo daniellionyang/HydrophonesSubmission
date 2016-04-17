@@ -279,27 +279,28 @@ void findbuoys(cv::Mat &firstImage)
  
  
  
- 
-	//rx = (rx - yNot.cols/2) / yNot.cols;
-	//ry = (yNot.rows/2 - ry) / yNot.rows;
-	//gx = (gx - yNot.cols/2) / yNot.cols;
-	//gy = (yNot.rows/2 - gy) / yNot.rows+offset;
-	//yx = (yx - yNot.cols/2) / yNot.cols;
-	//yy = (yNot.rows/2 - yy) / yNot.rows;
+	 
+	rx = (rx - yNot.cols/2) / yNot.cols;
+	ry = (yNot.rows/2 - ry) / yNot.rows;
+	gx = (gx - yNot.cols/2) / yNot.cols;
+	gy = (yNot.rows/2 - gy) / yNot.rows+offset;
+	yx = (yx - yNot.cols/2) / yNot.cols;
+	yy = (yNot.rows/2 - yy) / yNot.rows;
+	
  
  
 }
 
 int main(int argc, char* argv[])
 {
-	if(argc != 2) {return -1;}	
-	while(true){
-		char temp;
- 		std::cin.get(temp);
-		if(temp == 'b') {
+	//if(argc != 2) {return -1;}	
+	//while(true){
+	//	char temp;
+ 	//	std::cin.get(temp);
+	//	if(temp == 'b') {
 			auto input = imageRead(stdin);
-			findbuoys(input);
-			std::cout << "6 " << rx << "\n" << ry << "\n" << gx << "\n" << gy << "\n" << yx << "\n" << yy << "\n";
-		}
-	}
+	//		findbuoys(input);
+			std::cout << "6 " << "\n" << rx << "\n" << ry << "\n" << gx << "\n" << gy << "\n" << yx << "\n" << yy << "\n";
+	//	}
+	//}
 }
