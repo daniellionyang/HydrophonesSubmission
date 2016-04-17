@@ -78,12 +78,21 @@ bool MoveTo::run(FILE* in, FILE* out)
 	return true;
 }
 
+Matrix gettarget(char obj)
+{
+	return Matrix();
+}
+
 Action* getaction(FILE* config)
 {
 	int tnum;
 	fscanf(config, "%i", &tnum);
 	switch(tnum)
 	{
+	case 0:
+		char t; float m;
+		fscanf(config, "%c %f", &t, &m);
+		return new MoveTo(gettarget(t), m);
 	default:
 		return new Wait(0);
 	}
