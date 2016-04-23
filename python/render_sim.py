@@ -34,10 +34,18 @@ def generateNodes(scene):
 	viewer.location = 750, 210
 	viewer.use_alpha = False
 
+	# output compositing node (for rendering from blender ui)
+	composite = tree.nodes.new('CompositorNodeComposite')
+	composite.location = 750, 0
+	composite.use_alpha = False
+
 	# connect nodes
 	links.new(render.outputs[0], viewer.inputs[0])
+	links.new(render.outputs[0], composite.inputs[0])
 
 def renderFrame(scene, camera):
+	render = scene.render
+
 	# set camera
 	scene.camera = camera
 
@@ -45,13 +53,27 @@ def renderFrame(scene, camera):
 	bpy.ops.render.render()
 
 	# fetch image data
-	img = bpy.data.images['Viewer Node'].pixels
+	node = bpy.data.images['Viewer Node']
+	buffer = np.array(node.pixels[:])
 
 	# return numpy array
-	return (255 * np.array(img[:]).reshape([644, 482, 4])[:,:,[2,1,0]]).transpose([1,0,2]).astype(np.uint8)
+	return (255 * buffer).astype(np.uint8).reshape([
+		int(render.resolution_y * render.resolution_percentage/100), int(render.resolution_x * render.resolution_percentage/100), 4
+	])[:,:,[2,1,0]].transpose([0,1,2])[::-1,:,:]
 
 def run():
 	print("Begin script")
+
+	print("Setting material options")
+	for m in bpy.data.materials:
+		m.use_shadeless = False
+		m.use_shadows = False
+		m.use_cast_shadows = False
+		m.use_cast_buffer_shadows = False
+		m.use_cast_approximate = False
+		m.use_raytrace = False
+		m.subsurface_scattering.use = False
+
 	print("Fetching scene objects")
 	scene = bpy.data.scenes[0]
 	sub = scene.objects['Submarine']
@@ -99,7 +121,6 @@ def run():
 		print("Rendering images")
 		img_f = renderFrame(scene, cam_f)
 		img_d = renderFrame(scene, cam_d)
-		print(img_d)
 
 		print("Sending images over pipes")
 		im.write(output_f, img_f)
