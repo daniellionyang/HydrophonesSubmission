@@ -1,0 +1,6 @@
+pipe/control_in pipe/control_out 0
+pipe/mission_in pipe/mission_out 1
+pipe/modeling_in pipe/modeling_out 2
+pipe/camera_f_in pipe/camera_f_out 3
+pipe/camera_d_in pipe/camera_d_out 4
+

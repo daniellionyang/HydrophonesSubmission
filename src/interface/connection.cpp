@@ -7,7 +7,7 @@ Connection::Connection(FILE* in, FILE* out, std::function<bool(FILE*, FILE*, Dat
 	data(data),
 	thread([&]()
 	{
-		while (function(in, out, data));
+		return function(in, out, data);
 	})
 {
 }

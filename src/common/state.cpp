@@ -16,6 +16,12 @@ void SubState::write(FILE* out) const
 	fprintf(out, "%f %f %f %f %f %f\n", x, y, depth, yaw, pitch, roll);
 }
 
+State::State() :
+	m_location(Matrix()),
+	m_direction(Matrix())
+{
+}
+
 State::State(FILE* in)
 {
 	fscanf(in, "s");

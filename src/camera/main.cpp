@@ -195,7 +195,9 @@ int main(int argc, char** argv)
 	{
 		case 'i': // index
 		{
-			error = busMgr.GetCameraFromIndex(0, &guid);
+			unsigned int sn;
+			fscanf(stdin, "%i", &sn);
+			error = busMgr.GetCameraFromIndex(sn, &guid);
 			break;
 		}
 		case 'u': // usb serial number
