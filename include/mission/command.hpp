@@ -5,6 +5,7 @@
 #include "common/state.hpp"
 
 float move(FILE*, FILE*, float, float, float); // wrapper for state
+float turn(FILE*, FILE*, float, float, float);
 void setState(FILE*, const SubState&);
 void shoot(FILE*, char);
 void drop(FILE*);

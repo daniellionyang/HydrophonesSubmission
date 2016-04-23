@@ -19,6 +19,18 @@ float move(FILE* in, FILE* out, float tx, float ty, float tdepth)
 	return(std::sqrt(dx*dx + dy*dy + ddepth*ddepth));
 }
 
+float turn(FILE* in, FILE* out, float ty, float tp, float tr)
+{
+	SubState state = getSubState(in, out);
+	float dy, dp, dr;
+	dy = ty - state.yaw;
+	dp = tp - state.pitch;
+	dr = tr - state.roll;
+	
+	setState(out, SubState(state.x, state.y, state.depth, ty, tp, tr));
+	return(std::sqrt(dy*dy + dp*dp + dr*dr));
+}
+
 void setState(FILE* out, const SubState& state)
 {
 	fprintf(out, "c s\n");

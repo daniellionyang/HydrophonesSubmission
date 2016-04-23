@@ -126,7 +126,7 @@ bool Turn::run(FILE* in, FILE* out)
 	bool close = false;
 	while(!close)
 	{
-		float error = 0;//turn(in, out, yaw, pitch, roll);
+		float error = turn(in, out, yaw, pitch, roll);
 		
 		if (error < minDistance)
 			close = true;
