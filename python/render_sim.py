@@ -1,61 +1,109 @@
-#!/usb/bin/env blender -B render_sim.blend -P
+import sys
+import os
+
+import bpy
+import bgl
+import gpu
+
+# add this file's directory to path because blender does not add it by default
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# also add the blender's file's directory to path
+sys.path.append(os.path.dirname(bpy.data.filepath))
 
 import numpy as np
-import threading 
 
-import state as st
-import image as im
+from python.lib import state as st
+from python.lib import image as im
 
-from bge import logic
-from bge import texture
+def generateNodes(scene):
+	# enable nodes
+	scene.use_nodes = True
+	tree = scene.node_tree
+	links = tree.links
 
-class RenderSim(threading.Thread):
-	def __init__(self):
-		self.quit = False
-		self.isThreadAlive = True
-		
-		threading.Thread.__init__(self)
+	# clear nodes
+	for n in tree.nodes:
+		tree.nodes.remove(n)
 
-	def run(self):
-		print("In 'run' function. Hi.")
-		path = logic.expandPath('//')
+	# input node
+	render = tree.nodes.new('CompositorNodeRLayers')
+	render.location = 185, 285
 
-		input = open(path + 'pipe/sim_in', 'rb')
-		output_f = open(path + 'pipe/camera_f', 'wb')
-		output_d = open(path + 'pipe/camera_d', 'wb')
+	# output node
+	viewer = tree.nodes.new('CompositorNodeViewer')
+	viewer.location = 750, 210
+	viewer.use_alpha = False
 
-		sub = logic.getCurrentController().owner
-		scene = logic.getCurrentScene()
+	# connect nodes
+	links.new(render.outputs[0], viewer.inputs[0])
 
-		cam_f = texture.ImageRender(scene, scene.objects["CameraFront"])
-		cam_d = texture.ImageRender(scene, scene.objects["CameraDown"])
+def renderFrame(scene, camera):
+	# set camera
+	scene.camera = camera
 
-		self.cameraFront.alpha = self.cameraDown.alpha = False
-		self.cameraFront.background = self.cameraDown.background = [0, 0, 0, 0]
-		self.cameraFront.capsize = self.cameraDown.capsize = [644, 482]
+	# render frame
+	bpy.ops.render.render()
 
-		while True:
-			if (self.quit):
-				input.close()
-				output_f.close()
-				output_d.close()
-				self.isThreadAlive = False
-				break
+	# fetch image data
+	img = bpy.data.images['Viewer Node'].pixels
 
-			state = st.read(input)
+	# return numpy array
+	return (255 * np.array(img[:]).reshape([644, 482, 4])[:,:,[2,1,0]]).transpose([1,0,2]).astype(np.uint8)
 
-			sub.worldPosition = [state.x, state.y, state.depth]
-			att = obj.worldOrientation.to_euler()
-			att[0] = state.yaw
-			att[1] = state.pitch
-			att[2] = state.roll
-			sub.worldOrientation = att.to_matrix()
+def run():
+	print("Begin script")
+	print("Fetching scene objects")
+	scene = bpy.data.scenes[0]
+	sub = scene.objects['Submarine']
+	loc = sub.location
+	att = sub.rotation_euler
 
-			img_f = np.reshape(np.frombuffer(texture.imageToArray(cam_f, "BGR"), np.uint8), [cam_f.size[0], cam_f.size[1], 3])
-			im.write(output_f, img_f)
+	cam_f = scene.objects['CameraFront']
+	cam_d = scene.objects['CameraDown']
 
-			img_d = np.reshape(np.frombuffer(texture.imageToArray(cam_d, "BGR"), np.uint8), [cam_d.size[0], cam_d.size[1], 3])
-			im.write(output_d, img_d)
+	print("Generating nodes")
+	generateNodes(scene)
 
-RenderSim().start()
+	print("Opening input pipe")
+	path = bpy.path.abspath('//')
+	input = open(path + 'pipe/sim_in', 'rb')
+	print("Opening output pipes")
+	output_f = open(path + 'pipe/render_f', 'wb')
+	output_d = open(path + 'pipe/render_d', 'wb')
+
+	print("Begin main loop")
+	quit = False
+	while True:
+		if (quit):
+			print("Cleaning up")
+			bpy.context.area.type = original_type
+			input.close()
+			output_f.close()
+			output_d.close()
+			print("Exit")
+			return 0
+
+		print("Waiting for input")
+		state = st.read(input)
+		print("Received state\n{}".format(state.__dict__))
+
+		print("Moving objects")
+		loc[0] = state.x
+		loc[1] = state.y
+		loc[2] = state.depth
+
+		att[0] = state.yaw
+		att[1] = state.pitch
+		att[2] = state.roll
+
+		print("Rendering images")
+		img_f = renderFrame(scene, cam_f)
+		img_d = renderFrame(scene, cam_d)
+		print(img_d)
+
+		print("Sending images over pipes")
+		im.write(output_f, img_f)
+		im.write(output_d, img_d)
+
+run()
 

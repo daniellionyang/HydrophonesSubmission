@@ -9,7 +9,7 @@ class State(object):
 
 def read(input):
 	buf = bytearray()
-	rx = re.compile(b"i\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+([\d\.]+)\s+$")
+	rx = re.compile(b"s\s+([\d\.\-\+]+)\s+([\d\.\-\+]+)\s+([\d\.\-\+]+)\s+([\d\.\-\+]+)\s+([\d\.\-\+]+)\s+([\d\.\-\+]+)\s+$")
 	while True:
 		byt = input.read(1)
 		if len(byt) == 0:
