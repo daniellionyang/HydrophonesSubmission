@@ -1,5 +1,21 @@
 #include "common/state.hpp"
 
+SubState::SubState(float x, float y, float depth, float yaw, float pitch, float roll) :
+	x(x), y(y), depth(depth), yaw(yaw), pitch(pitch), roll(roll)
+{
+}
+
+SubState::SubState(FILE* in)
+{
+	fscanf(in, "%f %f %f %f %f %f ", &x, &y, &depth, &yaw, &pitch, &roll);
+}
+
+void SubState::write(FILE* out) const
+{
+	fprintf(out, "s\n");
+	fprintf(out, "%f %f %f %f %f %f\n", x, y, depth, yaw, pitch, roll);
+}
+
 State::State(FILE* in)
 {
 	fscanf(in, "s");

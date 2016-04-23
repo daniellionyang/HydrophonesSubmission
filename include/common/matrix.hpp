@@ -4,11 +4,47 @@
 #include <cstddef>
 #include <cstdio>
 
+enum Model
+{
+	UNDEF,
+	SUBX,
+	SUBY,
+	SUBZ,
+	SUBYAW,
+	SUBPITCH,
+	SUBROLL,
+	RBUOYX,
+	RBUOYY,
+	RBUOYZ,
+	GBUOYX,
+	GBUOYY,
+	GBUOYZ,
+	YBUOYX,
+	YBUOYY,
+	YBUOYZ,
+	LGATEX,
+	LGATEY,
+	LGATEZ,
+	BIGX,
+	BIGY,
+	BIGZ,
+	SMALLX,
+	SMALLY,
+	SMALLZ,
+	CBINX,
+	CBINY,
+	OBINX,
+	OBINY,
+	PINGERX,
+	PINGERY
+};
+
 class Matrix
 {
 public:
 	Matrix();
 	Matrix(const Matrix&);
+	Matrix(size_t, size_t);
 
 	Matrix(FILE*);
 	void write(FILE*) const;

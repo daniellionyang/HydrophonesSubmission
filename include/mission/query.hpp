@@ -8,6 +8,7 @@
 #include "model/system.hpp"
 #include "image/image.hpp"
 
+SubState getSubState(FILE*, FILE*);
 State getState(FILE*, FILE*);
 
 cv::Mat image(FILE*, FILE*, char, float res = 1, float hcrop = 1, float vcrop = 1);

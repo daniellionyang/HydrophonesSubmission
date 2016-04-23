@@ -2,6 +2,9 @@
 #include "mission/command.hpp"
 #include "mission/query.hpp"
 
+#include <cmath>
+
+/*
 struct Model
 {
 	Model(Matrix vec)
@@ -41,6 +44,7 @@ struct Model
 		coveredBin, openBin,
 		pinger;
 };
+*/
 
 Wait::Wait(long long time) :
 	wtime(time)
@@ -56,8 +60,8 @@ bool Wait::run(FILE* in, FILE* out)
 	}
 }
 
-MoveTo::MoveTo(const Matrix& target, float minDistance) :
-	target(target),
+MoveTo::MoveTo(int ox, float x, int oy, float y, int oz, float z, float minDistance) :
+	xnum(ox), offx(x), ynum(oy), offy(y), znum(oz), offz(z),
 	minDistance(minDistance)
 {
 }
@@ -70,9 +74,61 @@ bool MoveTo::run(FILE* in, FILE* out)
 		State state = getState(in, out);
 		Matrix location = state.location();
 
-		move(out, location, target);
+		float dist = move(in, out, location.get(xnum) + offx, location.get(ynum) + offy, location.get(znum) + offz);
 
-		if ((target - location).magnitude() < minDistance)
+		if (dist < minDistance)
+			close = true;
+	}
+	return true;
+}
+
+Move::Move(float dsurge, float dstrafe, float ddepth, float minDistance) :
+	surge(dsurge), strafe(dstrafe), depth(ddepth), minDistance(minDistance)
+{
+}
+
+void Move::convert(FILE* in, FILE* out)
+{
+	SubState state = getSubState(in, out); //TODO
+	float tx, ty, tz;
+	tx = state.x + surge*std::cos(state.yaw) + strafe*std::sin(state.yaw);
+	ty = state.y + surge*std::sin(state.yaw) + strafe*std::cos(state.yaw);
+	tz = state.depth + depth;
+	surge = tx; strafe = ty; depth = tz;
+}
+
+bool Move::run(FILE* in, FILE* out)
+{
+	convert(in, out);
+	bool close = false;
+	while (!close)
+	{
+		float dist = move(in, out, surge, strafe, depth);
+
+		if (dist < minDistance)
+			close = true;
+	}
+	return true;
+}
+
+Turn::Turn(float dyaw, float dpitch, float droll, float minDistance) :
+	yaw(dyaw), pitch(dpitch), roll(droll),
+	minDistance(minDistance)
+{
+}
+
+bool Turn::run(FILE* in, FILE* out)
+{
+	SubState state = getSubState(in, out); //TODO
+	yaw += state.yaw;
+	pitch += state.pitch;
+	roll += state.roll;
+	bool close = false;
+	while(!close)
+	{
+		float error = 0;//turn(in, out, yaw, pitch, roll);
+		
+		if (error < minDistance)
 			close = true;
 	}
 	return true;
@@ -90,9 +146,10 @@ Action* getaction(FILE* config)
 	switch(tnum)
 	{
 	case 0:
-		char t; float m;
-		fscanf(config, "%c %f", &t, &m);
-		return new MoveTo(gettarget(t), m);
+		int x, y, z;
+		float ox, oy, oz, min;
+		fscanf(config, "%i %f %i %f %i %f %f", &x, &ox, &y, &oy, &z, &oz, &min);
+		return (min > 0) ? new MoveTo(z, ox, y, oy, z, oz, min) : new MoveTo(z, ox, y, oy, z, oz);
 	default:
 		return new Wait(0);
 	}

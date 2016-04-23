@@ -6,6 +6,16 @@
 
 #include "common/matrix.hpp"
 
+struct SubState
+{
+	SubState(float, float, float, float, float, float);
+	SubState(FILE* in);
+	
+	void write(FILE* out) const;
+	
+	float x, y, depth, yaw, pitch, roll;
+};
+
 class State
 {
 public:

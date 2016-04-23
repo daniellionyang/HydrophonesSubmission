@@ -4,8 +4,8 @@
 #include "common/matrix.hpp"
 #include "common/state.hpp"
 
-void move(FILE*, const Matrix&, const Matrix&); // wrapper for state
-void setState(FILE*, const State&);
+float move(FILE*, FILE*, float, float, float); // wrapper for state
+void setState(FILE*, const SubState&);
 void shoot(FILE*, char);
 void drop(FILE*);
 void grab(FILE*);

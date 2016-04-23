@@ -28,6 +28,14 @@ Matrix::Matrix(FILE* in)
 		std::fscanf(in, "%f", &m_data[i]);
 }
 
+Matrix::Matrix(size_t r, size_t c) :
+	m_rows(r),
+	m_cols(c),
+	m_data(new float[r*c])
+{
+	std::memset(m_data, 0, size()*sizeof(float));
+}
+
 void Matrix::write(FILE* out) const
 {
 	std::fprintf(out, "%i %i ", m_rows, m_cols);

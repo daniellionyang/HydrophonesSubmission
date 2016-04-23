@@ -3,19 +3,23 @@
 #include <cmath>
 
 #include "common/state.hpp"
+#include "mission/query.hpp"
 
-void move(FILE* out, const Matrix& from, const Matrix& to)
+float move(FILE* in, FILE* out, float tx, float ty, float tdepth)
 {
-	Matrix dist = to - from;
-	Matrix direction;
-	direction.set(0, std::atan2(dist.get(1), dist.get(0)));
-	direction.set(1, 0);
-	direction.set(2, 0);
+	SubState state = getSubState(in, out);
+	float dx, dy, ddepth;
+	dx = tx - state.x;
+	dy = ty - state.y;
+	ddepth = tdepth - state.depth;
+	
+	float tyaw = std::atan2(dy, dx);
 
-	setState(out, State(to, direction));
+	setState(out, SubState(tx, ty, tdepth, tyaw, 0, 0));
+	return(std::sqrt(dx*dx + dy*dy + ddepth*ddepth));
 }
 
-void setState(FILE* out, const State& state)
+void setState(FILE* out, const SubState& state)
 {
 	fprintf(out, "c s\n");
 	state.write(out);

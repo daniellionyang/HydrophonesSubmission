@@ -5,6 +5,8 @@
 
 #include "common/matrix.hpp"
 
+#define DEFAULTMINDIST 5
+
 class Action
 {
 public:
@@ -26,24 +28,54 @@ private:
 class MoveTo : public virtual Action
 {
 public:
-	MoveTo(const Matrix&, float);
+	MoveTo(int, float, int, float, int, float, float = DEFAULTMINDIST);
 
 	virtual bool run(FILE*, FILE*);
 
 private:
-	Matrix target;
+	int xnum, ynum, znum;
+	float offx, offy, offz;
 	float minDistance;
 };
 
-class DoBins : public virtual Action
+class Move : public virtual Action
 {
 public:
-	DoBins();
+	Move(float, float, float, float = DEFAULTMINDIST);
 	
 	virtual bool run(FILE*, FILE*);
 
 private:
-	void PosBin(const Matrix&);
+	void convert(FILE*, FILE*);
+	
+	float surge, strafe, depth;
+	float minDistance;
+};
+
+class Turn : public virtual Action
+{
+public:
+	Turn(float, float, float, float = DEFAULTMINDIST);
+	
+	virtual bool run(FILE*, FILE*);
+
+private:
+	float yaw, pitch, roll;
+	float minDistance;
+};
+
+class OpenBin : public virtual Action
+{
+public:
+	OpenBin();
+	
+	virtual bool run(FILE*, FILE*);
+};
+
+class DropDat : public virtual Action
+{
+public:
+	
 };
 
 Action* getaction(FILE*);

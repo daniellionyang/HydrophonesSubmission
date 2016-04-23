@@ -45,7 +45,7 @@ int mission(FILE* in, FILE* out, FILE* config)
 		}
 		// otherwise approach goal (but continue loop so we can switch later if we want)
 		else
-			move(out, location, goalLoc);
+			move(in, out, goalLoc.get(0), goalLoc.get(1), goalLoc.get(2));
 
 		if (goals.empty()) quit = true;
 	}
