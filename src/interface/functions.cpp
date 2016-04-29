@@ -226,7 +226,7 @@ bool control(FILE* in, FILE* out, Data* data)
 	bool quit;
 	while (!quit)
 	{
-		fprintf(out, "g\n"); // request state
+		fprintf(out, "c\n"); // request state
 		auto state = State(in); // read state
 
 		State desiredState;

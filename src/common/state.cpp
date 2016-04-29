@@ -7,7 +7,7 @@ State::State()
 State::State(FILE* in)
 {
 	float x, y, depth, yaw, pitch, roll;
-	fscanf(in, "s %f %f %f %f %f %f",
+	fscanf(in, " s %f %f %f %f %f %f",
 		&x, &y, &depth, &yaw, &pitch, &roll
 	);
 
@@ -34,6 +34,7 @@ void State::write(FILE* out) const
 	fprintf(out, "s %f %f %f %f %f %f\n",
 		x(), y(), depth(), yaw(), pitch(), roll()
 	);
+	fflush(out);
 }
 
 float State::x() const
