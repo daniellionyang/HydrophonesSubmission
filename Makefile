@@ -3,7 +3,7 @@ SRC = src
 BUILD = build
 BIN = bin
 
-CFLAGS = -ggdb -c -std=c++14 -Iinclude
+CFLAGS = -ggdb -c -std=c++1z -Iinclude
 LFLAGS = 
 
 THIRDPARTY = ./3rdparty/
@@ -19,7 +19,7 @@ FLYCAP_LFLAGS = -L$(FLYCAP)/lib -lflycapture -Wl,-rpath=$(FLYCAP)/lib/
 COMMON = $(patsubst %,$(BUILD)/common/%.o,matrix state)
 COMMON_CFLAGS = 
 
-MODEL = $(patsubst %,$(BUILD)/model/%.o,system distribution function)
+MODEL = $(patsubst %,$(BUILD)/model/%.o,system hypothesis evidence)
 MODEL_CFLAGS = 
 
 IMAGE = $(patsubst %,$(BUILD)/image/%.o,image)

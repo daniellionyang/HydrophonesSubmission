@@ -11,7 +11,7 @@ public:
 	Matrix(const Matrix&);
 
 	Matrix(FILE*);
-	void write(FILE*) const;
+	size_t write(FILE*) const;
 
 	size_t rows() const;
 	size_t cols() const;
@@ -32,7 +32,7 @@ public:
 
 private:
 	size_t m_rows, m_cols;
-	float* m_data;
+	float m_data[64];
 };
 
 Matrix operator+(const Matrix&, const Matrix&);

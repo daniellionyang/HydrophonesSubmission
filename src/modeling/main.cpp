@@ -7,7 +7,7 @@
 
 #include "model/system.hpp"
 
-int bayesFilter(FILE* in, FILE* out)
+int process(FILE* in, FILE* out)
 {
 	srand(time(NULL));
 
@@ -30,7 +30,7 @@ int bayesFilter(FILE* in, FILE* out)
 				system.mode().write(out);
 				break;
 			case 'e': // evidence
-				system *= System(in);
+				system.add(Evidence(in));
 				break;
 			case 'q': // quit
 				quit = true;
@@ -43,6 +43,6 @@ int bayesFilter(FILE* in, FILE* out)
 
 int main()
 {
-	return bayesFilter(stdin, stdout);
+	return process(stdin, stdout);
 }
 

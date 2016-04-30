@@ -6,53 +6,57 @@ System::System()
 {
 }
 
-// <max # distributions> <# distributions> <dist 1> <dist 2> ...
 System::System(FILE* in)
 {
-	int size;
-	std::fscanf(in, "%i %i", &maxSize, &size);
+	int size, max_size;
+	std::fscanf(in, "%i %i", &max_size, &size);
+	maxSize = max_size;
 	for (int i = 0; i < size; i++)
-		distributions.push_back(Distribution(in));
+		hypotheses.push_back(Hypothesis(in));
 }
 
-void System::write(FILE* out)
+size_t System::write(FILE* out) const
 {
-	std::fprintf(out, "%i %i\n", maxSize, distributions.size());
-	for (Distribution d : distributions)
-		d.write(out);
-	std::fprintf(out, "\n");
+	size_t bytes;
+	bytes += std::fprintf(out, "%i %i\n", maxSize, hypotheses.size());
+	for (auto h : hypotheses)
+		bytes += h.write(out);
+	bytes += std::fprintf(out, "\n");
+	return bytes;
 }
 
 Matrix System::mode()
 {
-	return Matrix();
+	auto best = hypotheses.at(0);
+	for (auto h : hypotheses)
+		if (h.weight() > best.weight())
+			best = h;
+
+	return best.mode();
 }
 
-System System::operator*=(const System& b)
+void System::add(Evidence evidence)
 {
-	// the new system of distributions
-	std::vector<Distribution> newSystem;
+	std::vector<Hypothesis> newHypotheses;
 
-	// foil
-	for (auto av : distributions)
-		for (auto bv : b.distributions)
-			newSystem.push_back(av * bv);
-
-	// pruning
-	if (newSystem.size() > maxSize)
+	for (auto h : hypotheses)
 	{
-		std::sort(newSystem.begin(), newSystem.end());
-		newSystem.erase(newSystem.begin() + maxSize, newSystem.end());
+		auto a = h;
+		a.scale(.95);
+		a.add(evidence);
+		newHypotheses.push_back(a);
+
+		auto b = h;
+		b.scale(.05);
+		newHypotheses.push_back(b);
 	}
 
-	distributions = newSystem;
-	return *this;
-}
+	if (newHypotheses.size() > maxSize)
+	{
+		std::sort(newHypotheses.begin(), newHypotheses.end(), [](const Hypothesis& a, const Hypothesis& b){ return a.weight() > b.weight(); });
+		newHypotheses.erase(newHypotheses.begin() + maxSize, newHypotheses.end());
+	}
 
-System operator*(const System& a, const System& b)
-{
-	auto res = a;
-	res *= b;
-	return res;
+	hypotheses = newHypotheses;
 }
 

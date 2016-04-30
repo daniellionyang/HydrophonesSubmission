@@ -10,8 +10,7 @@ Matrix::Matrix()
 
 Matrix::Matrix(const Matrix& a) :
 	m_rows(a.rows()),
-	m_cols(a.cols()),
-	m_data(new float[a.size()])
+	m_cols(a.cols())
 {
 	std::memcpy(m_data, a.m_data, size());
 }
@@ -20,17 +19,18 @@ Matrix::Matrix(const Matrix& a) :
 Matrix::Matrix(FILE* in)
 {
 	std::fscanf(in, "%i %i", &m_rows, &m_cols);
-	m_data = new float[m_rows * m_cols];
 	for (int i = 0; i < m_rows * m_cols; i++)
 		std::fscanf(in, "%f", m_data[i]);
 }
 
-void Matrix::write(FILE* out) const
+size_t Matrix::write(FILE* out) const
 {
-	std::fprintf(out, "%i %i ", m_rows, m_cols);
+	size_t bytes = 0;
+	bytes += std::fprintf(out, "%i %i ", m_rows, m_cols);
 	for (int i = 0; i < m_rows * m_cols; i++)
-		std::fprintf(out, "%f ", m_data[i]);
-	std::fprintf(out, "\n");
+		bytes += std::fprintf(out, "%f ", m_data[i]);
+	bytes += std::fprintf(out, "\n");
+	return bytes;
 }
 
 size_t Matrix::rows() const
@@ -88,7 +88,7 @@ Matrix Matrix::operator*(const Matrix& a) const
 	{
 		for (int j = 0; j < res.cols(); j++)
 		{
-			m_data[i * res.cols() + j] = 0;
+			res.m_data[i * res.cols() + j] = 0;
 			for (int k = 0; k < cols(); k++)
 				res.m_data[i * res.cols() + j] += get(i, j) * a.get(k, j);
 		}
