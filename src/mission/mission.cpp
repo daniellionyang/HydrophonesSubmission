@@ -20,7 +20,6 @@ int mission(FILE* in, FILE* out, FILE* config)
 	{
 		// get current state
 		State state = getState(in, out);
-		Matrix location = state.location();
 		Matrix model = model_mode(in, out);
 
 		// select goal
@@ -29,7 +28,7 @@ int mission(FILE* in, FILE* out, FILE* config)
 		{
 			auto value = [&](const Goal& t)
 			{
-				return t.value() * t.certainty() / (t.time() + (t.location(model) - location).magnitude() / speed);
+				return t.value() * t.certainty() / (t.time() + state.distanceTo(t.location(model)) / speed);
 			};
 			return value(a) < value(b); // descending order
 		});
@@ -37,13 +36,12 @@ int mission(FILE* in, FILE* out, FILE* config)
 
 		// if close enough, begin goal
 		auto goalLoc = goal.location(model);
-		if ((goalLoc - location).magnitude() < 10)
+		if (state.distanceTo(goalLoc) < 10)
 		{
 			if (goal.run(in, out)) goals.pop_back();
 		}
 		// otherwise approach goal (but continue loop so we can switch later if we want)
-		else
-			move(out, location, goalLoc);
+		else move(out, state, goalLoc);
 
 		if (goals.empty()) quit = true;
 	}

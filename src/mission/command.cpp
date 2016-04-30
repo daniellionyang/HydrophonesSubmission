@@ -4,15 +4,12 @@
 
 #include "common/state.hpp"
 
-void move(FILE* out, const Matrix& from, const Matrix& to)
+void move(FILE* out, const State& from, const State& to)
 {
-	Matrix dist = to - from;
-	Matrix direction;
-	direction.set(0, std::atan2(dist.get(1), dist.get(0)));
-	direction.set(1, 0);
-	direction.set(2, 0);
+	auto dx = to.x() - from.x();
+	auto dy = to.y() - from.y();
 
-	setState(out, State(to, direction));
+	setState(out, State(to.x(), to.y(), to.depth(), std::atan2(dy, dx), 0, 0));
 }
 
 void setState(FILE* out, const State& state)

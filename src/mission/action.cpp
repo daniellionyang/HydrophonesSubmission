@@ -3,7 +3,7 @@
 #include "mission/command.hpp"
 #include "mission/query.hpp"
 
-MoveTo::MoveTo(const Matrix& target, float minDistance) :
+MoveTo::MoveTo(const State& target, float minDistance) :
 	target(target),
 	minDistance(minDistance)
 {
@@ -15,11 +15,10 @@ bool MoveTo::run(FILE* in, FILE* out)
 	while (!close)
 	{
 		State state = getState(in, out);
-		Matrix location = state.location();
 
-		move(out, location, target);
+		move(out, state, target);
 
-		if ((target - location).magnitude() < minDistance)
+		if (state.distanceTo(target) < minDistance)
 			close = true;
 	}
 	return true;

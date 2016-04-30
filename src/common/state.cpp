@@ -1,5 +1,7 @@
 #include "common/state.hpp"
 
+#include <cmath>
+
 State::State()
 {
 }
@@ -95,5 +97,14 @@ float State::setPitch(float pitch)
 float State::setRoll(float roll)
 {
 	return m_roll = roll;
+}
+
+float State::distanceTo(const State& to) const
+{
+	return std::sqrt(
+		std::pow(x() - to.x(), 2) +
+		std::pow(y() - to.y(), 2) +
+		std::pow(depth() - to.depth(), 2)
+	);
 }
 

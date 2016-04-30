@@ -11,7 +11,7 @@ class State
 public:
 	State();
 	State(FILE*);
-	State(float, float, float, float, float, float);
+	State(float, float, float, float yaw = 0, float pitch = 0, float roll = 0);
 	void write(FILE*) const;
 
 	float x() const;
@@ -27,6 +27,8 @@ public:
 	float setYaw(float);
 	float setPitch(float);
 	float setRoll(float);
+
+	float distanceTo(const State&) const;
 
 private:
 	float

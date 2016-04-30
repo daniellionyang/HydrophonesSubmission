@@ -1,7 +1,7 @@
 #ifndef MISSION_ACTION_HPP
 #define MISSION_ACTION_HPP
 
-#include "common/matrix.hpp"
+#include "common/state.hpp"
 
 class Action
 {
@@ -12,12 +12,12 @@ public:
 class MoveTo : public virtual Action
 {
 public:
-	MoveTo(const Matrix&, float);
+	MoveTo(const State&, float);
 
 	virtual bool run(FILE*, FILE*);
 
 private:
-	Matrix target;
+	State target;
 	float minDistance;
 };
 
