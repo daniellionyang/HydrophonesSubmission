@@ -4,7 +4,9 @@
 #include <cstring>
 #include <cmath>
 
-Matrix::Matrix()
+Matrix::Matrix() :
+	m_rows(0),
+	m_cols(0)
 {
 }
 
@@ -12,15 +14,18 @@ Matrix::Matrix(const Matrix& a) :
 	m_rows(a.rows()),
 	m_cols(a.cols())
 {
-	std::memcpy(m_data, a.m_data, size());
+	std::memcpy(m_data, a.m_data, size() * sizeof(float));
 }
 
 // <size> <element 1> <element 2> ...
 Matrix::Matrix(FILE* in)
 {
-	std::fscanf(in, "%i %i", &m_rows, &m_cols);
+	int rows, cols;
+	std::fscanf(in, " %i %i", &rows, &cols);
+	m_rows = rows;
+	m_cols = cols;
 	for (int i = 0; i < m_rows * m_cols; i++)
-		std::fscanf(in, "%f", m_data[i]);
+		std::fscanf(in, " %f", &m_data[i]);
 }
 
 size_t Matrix::write(FILE* out) const

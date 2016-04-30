@@ -32,7 +32,7 @@ public:
 
 private:
 	size_t m_rows, m_cols;
-	float m_data[64];
+	float m_data[256];
 };
 
 Matrix operator+(const Matrix&, const Matrix&);

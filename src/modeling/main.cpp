@@ -16,8 +16,7 @@ int process(FILE* in, FILE* out)
 	bool quit = false;
 	while (!quit)
 	{
-		char c;
-		fscanf(in, " %c", &c);
+		char c = fgetc(in);
 		switch (c)
 		{
 			case 's': // set

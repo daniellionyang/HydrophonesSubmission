@@ -27,6 +27,8 @@ size_t System::write(FILE* out) const
 
 Matrix System::mode()
 {
+	if (hypotheses.size() == 0) return Matrix();
+
 	auto best = hypotheses.at(0);
 	for (auto h : hypotheses)
 		if (h.weight() > best.weight())
