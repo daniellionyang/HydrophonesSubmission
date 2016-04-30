@@ -1,5 +1,7 @@
 #include "model/hypothesis.hpp"
 
+#include <cmath>
+
 Hypothesis::Hypothesis()
 {
 }
@@ -37,17 +39,46 @@ void Hypothesis::add(Evidence evidence)
 {
 	for (auto v : evidence.variables)
 	{
-		// kalman filter update step
-		// no prediction step because the objects don't move
 		size_t i = v.index;
 
-		auto x = m_values.get(i);
-		auto p = m_variance.get(i);
+		// kalman filter update step
+		// no prediction step because the objects don't move
+		// and process each variable independently
+		// 
+		// Given two Gaussian distributions with means (u1, u2) and variance
+		// (v1, v2) their product has mean
+		// 
+		//   u1*v2 + u2*v1
+		//   -------------
+		//      v1 + v2
+		//
+		// and variance
+		// 
+		//   v1 * v2
+		//   -------
+		//   v1 + v2
+		//
+		// It mimics another Gaussian distribution, but the maximum value of
+		// the exponent is not 0, but
+		// 
+		//   - (u1 - u2)^2
+		//   -------------
+		//   2 * (v1 + v2)
+		// 
+		// Therefore, the maximum height (which we use as the weight instead of
+		// the integral, because who wants to calculate the integral?) is the
+		// product of the original two distributions' heights (ie weights) and
+		// e to the power of the above value.
 
-		float k = p / (p + v.variance);
+		auto u1 = m_values.get(i);
+		auto v1 = m_variance.get(i);
 
-		m_values.set(i, x + k * (v.value - x));
-		m_variance.set(i, (1 - k) * p);
+		auto u2 = v.value;
+		auto v2 = v.variance;
+
+		m_values.set(i, (u1*v2 + u2*v1) / (v1 + v2));
+		m_variance.set(i, (v1 * v2) / (v1 + v2));
+		m_weight *= std::exp(-std::pow(u1 - u2, 2) / (2 * (v1 + v2)));
 	}
 }
 
