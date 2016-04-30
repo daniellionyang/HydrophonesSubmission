@@ -55,6 +55,10 @@ void System::add(Evidence evidence)
 	{
 		std::sort(newHypotheses.begin(), newHypotheses.end(), [](const Hypothesis& a, const Hypothesis& b){ return a.weight() > b.weight(); });
 		newHypotheses.erase(newHypotheses.begin() + maxSize, newHypotheses.end());
+
+		auto scalar = 1 / newHypotheses.at(0).weight();
+		for (Hypothesis& h : newHypotheses)
+			h.scale(scalar);
 	}
 
 	hypotheses = newHypotheses;
