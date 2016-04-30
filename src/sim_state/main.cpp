@@ -71,7 +71,7 @@ bool handleCPU(std::atomic<State>* state, std::atomic<State>* des)
 
 bool outputState(std::atomic<State>* state)
 {
-	float freq = .6;
+	float freq = 8;
 	FILE* out = fopen("pipe/sim_in", "w");
 
 	while (true)

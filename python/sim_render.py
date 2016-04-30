@@ -88,10 +88,10 @@ def run():
 
 	print("Opening input pipe")
 	path = bpy.path.abspath('//')
-	input = open(path + 'pipe/sim_in', 'rb')
+	input = open(path + 'pipe/sim_in', 'rb', 0)
 	print("Opening output pipes")
-	output_f = open(path + 'pipe/render_f', 'wb')
-	output_d = open(path + 'pipe/render_d', 'wb')
+	output_f = open(path + 'pipe/render_f', 'wb', 0)
+	output_d = open(path + 'pipe/render_d', 'wb', 0)
 
 	print("Begin main loop")
 	quit = False
