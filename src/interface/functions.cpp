@@ -8,6 +8,7 @@
 #include "common/matrix.hpp"
 #include "common/state.hpp"
 #include "image/image.hpp"
+#include "model/evidence.hpp"
 #include "model/system.hpp"
 
 bool camera_f(const std::string in_name, const std::string out_name, Data* data)
@@ -245,6 +246,7 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 {
 	FILE* in = NULL;
 	FILE* out = NULL;
+	FILE* config = NULL;
 
 	while (!in) 
 	{
@@ -256,6 +258,16 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 		out = fopen(out_name.c_str(), "w");
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
+	while (!config)
+	{
+		config = fopen("config/initial_model.conf", "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	int c;
+	while ((c = fgetc(config)) != EOF)
+		fputc(c, out);
+	fflush(out);
 
 	bool quit = false;
 	while (!quit)
@@ -264,7 +276,7 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 		fflush(out);
 		auto model = Matrix(in); // read model
 
-		std::queue<System> evidence;
+		std::queue<Evidence> evidence;
 		// store model and get new evidences
 		data->lock();
 			data->model = std::move(model);
@@ -281,7 +293,7 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 		}
 		fflush(out);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return true;

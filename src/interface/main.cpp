@@ -25,6 +25,9 @@ int process(std::istream& in, std::ostream& out)
 		int func_idx;
 
 		in >> in_name >> out_name >> func_idx;
+
+		if (func_idx < 0) break;
+
 		if (!in.good())
 		{
 			out << "failed to parse\n";
