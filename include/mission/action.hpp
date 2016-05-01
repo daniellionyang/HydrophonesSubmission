@@ -70,14 +70,20 @@ private:
 class OpenBin : public virtual Action
 {
 public:
-	OpenBin();
+	OpenBin(float);
 	
 	virtual bool run(FILE*, FILE*);
+
+private:
+	float height;
 };
 
 class DropDat : public virtual Action
 {
 public:
+	DropDat();
+	
+	virtual bool run(FILE*, FILE*);
 	
 };
 

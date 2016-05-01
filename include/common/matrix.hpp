@@ -35,6 +35,7 @@ enum Model
 	CBINY,
 	OBINX,
 	OBINY,
+	BINZ,
 	PINGERX,
 	PINGERY
 };
