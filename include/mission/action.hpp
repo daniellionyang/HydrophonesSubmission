@@ -29,6 +29,7 @@ class MoveTo : public virtual Action
 {
 public:
 	MoveTo(int, float, int, float, int, float, float = DEFAULTMINDIST);
+	MoveTo(FILE*);
 
 	virtual bool run(FILE*, FILE*);
 
@@ -42,6 +43,7 @@ class Move : public virtual Action
 {
 public:
 	Move(float, float, float, float = DEFAULTMINDIST);
+	Move(FILE*);
 	
 	virtual bool run(FILE*, FILE*);
 
@@ -56,6 +58,7 @@ class Turn : public virtual Action
 {
 public:
 	Turn(float, float, float, float = DEFAULTMINDIST);
+	Turn(FILE*);
 	
 	virtual bool run(FILE*, FILE*);
 

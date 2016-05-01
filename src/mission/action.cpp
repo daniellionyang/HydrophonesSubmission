@@ -66,6 +66,14 @@ MoveTo::MoveTo(int ox, float x, int oy, float y, int oz, float z, float minDista
 {
 }
 
+MoveTo::MoveTo(FILE* config)
+{
+	MoveTo(0,0,0,0,0,0);
+	float tempmin;
+	fprintf(config, "%f %f %f %f %f %f %f", &xnum, &offx, &ynum, &offy, &znum, &offz, &tempmin);
+	if(tempmin > 0){minDistance = tempmin;}
+}
+
 bool MoveTo::run(FILE* in, FILE* out)
 {
 	bool close = false;
@@ -85,6 +93,14 @@ bool MoveTo::run(FILE* in, FILE* out)
 Move::Move(float dsurge, float dstrafe, float ddepth, float minDistance) :
 	surge(dsurge), strafe(dstrafe), depth(ddepth), minDistance(minDistance)
 {
+}
+
+Move::Move(FILE* config)
+{
+	Move(0,0,0);
+	float tempmin;
+	fprintf(config, "%f %f %f %f ", &surge, &strafe, &depth, &tempmin);
+	if(tempmin > 0){minDistance = tempmin;}
 }
 
 void Move::convert(FILE* in, FILE* out)
@@ -146,10 +162,7 @@ Action* getaction(FILE* config)
 	switch(tnum)
 	{
 	case 0:
-		int x, y, z;
-		float ox, oy, oz, min;
-		fscanf(config, "%i %f %i %f %i %f %f", &x, &ox, &y, &oy, &z, &oz, &min);
-		return (min > 0) ? new MoveTo(z, ox, y, oy, z, oz, min) : new MoveTo(z, ox, y, oy, z, oz);
+		return new MoveTo(config);
 	default:
 		return new Wait(0);
 	}
