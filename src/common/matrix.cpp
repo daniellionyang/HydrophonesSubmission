@@ -35,6 +35,7 @@ size_t Matrix::write(FILE* out) const
 	for (int i = 0; i < m_rows * m_cols; i++)
 		bytes += std::fprintf(out, "%f ", m_data[i]);
 	bytes += std::fprintf(out, "\n");
+	fflush(out);
 	return bytes;
 }
 

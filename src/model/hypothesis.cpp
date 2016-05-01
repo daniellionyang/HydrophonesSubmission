@@ -19,6 +19,7 @@ size_t Hypothesis::write(FILE* out) const
 	bytes += fprintf(out, "%f\n", m_weight);
 	bytes += m_values.write(out);
 	bytes += m_variance.write(out);
+	fflush(out);
 	return bytes;
 }
 

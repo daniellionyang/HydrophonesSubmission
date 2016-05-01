@@ -10,12 +10,27 @@
 #include "image/image.hpp"
 #include "model/system.hpp"
 
-bool camera_f(FILE* in, FILE* out, Data* data)
+bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 {
-	bool quit;
+	FILE* in = NULL;
+	FILE* out = NULL;
+
+	while (!in) 
+	{
+		in = fopen(in_name.c_str(), "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	while (!out)
+	{
+		out = fopen(out_name.c_str(), "w");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	bool quit = false;
 	while (!quit)
 	{
 		fprintf(out, "i\n"); // request image
+		fflush(out);
 		auto img = imageRead(in); // read image
 
 		// store image
@@ -30,12 +45,27 @@ bool camera_f(FILE* in, FILE* out, Data* data)
 	return true;
 }
 
-bool camera_d(FILE* in, FILE* out, Data* data)
+bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 {
-	bool quit;
+	FILE* in = NULL;
+	FILE* out = NULL;
+
+	while (!in) 
+	{
+		in = fopen(in_name.c_str(), "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	while (!out)
+	{
+		out = fopen(out_name.c_str(), "w");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	bool quit = false;
 	while (!quit)
 	{
 		fprintf(out, "i\n"); // request image
+		fflush(out);
 		auto img = imageRead(in); // read image
 
 		// store image
@@ -50,9 +80,23 @@ bool camera_d(FILE* in, FILE* out, Data* data)
 	return true;
 }
 
-bool mission(FILE* in, FILE* out, Data* data)
+bool mission(const std::string in_name, const std::string out_name, Data* data)
 {
-	bool quit;
+	FILE* in = NULL;
+	FILE* out = NULL;
+
+	while (!in) 
+	{
+		in = fopen(in_name.c_str(), "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	while (!out)
+	{
+		out = fopen(out_name.c_str(), "w");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	bool quit = false;
 	while (!quit)
 	{
 		char m;
@@ -72,6 +116,7 @@ bool mission(FILE* in, FILE* out, Data* data)
 						data->unlock();
 
 						state.write(out);
+						fflush(out);
 						break;
 					}
 					case 'i': // image
@@ -87,6 +132,7 @@ bool mission(FILE* in, FILE* out, Data* data)
 								data->unlock();
 
 								imageWrite(out, img);
+								fflush(out);
 								break;
 							}
 							case 'd': // down
@@ -96,6 +142,7 @@ bool mission(FILE* in, FILE* out, Data* data)
 								data->unlock();
 
 								imageWrite(out, img);
+								fflush(out);
 								break;
 							}
 						}
@@ -114,16 +161,19 @@ bool mission(FILE* in, FILE* out, Data* data)
 								data->unlock();
 
 								model.write(out);
+								fflush(out);
 								break;
 							}
 							case 's': // system
 							{
 								System().write(out); // currently unsupported
+								fflush(out);
 								break;
 							}
 							case 'c': // certainty
 							{
 								fprintf(out, "0\n"); // currently unsupported
+								fflush(out);
 								break;
 							}
 						}
@@ -191,12 +241,27 @@ bool mission(FILE* in, FILE* out, Data* data)
 	return true;
 }
 
-bool modeling(FILE* in, FILE* out, Data* data)
+bool modeling(const std::string in_name, const std::string out_name, Data* data)
 {
-	bool quit;
+	FILE* in = NULL;
+	FILE* out = NULL;
+
+	while (!in) 
+	{
+		in = fopen(in_name.c_str(), "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	while (!out)
+	{
+		out = fopen(out_name.c_str(), "w");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	bool quit = false;
 	while (!quit)
 	{
 		fprintf(out, "m\n"); // request model
+		fflush(out);
 		auto model = Matrix(in); // read model
 
 		std::queue<System> evidence;
@@ -214,19 +279,35 @@ bool modeling(FILE* in, FILE* out, Data* data)
 			evidence.front().write(out);
 			evidence.pop();
 		}
+		fflush(out);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 
 	return true;
 }
 
-bool control(FILE* in, FILE* out, Data* data)
+bool control(const std::string in_name, const std::string out_name, Data* data)
 {
-	bool quit;
+	FILE* in = NULL;
+	FILE* out = NULL;
+
+	while (!in) 
+	{
+		in = fopen(in_name.c_str(), "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	while (!out)
+	{
+		out = fopen(out_name.c_str(), "w");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	bool quit = false;
 	while (!quit)
 	{
 		fprintf(out, "c\n"); // request state
+		fflush(out);
 		auto state = State(in); // read state
 
 		State desiredState;
@@ -255,6 +336,7 @@ bool control(FILE* in, FILE* out, Data* data)
 		{
 			fprintf(out, "s\n");
 			desiredState.write(out);
+			fflush(out);
 		}
 
 		if (shoot == 'r') fprintf(out, "t r\n");
@@ -263,6 +345,8 @@ bool control(FILE* in, FILE* out, Data* data)
 		if (drop) fprintf(out, "d\n");
 		if (grab) fprintf(out, "g\n");
 		if (release) fprintf(out, "r\n");
+
+		fflush(out);
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}

@@ -22,6 +22,7 @@ size_t System::write(FILE* out) const
 	for (auto h : hypotheses)
 		bytes += h.write(out);
 	bytes += std::fprintf(out, "\n");
+	fflush(out);
 	return bytes;
 }
 

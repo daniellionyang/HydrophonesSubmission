@@ -30,7 +30,7 @@ MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
 MODELING_LFLAGS = 
 
-INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main connection functions data) $(MODEL) $(IMAGE) $(COMMON)
+INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main functions data) $(MODEL) $(IMAGE) $(COMMON)
 INTERFACE_CFLAGS = $(OPENCV_CFLAGS)
 INTERFACE_LFLAGS = $(OPENCV_LFLAGS)
 
@@ -55,7 +55,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera image_read image_show
+EXE_NAMES = modeling interface mission camera image_read image_show sim_state
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
 all: $(EXE)
