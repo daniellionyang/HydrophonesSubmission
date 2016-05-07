@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdint.h>
 #include <time.h>
+#include <thread>
+#include <chrono>
 
 #include "model/system.hpp"
 
@@ -16,7 +18,7 @@ int process(FILE* in, FILE* out)
 	bool quit = false;
 	while (!quit)
 	{
-		char c = fgetc(in);
+		int c = fgetc(in);
 		switch (c)
 		{
 			case 's': // set
@@ -33,6 +35,9 @@ int process(FILE* in, FILE* out)
 				break;
 			case 'q': // quit
 				quit = true;
+				break;
+			case EOF: // end of file, so wait a bit
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 				break;
 		}
 	}
