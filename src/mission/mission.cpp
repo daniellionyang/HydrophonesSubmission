@@ -12,40 +12,38 @@ int mission(FILE* in, FILE* out, FILE* config)
 	int numGoals = 0;
 	fscanf(config, "%i", &numGoals);
 	if(numGoals < 1) return 0;
-	auto goals = std::vector<Goal*>();
+	auto goals = std::vector<Goal>();
 	for (size_t i = 0; i < numGoals; i++)
-		goals.push_back(new Goal(config));
+		goals.push_back(Goal(config));
 
 	bool quit = false;
 	while (!quit)
 	{
 		// get current state
 		State state = getState(in, out);
-		Matrix location = state.location();
 		Matrix model = model_mode(in, out);
 
 		// select goal
 		float speed = 1;
-		std::sort(goals.begin(), goals.end(), [&](const Goal* a, const Goal* b)
+		std::sort(goals.begin(), goals.end(), [&](const Goal a, const Goal b)
 		{
-			auto value = [&](const Goal* t)
+			auto value = [&](const Goal t)
 			{
-				return t->value() * t->certainty() / (t->time() + (t->location(model) - location).magnitude() / speed);
+				return t.value() * t.certainty() / (t.time() + state.distanceTo(t.location(model)) / speed);
 			};
 			return value(a) < value(b); // descending order
 		});
-		auto goal = *goals.back();
+		auto goal = goals.back();
 
 		// if close enough, begin goal
 		auto goalLoc = goal.location(model);
-		if ((goalLoc - location).magnitude() < 10)
+		if (state.distanceTo(goalLoc) < 10)
 		{
 			if (goal.run(in, out)) goals.pop_back();
 			else goal.failed();
 		}
 		// otherwise approach goal (but continue loop so we can switch later if we want)
-		else
-			move(in, out, goalLoc.get(0), goalLoc.get(1), goalLoc.get(2));
+		else move(out, state, goalLoc);
 
 		if (goals.empty()) quit = true;
 	}

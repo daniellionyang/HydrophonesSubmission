@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "common/matrix.hpp"
+#include "common/state.hpp"
 #include "mission/action.hpp"
 
 class Goal
@@ -14,7 +15,7 @@ public:
 
 	void write(FILE*);
 
-	Matrix location(const Matrix&) const;
+	State location(const Matrix&) const;
 
 	float value() const;
 	float time() const;

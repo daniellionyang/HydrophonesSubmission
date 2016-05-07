@@ -9,7 +9,7 @@
 
 #include "common/matrix.hpp"
 #include "common/state.hpp"
-#include "model/system.hpp"
+#include "model/evidence.hpp"
 
 class Data
 {
@@ -28,7 +28,7 @@ public:
 	Matrix model;
 	uint32_t modelID = 0;
 
-	std::queue<System> evidence;
+	std::queue<Evidence> evidence;
 
 	State desiredState;
 	bool setState = false;

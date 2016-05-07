@@ -1,11 +1,5 @@
 #include "mission/query.hpp"
 
-SubState getSubState(FILE* in, FILE* out)
-{
-	fprintf(out, "q s\n");
-	return SubState(in);
-}
-
 State getState(FILE* in, FILE* out)
 {
 	fprintf(out, "q u\n");

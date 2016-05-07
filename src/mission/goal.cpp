@@ -29,9 +29,10 @@ bool Goal::run(FILE* in, FILE* out)
 	return true;
 }
 
-Matrix Goal::location(const Matrix& model) const
+State Goal::location(const Matrix& model) const
 {
-	return m_loc_transform * model + m_loc_offset;
+	auto loc = m_loc_transform * model + m_loc_offset;
+	return State(loc.get(0), loc.get(1), loc.get(2));
 }
 
 float Goal::value() const

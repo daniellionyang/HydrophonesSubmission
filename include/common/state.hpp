@@ -21,15 +21,30 @@ class State
 public:
 	State();
 	State(FILE*);
-	State(const Matrix& location, const Matrix& direction);
+	State(float, float, float, float yaw = 0, float pitch = 0, float roll = 0);
 	void write(FILE*) const;
 
-	Matrix location() const;
-	Matrix direction() const;
+	float x() const;
+	float y() const;
+	float depth() const;
+	float yaw() const;
+	float pitch() const;
+	float roll() const;
+
+	float setX(float);
+	float setY(float);
+	float setDepth(float);
+	float setYaw(float);
+	float setPitch(float);
+	float setRoll(float);
+
+	float distanceTo(const State&) const;
 
 private:
-	Matrix m_location;
-	Matrix m_direction;
+	float
+		m_x,   m_y,     m_depth,
+		m_yaw, m_pitch, m_roll
+	;
 };
 
 #endif

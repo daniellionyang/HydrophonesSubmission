@@ -19,7 +19,7 @@ FLYCAP_LFLAGS = -L$(FLYCAP)/lib -lflycapture -Wl,-rpath=$(FLYCAP)/lib/
 COMMON = $(patsubst %,$(BUILD)/common/%.o,matrix state)
 COMMON_CFLAGS = 
 
-MODEL = $(patsubst %,$(BUILD)/model/%.o,system distribution function)
+MODEL = $(patsubst %,$(BUILD)/model/%.o,system hypothesis evidence)
 MODEL_CFLAGS = 
 
 IMAGE = $(patsubst %,$(BUILD)/image/%.o,image)
@@ -30,7 +30,7 @@ MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
 MODELING_LFLAGS = 
 
-INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main connection functions data) $(MODEL) $(IMAGE) $(COMMON)
+INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main functions data) $(MODEL) $(IMAGE) $(COMMON)
 INTERFACE_CFLAGS = $(OPENCV_CFLAGS)
 INTERFACE_LFLAGS = $(OPENCV_LFLAGS)
 
@@ -50,8 +50,12 @@ IMAGE_SHOW = $(patsubst %,$(BUILD)/image_show/%.o,main) $(IMAGE) $(COMMON)
 IMAGE_SHOW_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_SHOW_LFLAGS = $(OPENCV_LFLAGS)
 
+SIM_STATE = $(patsubst %,$(BUILD)/sim_state/%.o,main) $(COMMON)
+SIM_STATE_CFLAGS = -pthread
+SIM_STATE_LFLAGS = -pthread -latomic
 
-EXE_NAMES = modeling interface mission camera image_read image_show
+
+EXE_NAMES = modeling interface mission camera image_read image_show sim_state
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
 all: $(EXE)
@@ -73,6 +77,9 @@ $(BIN)/image_read: $(IMAGE_READ)
 
 $(BIN)/image_show: $(IMAGE_SHOW)
 	$(CC) $^ $(LFLAGS) $(IMAGE_SHOW_LFLAGS) -o $@
+
+$(BIN)/sim_state: $(SIM_STATE)
+	$(CC) $^ $(LFLAGS) $(SIM_STATE_LFLAGS) -o $@
 
 $(BUILD)/common/%.o: $(SRC)/common/%.cpp
 	$(CC) $(CFLAGS) $< -o $@
@@ -100,6 +107,9 @@ $(BUILD)/image_read/%.o: $(SRC)/image_read/%.cpp
 
 $(BUILD)/image_show/%.o: $(SRC)/image_show/%.cpp
 	$(CC) $(CFLAGS) $(IMAGE_SHOW_CFLAGS) $< -o $@
+
+$(BUILD)/sim_state/%.o: $(SRC)/sim_state/%.cpp
+	$(CC) $(CFLAGS) $(SIM_STATE_CFLAGS) $< -o $@
 
 clean:
 	rm -f $(EXE)

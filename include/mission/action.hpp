@@ -4,6 +4,7 @@
 #include <time.h>
 
 #include "common/matrix.hpp"
+#include "common/state.hpp"
 
 #define DEFAULTMINDIST 5
 
@@ -25,32 +26,30 @@ private:
 	long long wtime;
 };
 
-class MoveTo : public virtual Action
-{
-public:
-	MoveTo(int, float, int, float, int, float, float = DEFAULTMINDIST);
-	MoveTo(FILE*);
-
-	virtual bool run(FILE*, FILE*);
-
-private:
-	int xnum, ynum, znum;
-	float offx, offy, offz;
-	float minDistance;
-};
-
 class Move : public virtual Action
 {
 public:
-	Move(float, float, float, float = DEFAULTMINDIST);
-	Move(FILE*);
+	Move(FILE* config);
+	Move(const State&, float);
 	
 	virtual bool run(FILE*, FILE*);
 
 private:
-	void convert(FILE*, FILE*);
-	
+	State target;
 	float surge, strafe, depth;
+	float minDistance;
+};
+
+class MoveTo : public virtual Action
+{
+public:
+	MoveTo(FILE* config);
+	MoveTo(const State&, float);
+	
+	virtual bool run(FILE*, FILE*);
+	
+private:
+	State target;
 	float minDistance;
 };
 

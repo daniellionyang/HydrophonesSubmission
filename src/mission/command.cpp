@@ -5,33 +5,15 @@
 #include "common/state.hpp"
 #include "mission/query.hpp"
 
-float move(FILE* in, FILE* out, float tx, float ty, float tdepth)
+void move(FILE* out, const State& from, const State& to)
 {
-	SubState state = getSubState(in, out);
-	float dx, dy, ddepth;
-	dx = tx - state.x;
-	dy = ty - state.y;
-	ddepth = tdepth - state.depth;
-	
-	float tyaw = std::atan2(dy, dx);
+	auto dx = to.x() - from.x();
+	auto dy = to.y() - from.y();
 
-	setState(out, SubState(tx, ty, tdepth, tyaw, 0, 0));
-	return(std::sqrt(dx*dx + dy*dy + ddepth*ddepth));
+	setState(out, State(to.x(), to.y(), to.depth(), std::atan2(dy, dx), 0, 0));
 }
 
-float turn(FILE* in, FILE* out, float ty, float tp, float tr)
-{
-	SubState state = getSubState(in, out);
-	float dy, dp, dr;
-	dy = ty - state.yaw;
-	dp = tp - state.pitch;
-	dr = tr - state.roll;
-	
-	setState(out, SubState(state.x, state.y, state.depth, ty, tp, tr));
-	return(std::sqrt(dy*dy + dp*dp + dr*dr));
-}
-
-void setState(FILE* out, const SubState& state)
+void setState(FILE* out, const State& state)
 {
 	fprintf(out, "c s\n");
 	state.write(out);
