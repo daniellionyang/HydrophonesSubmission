@@ -2,7 +2,7 @@
 
 State getState(FILE* in, FILE* out)
 {
-	fprintf(out, "q u\n");
+	fprintf(out, "q s\n");
 	return State(in);
 }
 

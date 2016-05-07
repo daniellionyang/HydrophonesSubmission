@@ -7,14 +7,13 @@ Goal::Goal(FILE* config) : fails(0)
 	fscanf(config, "%f", &m_value);
 	fscanf(config, "%f", &m_time);
 	fscanf(config, "%f", &m_certainty);
+	fscanf(config, "%i", &m_offset);
 	int n;
 	fscanf(config, "%i", &n);
 	for(int i = 0; i < n; i++)
 	{
 		m_actions.push_back(getaction(config));
 	}
-	m_loc_transform = Matrix();
-	m_loc_transform = Matrix();
 }
 
 void Goal::write(FILE* out)
@@ -31,8 +30,7 @@ bool Goal::run(FILE* in, FILE* out)
 
 State Goal::location(const Matrix& model) const
 {
-	auto loc = m_loc_transform * model + m_loc_offset;
-	return State(loc.get(0), loc.get(1), loc.get(2));
+	return State(model.get(m_offset), model.get(m_offset+1), model.get(m_offset+2));
 }
 
 float Goal::value() const

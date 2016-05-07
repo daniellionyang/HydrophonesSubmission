@@ -32,8 +32,7 @@ private:
 	float m_time_limit;
 	int fails;
 
-	Matrix m_loc_transform;
-	Matrix m_loc_offset;
+	int m_offset;
 
 	std::vector<Action*> m_actions;
 };
