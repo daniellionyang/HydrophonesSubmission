@@ -3,13 +3,19 @@
 #include <cmath>
 
 #include "common/state.hpp"
+#include "mission/query.hpp"
+
+void stop(FILE* in, FILE* out)
+{
+	setState(out, getState(in, out));
+}
 
 void move(FILE* out, const State& from, const State& to)
 {
 	auto dx = to.x() - from.x();
 	auto dy = to.y() - from.y();
 
-	setState(out, State(to.x(), to.y(), to.depth(), std::atan2(dy, dx), 0, 0));
+	setState(out, State(to.x(), to.y(), to.depth(), std::atan2(dy, dx) / (2 * M_PI), 0, 0));
 }
 
 void setState(FILE* out, const State& state)

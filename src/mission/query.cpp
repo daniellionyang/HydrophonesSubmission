@@ -3,32 +3,37 @@
 State getState(FILE* in, FILE* out)
 {
 	fprintf(out, "q s\n");
+	fflush(out);
 	return State(in);
 }
 
 cv::Mat image(FILE* in, FILE* out, char dir, float res, float hcrop, float vcrop)
 {
 	fprintf(out, "q i %c %f %f %f\n", dir, res, hcrop, vcrop);
+	fflush(out);
 	return imageRead(in);
 }
 
-Matrix model_mode(FILE* in, FILE* out)
+Matrix getModel(FILE* in, FILE* out)
 {
 	fprintf(out, "q m m\n");
+	fflush(out);
 	return Matrix(in);
 }
 
-System model_system(FILE* in, FILE* out)
+System getSystem(FILE* in, FILE* out)
 {
 	fprintf(out, "q m s\n");
+	fflush(out);
 	return System(in);
 }
 
-float model_certainty(FILE* in, FILE* out)
+float getCertainty(FILE* in, FILE* out)
 {
 	fprintf(out, "q m c\n");
+	fflush(out);
 	float certainty;
-	fscanf(in, "%f", &certainty);
+	fscanf(in, " %f", &certainty);
 	return certainty;
 }
 

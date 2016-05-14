@@ -15,4 +15,3 @@ python/**/*.pyo
 # flycapture sdk (which we can't distribute)
 3rdparty/flycapture/include/**
 3rdparty/flycapture/lib/**
-

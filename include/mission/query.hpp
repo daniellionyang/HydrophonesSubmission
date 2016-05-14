@@ -12,9 +12,9 @@ State getState(FILE*, FILE*);
 
 cv::Mat image(FILE*, FILE*, char, float res = 1, float hcrop = 1, float vcrop = 1);
 
-Matrix model_mode(FILE*, FILE*);
-System model_system(FILE*, FILE*);
-float model_certainty(FILE*, FILE*);
+Matrix getModel(FILE*, FILE*);
+System getSystem(FILE*, FILE*);
+float getCertainty(FILE*, FILE*);
 
 #endif
 

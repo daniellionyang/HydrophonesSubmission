@@ -1,25 +1,41 @@
 #ifndef MISSION_ACTION_HPP
 #define MISSION_ACTION_HPP
 
+#include <functional>
+
 #include "common/state.hpp"
+
+#define DEFAULTMINDIST 5
 
 class Action
 {
 public:
-	virtual bool run(FILE*, FILE*) = 0;
-};
+	template <typename F, typename... A>
+	Action(F _function, A... args) :
+		m_function(std::bind(_function, std::placeholders::_1, std::placeholders::_2, args...))
+	{
+	}
 
-class MoveTo : public virtual Action
-{
-public:
-	MoveTo(const State&, float);
+	Action(FILE*);
+	size_t write(FILE*);
 
-	virtual bool run(FILE*, FILE*);
+	bool run(FILE*, FILE*);
 
 private:
-	State target;
-	float minDistance;
+	std::function<bool(FILE*, FILE*)> m_function;
 };
+
+
+bool wait(FILE*, FILE*, float);
+bool moveAbsolute(FILE*, FILE*, const State&, float);
+bool moveRelative(FILE*, FILE*, const State&, float);
+bool moveModel(FILE*, FILE*, int, int, int, float, float, float, float);
+
+bool dropInBin(FILE*, FILE*);
+bool uncoverBin(FILE*, FILE*);
+
+bool shootInHole(FILE*, FILE*);
+bool uncoverHole(FILE*, FILE*);
 
 #endif
 
