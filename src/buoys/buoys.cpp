@@ -62,83 +62,56 @@ float scaley = 0.2;
 int diffDist = 8;
 //End supposedly config values that I suspect were never acually modified
 
-//these SHOULD be the values that do stuff. Censored for the open source.
- 
-int rx, ry, gx, gy, yx, yy;
+float rx, ry, gx, gy, yx, yy;
+//this was global in the original buoys so stop blaming me luk
+cv::Mat processedImage; 
 
-void findbuoys(cv::Mat &firstImage)
-{
-	cv::Mat processedImage;
-	
-	int image_size = firstImage.rows*firstImage.cols;
-	
-	if (image_size <= 0 )
-	{
-		return;
+int main(int argc, char** argv) {
+	//offset = 0;
+	// obtain images from the front camera.
+ 
+	//TODO: replace with interface thing.
+	cv::Mat image = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);
+
+	if(! image.data ){
+	std::cout <<  "Could not open or find the image" << std::endl ;
+	return -1;
 	}
-	//This paranthesized staement is large enough to justify newlines and indentation
-	//It resizes the image by some arcane parameters
-	firstImage(
-		cv::Rect(
-			firstImage.cols*(1-cropx)/2,
-			firstImage.rows*(1-cropy-offset)/2,
-			firstImage.cols*cropx,
-			firstImage.rows*cropy
-			)
-		  );
-	//std::cout << "\n" << firstImage.cols << "\n" << firstImage.rows << "\n" << cropx << "\n" << cropy << "\n" << offset;
+	// reset processedImage and define the image size
  
-	cv::Mat yNot;
-	
+	processedImage.create(360, 640, CV_8UC3);
 
-	//resize by arcane parameters 
-	cv::resize(
-		firstImage,
-		yNot,
-		cv::Size(
-			firstImage.cols*cropx*scalex,
-			firstImage.rows*cropy*scaley
-			)
-		);
-	//And finally the end of the monstrosity
-	
-	//Create a temp image to store lower smaller processed image
-	cv::Mat output(yNot.rows, yNot.cols, CV_8UC3, cv::Scalar(0,0,0));
- 
-	//Making a pointer to first element of output
+	memset(processedImage.ptr(), 100, processedImage.rows*processedImage.cols*3);
+	int image_size = image.rows*image.cols;
+
+	// crop and resize image
+	cv::resize(image(cv::Rect(image.cols*(1-cropx)/2, image.rows*(1-cropy-offset)/2, 
+				image.cols*cropx, image.rows*cropy)), image, 
+			cv::Size(image.cols*cropx*scalex, image.rows*cropy*scaley));
+
+	// create temporary image to store lower smaller processed image
+	cv::Mat output(image.rows, image.cols, CV_8UC3, cv::Scalar(0, 0, 0));
 	unsigned char* op = output.ptr();
-	
-	//Initialising come Mats for later usage
-	cv::Mat imgR, imgG, imgY;
- 
-	//images created for each channel 
-	imgY.create(yNot.rows, yNot.cols, CV_8UC1);
-	imgG.create(yNot.rows, yNot.cols, CV_8UC1);
-	imgR.create(yNot.rows, yNot.cols, CV_8UC1);
-					 
-	//ptrs created for other things 
-	unsigned char *rPtr = imgR.ptr();
-	unsigned char *gPtr = imgG.ptr();
-	unsigned char *yPtr = imgY.ptr();
-	const unsigned char* ip = yNot.ptr();
 
- 
- 
-	//Filter for green (conspicuously devoid of comments...)
-	//Because I have no idea how it works. BLAME BRIAN! 
-	cv::Mat grMat(yNot.size(), CV_32F, cv::Scalar(0));
-	cv::Mat reMat(yNot.size(), CV_32F, cv::Scalar(0));
- 
+	cv::Mat imgR, imgG, imgY;
+	imgR.create(image.rows, image.cols, CV_8UC1);
+	imgG.create(image.rows, image.cols, CV_8UC1);
+	imgY.create(image.rows, image.cols, CV_8UC1);
+
+	unsigned char *rPtr = imgR.ptr(), *gPtr = imgG.ptr(), *yPtr = imgY.ptr();
+
+	const unsigned char* ip = image.ptr();
+
+	// filter for green
+	cv::Mat grMat(image.size(), CV_32F, cv::Scalar(0));
+	cv::Mat reMat(image.size(), CV_32F, cv::Scalar(0));
 	float* gp = grMat.ptr<float>();
 	float* rp = reMat.ptr<float>();
- 
-	cv::Mat histo = equalColorHist(yNot, false, false, false);
- 
+	cv::Mat histo = equalColorHist(image, false, false, false);
 	unsigned char* hp = histo.ptr();
- 
 	auto filterColors = [=](int beg, int end)
 	{
-		for (int i = 0; i < yNot.rows*yNot.cols; i++)
+		for (int i = 0; i < image.rows*image.cols; i++)
 		{
 			int b = hp[3*i], g = hp[3*i+1], r = (int)hp[3*i+2];
 			//gp[i] = 40.0*(g-0.4*r)/(b+3.0*r+10.1);
@@ -147,63 +120,55 @@ void findbuoys(cv::Mat &firstImage)
 		}
 	};
  
-	filterColors(0,yNot.rows*yNot.cols);
- 
+	filterColors(0 , image.rows * image.cols);
 	cv::Mat diMap = generateDiffMap(grMat, diffDist);
+
 	cv::Mat drMap = generateDiffMap(reMat, diffDist);
- 
 	float* drffp = drMap.ptr<float>();
 
 	cv::blur(diMap, diMap, cv::Size(3,3));
- 
- 
 	float* diffp = diMap.ptr<float>();
- 
- 
 	float maxR[4][4] = {{-1000, 0, 0, 1000}};
 	int maxY[4][3] = {{-1}};
 	float maxG[4][4] = {{-1000, 0, 0, 1000}};
- 
- 
 	auto filterRY = [=](int start, int end, float rVals[4], int yVals[3], float gVals[4])
 	{
-		for (int i = 0; i < yNot.cols*yNot.rows; i++)
+		for (int i = 0; i < image.cols*image.rows; i++)
 		{
 			int b = ip[3*i], g = ip[3*i+1], r = (int)ip[3*i+2];
 			
 			op[3*i+2] = drffp[i]/10+128;
-			
-			//Filter for red
+			// filter for red
 			if (drffp[i] > rVals[0])
 			{
 				rVals[0] = drffp[i];
-				rVals[1] = i % yNot.cols;
-				rVals[2] = i / yNot.cols;
+				rVals[1] = i % image.cols;
+				rVals[2] = i / image.cols;
 			}
 			if (drffp[i] < rVals[3])
 			{
 				rVals[3] = drffp[i];
 			}
 
-			//Filter for yellow
+			// filter for yellow
 			yPtr[i] = std::max(0, std::min(255, 128+(r+g-b)/4));
 			op[3*i] = yPtr[i];
 
-			//Find yellow buoy
+			// find yellow buoy
 			if (yPtr[i] > yVals[0])
 			{
 				yVals[0] = yPtr[i];
-				yVals[1] = i % yNot.cols;
-				yVals[2] = i / yNot.cols;
+				yVals[1] = i % image.cols;
+				yVals[2] = i / image.cols;
 			}
+
 			op[3*i+1] = diffp[i]+128;
-			
-			//Find green buoy and max/min values
+			//find green buoy and max/min values
 			if (diffp[i] > gVals[0])
 			{
 				gVals[0] = diffp[i];
-				gVals[1] = i % yNot.cols;
-				gVals[2] = i / yNot.cols;
+				gVals[1] = i % image.cols;
+				gVals[2] = i / image.cols;
 			}
 			if (diffp[i] < gVals[3])
 			{
@@ -211,16 +176,15 @@ void findbuoys(cv::Mat &firstImage)
 			}
 		}
 	};
-
- 
-	filterRY(0,yNot.rows*yNot.cols, maxR[0],maxY[0],maxG[0]);
- 
- 
-	float rMax = -2000000;
-	float rMin = 2000000;
+	filterRY( 0, image.rows*image.cols/4, maxR[0], maxY[0], maxG[0]);
+	filterRY( image.rows*image.cols/4, 2*image.rows*image.cols/4, maxR[1], maxY[1], maxG[1]);
+	filterRY( 2*image.rows*image.cols/4, 3*image.rows*image.cols/4, maxR[2], maxY[2], maxG[2]);
+	filterRY( 3*image.rows*image.cols/4, image.rows*image.cols, maxR[3], maxY[3], maxG[3]);
+	float rMax = -2;
+	float rMin = -2;
 	int yMax = -2;
-	float gMax = -2000000;
-	float gMin = 2000000;
+	float gMax = -2;
+	float gMin = -2;
 	for (int i = 0; i < 4; i++)
 	{
 		if (maxR[i][0] > rMax)
@@ -251,56 +215,30 @@ void findbuoys(cv::Mat &firstImage)
 		}
 	}
 
-	//Highlight buoys on processed yNot (unnecessary but useful to see)
-	op[(int)(3*(ry*yNot.cols+rx))] = 0;
-	op[(int)(3*(ry*yNot.cols+rx))+1] = 0;
-	op[(int)(3*(gy*yNot.cols+gx))] = 0;
-	op[(int)(3*(gy*yNot.cols+gx))+2] = 0;
-	op[(int)(3*(yy*yNot.cols+yx))+1] = 0;
-	op[(int)(3*(yy*yNot.cols+yx))+2] = 0;
-	op[(int)(3*(gy*yNot.cols+gx))+1] = 255;
-	op[(int)(3*(ry*yNot.cols+rx))+2] = 255;
-	op[(int)(3*(yy*yNot.cols+yx))] = 255;
+	// highlight buoys on processed image
+	op[(int)(3*(ry*image.cols+rx))] = 0;
+	op[(int)(3*(ry*image.cols+rx))+1] = 0;
+	op[(int)(3*(gy*image.cols+gx))] = 0;
+	op[(int)(3*(gy*image.cols+gx))+2] = 0;
+	op[(int)(3*(yy*image.cols+yx))+1] = 0;
+	op[(int)(3*(yy*image.cols+yx))+2] = 0;
+	op[(int)(3*(gy*image.cols+gx))+1] = 255;
+	op[(int)(3*(ry*image.cols+rx))+2] = 255;
+	op[(int)(3*(yy*image.cols+yx))] = 255;
 
-	//Resize filtered yNot for processed yNot
+	// resize filtered image for processed image
+	cv::resize(output, processedImage(cv::Rect(processedImage.cols*(1-cropx)/2, processedImage.rows*(1-cropy-offset)/2, 
+				processedImage.cols*cropx, processedImage.rows*cropy)), 
+			cv::Size(processedImage.cols*cropx, processedImage.rows*cropy), 0, 0, cv::INTER_NEAREST);
 
-	//This stuff didn't work so I removed it
-	 /*processedImage(
-			cv::Rect(processedImage.cols*(1-cropx)/2, 
-			processedImage.rows*(1-cropy-offset)/2, 
-			processedImage.cols*cropx,
-			processedImage.rows*cropy)
-			);*/
-	//std::cout << "\n processedImage.rows: " << processedImage.rows << "\n processedImage.cols: " << processedImage.cols; 
-	/*cv::resize(output, processedImage, 
-		cv::Size(processedImage.cols*cropx, processedImage.rows*cropy), 0, 0, cv::INTER_NEAREST
-		);*/
-	cv::imshow("Hi", yNot);
- 
- 
- 
-	 
-	rx = (rx - yNot.cols/2) / yNot.cols;
-	ry = (yNot.rows/2 - ry) / yNot.rows;
-	gx = (gx - yNot.cols/2) / yNot.cols;
-	gy = (yNot.rows/2 - gy) / yNot.rows+offset;
-	yx = (yx - yNot.cols/2) / yNot.cols;
-	yy = (yNot.rows/2 - yy) / yNot.rows;
-	
- 
- 
-}
+	rx = (rx - image.cols/2) / image.cols;
+	ry = (image.rows/2 - ry) / image.rows;
+	gx = (gx - image.cols/2) / image.cols;
+	gy = (image.rows/2 - gy) / image.rows+offset;
+	yx = (yx - image.cols/2) / image.cols;
+	yy = (image.rows/2 - yy) / image.rows;
 
-int main(int argc, char* argv[])
-{
-	//if(argc != 2) {return -1;}	
-	//while(true){
-	//	char temp;
- 	//	std::cin.get(temp);
-	//	if(temp == 'b') {
-			auto input = imageRead(stdin);
-	//		findbuoys(input);
-			std::cout << "6 " << "\n" << rx << "\n" << ry << "\n" << gx << "\n" << gy << "\n" << yx << "\n" << yy << "\n";
-	//	}
-	//}
+	std::cout << "buoys: " << rx << " " << ry << " " << gx << " " << gy << " " << yx << " " << yy << "\n "; 
+ 
+	return 0;
 }
