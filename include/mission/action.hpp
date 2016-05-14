@@ -5,8 +5,6 @@
 
 #include "common/state.hpp"
 
-#define DEFAULTMINDIST 5
-
 class Action
 {
 public:
@@ -30,6 +28,7 @@ bool wait(FILE*, FILE*, float);
 bool moveAbsolute(FILE*, FILE*, const State&, float);
 bool moveRelative(FILE*, FILE*, const State&, float);
 bool moveModel(FILE*, FILE*, int, int, int, float, float, float, float);
+bool moveModelRel(FILE*, FILE*, int, int, int, float, float, float, float);
 
 bool dropInBin(FILE*, FILE*);
 bool uncoverBin(FILE*, FILE*);
