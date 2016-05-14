@@ -1,0 +1,5 @@
+pipe/control_out pipe/control_in 0
+pipe/mission_out pipe/mission_in 1
+pipe/modeling_out pipe/modeling_in 2
+0 0 -1
+

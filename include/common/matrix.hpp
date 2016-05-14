@@ -1,5 +1,5 @@
-#ifndef MODEL_MATRIX_HPP
-#define MODEL_MATRIX_HPP
+#ifndef COMMON_MATRIX_HPP
+#define COMMON_MATRIX_HPP
 
 #include <cstddef>
 #include <cstdio>
@@ -11,7 +11,7 @@ public:
 	Matrix(const Matrix&);
 
 	Matrix(FILE*);
-	void write(FILE*);
+	size_t write(FILE*) const;
 
 	size_t rows() const;
 	size_t cols() const;
@@ -20,14 +20,19 @@ public:
 	float get(size_t, size_t) const;
 	float get(size_t) const;
 
-	Matrix operator*(const Matrix&);
+	float set(size_t, size_t, float);
+	float set(size_t, float);
+
+	float magnitude() const;
+
+	Matrix operator*(const Matrix&) const;
 	Matrix operator*=(const Matrix&);
 	Matrix operator+=(const Matrix&);
 	Matrix operator-=(const Matrix&);
 
 private:
 	size_t m_rows, m_cols;
-	float* m_data;
+	float m_data[256];
 };
 
 Matrix operator+(const Matrix&, const Matrix&);

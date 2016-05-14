@@ -1,35 +1,42 @@
-#include "model/matrix.hpp"
+#include "common/matrix.hpp"
 
 #include <stdexcept>
 #include <cstring>
+#include <cmath>
 
-Matrix::Matrix()
+Matrix::Matrix() :
+	m_rows(0),
+	m_cols(0)
 {
 }
 
 Matrix::Matrix(const Matrix& a) :
 	m_rows(a.rows()),
-	m_cols(a.cols()),
-	m_data(new float[a.size()])
+	m_cols(a.cols())
 {
-	std::memcpy(m_data, a.m_data, size());
+	std::memcpy(m_data, a.m_data, size() * sizeof(float));
 }
 
 // <size> <element 1> <element 2> ...
 Matrix::Matrix(FILE* in)
 {
-	std::fscanf(in, "%i %i", &m_rows, &m_cols);
-	m_data = new float[m_rows * m_cols];
+	int rows, cols;
+	std::fscanf(in, " %i %i", &rows, &cols);
+	m_rows = rows;
+	m_cols = cols;
 	for (int i = 0; i < m_rows * m_cols; i++)
-		std::fscanf(in, "%f", m_data[i]);
+		std::fscanf(in, " %f", &m_data[i]);
 }
 
-void Matrix::write(FILE* out)
+size_t Matrix::write(FILE* out) const
 {
-	std::fprintf(out, "%i %i ", m_rows, m_cols);
+	size_t bytes = 0;
+	bytes += std::fprintf(out, "%i %i ", m_rows, m_cols);
 	for (int i = 0; i < m_rows * m_cols; i++)
-		std::fprintf(out, "%f ", m_data[i]);
-	std::fprintf(out, "\n");
+		bytes += std::fprintf(out, "%f ", m_data[i]);
+	bytes += std::fprintf(out, "\n");
+	fflush(out);
+	return bytes;
 }
 
 size_t Matrix::rows() const
@@ -57,7 +64,25 @@ float Matrix::get(size_t i) const
 	return m_data[i];
 }
 
-Matrix Matrix::operator*(const Matrix& a)
+float Matrix::set(size_t i, size_t j, float value)
+{
+	return m_data[i * m_cols + j] = value;
+}
+
+float Matrix::set(size_t i, float value)
+{
+	return m_data[i] = value;
+}
+
+float Matrix::magnitude() const
+{
+	float sum = 0;
+	for (size_t i = 0; i < size(); i++)
+		sum += std::pow(get(i), 2);
+	return std::sqrt(sum);
+}
+
+Matrix Matrix::operator*(const Matrix& a) const
 {
 	if (cols() != a.rows()) throw std::runtime_error("incompatible size");
 
@@ -69,7 +94,7 @@ Matrix Matrix::operator*(const Matrix& a)
 	{
 		for (int j = 0; j < res.cols(); j++)
 		{
-			m_data[i * res.cols() + j] = 0;
+			res.m_data[i * res.cols() + j] = 0;
 			for (int k = 0; k < cols(); k++)
 				res.m_data[i * res.cols() + j] += get(i, j) * a.get(k, j);
 		}

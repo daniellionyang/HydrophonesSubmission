@@ -1,16 +1,22 @@
 #include <iostream>
 #include <thread>
 
-#include "interface/connection.hpp"
 #include "interface/functions.hpp"
 
 int process(std::istream& in, std::ostream& out)
 {
-	std::function<bool(FILE*, FILE*, Data*)> functions[] = {camera};
+	std::function<bool(const std::string, const std::string, Data*)> functions[] = {
+		control,
+		mission,
+		modeling,
+		camera_f,
+		camera_d
+	};
 
 	Data data;
 
-	std::vector<Connection*> connections;
+	std::thread threads[256];
+	size_t numThreads = 0;
 
 	bool quit = false;
 	while (!quit)
@@ -19,35 +25,29 @@ int process(std::istream& in, std::ostream& out)
 		int func_idx;
 
 		in >> in_name >> out_name >> func_idx;
+
+		if (func_idx < 0) break;
+
 		if (!in.good())
 		{
 			out << "failed to parse\n";
 			continue;
 		}
 
-		FILE* in_file = fopen(in_name.c_str(), "r");
-		if (!in_file)
+		if (func_idx > sizeof(functions) / sizeof(functions[0]))
 		{
-			out << "failed to open input file\n";
+			out << "function index too high\n";
 			continue;
 		}
-		FILE* out_file = fopen(out_name.c_str(), "w");
-		if (!in_file)
-		{
-			out << "failed to open output file\n";
-			continue;
-		}
-		if (func_idx > sizeof(functions))
-		{
-			out << "failed to open output file\n";
-			continue;
-		}
-		
-		connections.push_back(new Connection(in_file, out_file, functions[func_idx], &data));
+
+		threads[numThreads++] = std::thread(functions[func_idx], in_name, out_name, &data);
+		out << "opened thread\n";
 	}
 
-	for (auto c : connections)
-		delete c;
+	for (size_t i = 0; i < numThreads; i++)
+	{
+		threads[i].join();
+	}
 
 	return 0;
 }

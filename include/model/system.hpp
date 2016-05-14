@@ -4,25 +4,25 @@
 #include <cstdio>
 #include <vector>
 
-#include "model/matrix.hpp"
-#include "model/distribution.hpp"
+#include "common/matrix.hpp"
+#include "model/hypothesis.hpp"
 
 class System
 {
 public:
 	System();
-
 	System(FILE*);
+
+	size_t write(FILE*) const;
+
 	Matrix mode();
-	System operator*=(const System&);
-	void write(FILE*);
+
+	void add(Evidence);
 
 private:
 	size_t maxSize;
-	std::vector<Distribution> distributions;
+	std::vector<Hypothesis> hypotheses;
 };
-
-System operator*(const System&, const System&);
 
 #endif
 

@@ -1,0 +1,51 @@
+#include "mission/mission.hpp"
+
+#include <vector>
+#include <algorithm>
+
+#include "mission/command.hpp"
+#include "mission/query.hpp"
+#include "mission/goal.hpp"
+
+int mission(FILE* in, FILE* out, FILE* config)
+{
+	int numGoals = 0;
+	fscanf(config, "%i", &numGoals);
+	auto goals = std::vector<Goal>();
+	for (size_t i = 0; i < numGoals; i++)
+		goals.push_back(Goal(in));
+
+	bool quit = false;
+	while (!quit)
+	{
+		// get current state
+		State state = getState(in, out);
+		Matrix model = model_mode(in, out);
+
+		// select goal
+		float speed = 1;
+		std::sort(goals.begin(), goals.end(), [&](const Goal& a, const Goal& b)
+		{
+			auto value = [&](const Goal& t)
+			{
+				return t.value() * t.certainty() / (t.time() + state.distanceTo(t.location(model)) / speed);
+			};
+			return value(a) < value(b); // descending order
+		});
+		auto goal = goals.back();
+
+		// if close enough, begin goal
+		auto goalLoc = goal.location(model);
+		if (state.distanceTo(goalLoc) < 10)
+		{
+			if (goal.run(in, out)) goals.pop_back();
+		}
+		// otherwise approach goal (but continue loop so we can switch later if we want)
+		else move(out, state, goalLoc);
+
+		if (goals.empty()) quit = true;
+	}
+
+	return 0;
+}
+
