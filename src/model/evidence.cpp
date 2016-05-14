@@ -4,6 +4,11 @@ Evidence::Evidence()
 {
 }
 
+Evidence::Evidence(const std::vector<Variable>& _variables) :
+	variables(_variables)
+{
+}
+
 Evidence::Evidence(FILE* in)
 {
 	int size;

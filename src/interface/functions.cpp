@@ -11,6 +11,43 @@
 #include "model/evidence.hpp"
 #include "model/system.hpp"
 
+bool hydrophones(const std::string in_name, const std::string out_name, Data* data)
+{
+	FILE* in = NULL;
+	FILE* out = NULL;
+
+	while (!in) 
+	{
+		in = fopen(in_name.c_str(), "r");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+	while (!out)
+	{
+		out = fopen(out_name.c_str(), "w");
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+
+	bool quit = false;
+	while (!quit)
+	{
+		float theta, phi;
+		fscanf(" h %f %f", &theta, &phi);
+
+		float x = 0, y = 0, s = 1;
+
+		// TODO: compute values
+
+		data->lock();
+			data->evidence.push({
+				{M_PINGER_X, x, s},
+				{M_PINGER_Y, y, s},
+			});
+		data->unlock();
+	}
+
+	return true;
+}
+
 bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 {
 	FILE* in = NULL;
