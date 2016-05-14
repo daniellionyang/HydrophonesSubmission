@@ -30,7 +30,7 @@ MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
 MODELING_LFLAGS = 
 
-INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main functions data) $(MODEL) $(IMAGE) $(COMMON)
+INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main functions data config) $(MODEL) $(IMAGE) $(COMMON)
 INTERFACE_CFLAGS = $(OPENCV_CFLAGS)
 INTERFACE_LFLAGS = $(OPENCV_LFLAGS)
 
