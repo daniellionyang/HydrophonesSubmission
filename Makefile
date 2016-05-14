@@ -50,7 +50,6 @@ IMAGE_SHOW = $(patsubst %,$(BUILD)/image_show/%.o,main) $(IMAGE) $(COMMON)
 IMAGE_SHOW_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_SHOW_LFLAGS = $(OPENCV_LFLAGS)
 
-<<<<<<< HEAD
 DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS) 
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
@@ -60,7 +59,6 @@ BUOYS_CFLAGS = $(OPENCV_CFLAGS)
 BUOYS_LFLAGS = $(OPENCV_LFLAGS)
 
 all: modeling interface camera image_read image_show dropper buoys
-=======
 SIM_STATE = $(patsubst %,$(BUILD)/sim_state/%.o,main) $(COMMON)
 SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
