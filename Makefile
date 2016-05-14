@@ -34,7 +34,7 @@ INTERFACE = $(patsubst %,$(BUILD)/interface/%.o, main functions data) $(MODEL) $
 INTERFACE_CFLAGS = $(OPENCV_CFLAGS)
 INTERFACE_LFLAGS = $(OPENCV_LFLAGS)
 
-MISSION = $(patsubst %,$(BUILD)/mission/%.o, main mission command query goal action) $(MODEL) $(IMAGE) $(COMMON)
+MISSION = $(patsubst %,$(BUILD)/mission/%.o, main mission command query goal action config) $(MODEL) $(IMAGE) $(COMMON)
 MISSION_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS) $(MODEL_CFLAGS)
 MISSION_LFLAGS = $(OPENCV_LFLAGS)
 
