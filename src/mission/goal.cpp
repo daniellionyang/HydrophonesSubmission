@@ -2,35 +2,70 @@
 
 #include "mission/action.hpp"
 
-Goal::Goal(FILE* config) : fails(0)
+Goal::Goal(float _value, float _time, int _xi, int _yi, int _di, float _xo, float _yo, float _do, std::vector<Action> _actions) :
+	m_value(_value),
+	m_time(_time),
+	m_xi(_xi),
+	m_yi(_yi),
+	m_di(_di),
+	m_xo(_xo),
+	m_yo(_yo),
+	m_do(_do),
+	m_actions(_actions)
 {
-	fscanf(config, "%f", &m_value);
-	fscanf(config, "%f", &m_time);
-	fscanf(config, "%f", &m_certainty);
-	fscanf(config, "%i", &m_offset);
-	int n;
-	fscanf(config, "%i", &n);
-	for(int i = 0; i < n; i++)
-	{
-		m_actions.push_back(getaction(config));
-	}
 }
 
-void Goal::write(FILE* out)
+Goal::Goal(FILE* in)
 {
+	int numActions = 0;
+
+	if (fscanf(in, " %f %f %i %i %i %f %f %f %i",
+		&m_value, &m_time,
+		&m_xi, &m_yi, &m_di,
+		&m_xo, &m_yo, &m_do,
+		&numActions
+	) < 9)
+		throw 1;
+
+	for (int i = 0; i < numActions; i++)
+		m_actions.push_back(Action(in));
+}
+
+size_t Goal::write(FILE* out)
+{
+	size_t numBytes = 0;
+
+	numBytes += fprintf(out, "%f %f %i %i %i %f %f %f %i\n",
+		m_value, m_time,
+		m_xi, m_yi, m_di,
+		m_xo, m_yo, m_do,
+		m_actions.size()
+	);
+
+	 for (auto a : m_actions)
+	 	numBytes += a.write(out);
+
+	fflush(out);
+	
+	return numBytes;
 }
 
 bool Goal::run(FILE* in, FILE* out)
 {
 	for (auto a : m_actions)
-		if (!a->run(in, out))
+		if (!a.run(in, out))
 			return false;
+
 	return true;
 }
 
 State Goal::location(const Matrix& model) const
 {
-	return State(model.get(m_offset), model.get(m_offset+1), model.get(m_offset+2));
+	return State(
+		model.get(m_xi) + m_xo,
+		model.get(m_yi) + m_yo,
+		model.get(m_di) + m_do
+	);
 }
 
 float Goal::value() const
@@ -41,10 +76,5 @@ float Goal::value() const
 float Goal::time() const
 {
 	return m_time;
-}
-
-float Goal::certainty() const
-{
-	return (fails > 0) ? 0.001 : m_certainty;
 }
 
