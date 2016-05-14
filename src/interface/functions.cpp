@@ -12,21 +12,21 @@
 #include "model/evidence.hpp"
 #include "model/system.hpp"
 
+FILE* openStream(const std::string name, const char* mode)
+{
+	FILE* f = NULL;
+	while (true)
+	{
+		f = fopen(name.c_str(), mode);
+		if (f) return f;
+		else std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+}
+
 bool hydrophones(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -51,19 +51,8 @@ bool hydrophones(const std::string in_name, const std::string out_name, Data* da
 
 bool buoys(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	uint32_t imageID = 0;
 
@@ -128,19 +117,8 @@ bool buoys(const std::string in_name, const std::string out_name, Data* data)
 
 bool bins(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	uint32_t imageID = 0;
 
@@ -194,19 +172,8 @@ bool bins(const std::string in_name, const std::string out_name, Data* data)
 }
 bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -229,19 +196,8 @@ bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 
 bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -264,19 +220,8 @@ bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 
 bool mission(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -425,25 +370,9 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 
 bool modeling(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-	FILE* config = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!config)
-	{
-		config = fopen("config/initial_model.conf", "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
+	FILE* config = openStream("config/initial_model.conf", "r");
 
 	int c;
 	while ((c = fgetc(config)) != EOF)
@@ -482,19 +411,8 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 
 bool control(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
