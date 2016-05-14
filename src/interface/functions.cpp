@@ -32,17 +32,17 @@ bool hydrophones(const std::string in_name, const std::string out_name, Data* da
 	while (!quit)
 	{
 		float theta, phi;
-		fscanf(" h %f %f", &theta, &phi);
+		fscanf(in, " h %f %f", &theta, &phi);
 
 		float x = 0, y = 0, s = 1;
 
 		// TODO: compute values
 
 		data->lock();
-			data->evidence.push({
+			data->evidence.push(Evidence({
 				{M_PINGER_X, x, s},
 				{M_PINGER_Y, y, s},
-			});
+			}));
 		data->unlock();
 	}
 
