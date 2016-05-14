@@ -5,6 +5,7 @@
 #include <thread>
 #include <chrono>
 
+#include "common/defs.hpp"
 #include "common/matrix.hpp"
 #include "common/state.hpp"
 #include "image/image.hpp"
