@@ -61,6 +61,22 @@ bool moveRelative(FILE* in, FILE* out, const State& diff, float minDistance)
 	return moveAbsolute(in, out, target, minDistance);
 }
 
+bool moveAbsRel(FILE* in, FILE* out, float x, float y, float z)
+{
+	State state = getState(in, out);
+	return false;
+}
+
+State convertRelative(const State& sub, const State& target, const State& offset)
+{
+	float hyp = sqrt(pow(sub.x() - target.x(), 2) + pow(sub.y() - target.y(), 2));
+	return State(
+		(sub.x() - target.x()) / hyp * offset.x() + (sub.y() - target.y()) / hyp * offset.y(),
+		(sub.y() - target.y()) / hyp * offset.x() + (sub.x() - target.x()) / hyp * offset.y(),
+		offset.depth()
+	);
+}
+
 bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
 {
 	bool close = false;
@@ -89,6 +105,14 @@ bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, 
 	stop(in, out);
 
 	return true;
+}
+
+bool moveModelRel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
+{
+	State state = getState(in, out);
+	auto model = getModel(in, out);
+	State target = convertRelative(state, State(model.get(xi), model.get(yi), model.get(zi)), State(xo, yo, zo));
+	return moveModel(in, out, xi, yi, zi, target.x(), target.y(), target.depth(), minDistance);
 }
 
 bool dropInBin(FILE* in, FILE* out)
