@@ -11,6 +11,7 @@ class System
 {
 public:
 	System();
+	System(size_t, std::vector<Hypothesis>);
 	System(FILE*);
 
 	size_t write(FILE*) const;

@@ -3,48 +3,14 @@
 
 #include <cstddef>
 #include <cstdio>
-
-enum Model
-{
-	UNDEF,
-	SUBX,
-	SUBY,
-	SUBZ,
-	SUBYAW,
-	SUBPITCH,
-	SUBROLL,
-	RBUOYX,
-	RBUOYY,
-	RBUOYZ,
-	GBUOYX,
-	GBUOYY,
-	GBUOYZ,
-	YBUOYX,
-	YBUOYY,
-	YBUOYZ,
-	LGATEX,
-	LGATEY,
-	LGATEZ,
-	BIGX,
-	BIGY,
-	BIGZ,
-	SMALLX,
-	SMALLY,
-	SMALLZ,
-	CBINX,
-	CBINY,
-	OBINX,
-	OBINY,
-	BINZ,
-	PINGERX,
-	PINGERY
-};
+#include <utility>
 
 class Matrix
 {
 public:
 	Matrix();
 	Matrix(const Matrix&);
+	Matrix(std::initializer_list<float>);
 	Matrix(size_t, size_t);
 
 	Matrix(FILE*);

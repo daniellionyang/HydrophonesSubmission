@@ -17,6 +17,15 @@ Matrix::Matrix(const Matrix& a) :
 	std::memcpy(m_data, a.m_data, size() * sizeof(float));
 }
 
+Matrix::Matrix(std::initializer_list<float> values) :
+	m_cols(1),
+	m_rows(0)
+{
+	for (auto v : values)
+		m_data[m_rows++] = v;
+
+}
+
 // <size> <element 1> <element 2> ...
 Matrix::Matrix(FILE* in)
 {

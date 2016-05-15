@@ -15,5 +15,8 @@ struct Connection
 
 std::vector<Connection> defaultConnections();
 
+Matrix initialModel();
+Matrix initialVariance();
+
 #endif
 

@@ -8,6 +8,7 @@
 #include "common/defs.hpp"
 #include "common/matrix.hpp"
 #include "common/state.hpp"
+#include "interface/config.hpp"
 #include "image/image.hpp"
 #include "model/evidence.hpp"
 #include "model/system.hpp"
@@ -374,9 +375,9 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 	FILE* out = openStream(out_name, "w");
 	FILE* config = openStream("config/initial_model.conf", "r");
 
-	int c;
-	while ((c = fgetc(config)) != EOF)
-		fputc(c, out);
+	// initialize model
+	fprintf(out, "s\n");
+	System(16, {{1, initialModel(), initialVariance()}}).write(out);
 	fflush(out);
 
 	bool quit = false;

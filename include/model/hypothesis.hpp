@@ -11,6 +11,7 @@ class Hypothesis
 {
 public:
 	Hypothesis();
+	Hypothesis(float, Matrix, Matrix);
 	Hypothesis(FILE*);
 
 	size_t write(FILE*) const;

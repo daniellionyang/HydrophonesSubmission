@@ -6,6 +6,13 @@ Hypothesis::Hypothesis()
 {
 }
 
+Hypothesis::Hypothesis(float _weight, Matrix _values, Matrix _variance) :
+	m_weight(_weight),
+	m_values(_values),
+	m_variance(_variance)
+{
+}
+
 Hypothesis::Hypothesis(FILE* in)
 {
 	fscanf(in, " %f", &m_weight);
