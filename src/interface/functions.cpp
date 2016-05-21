@@ -4,6 +4,7 @@
 #include <queue>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 #include "common/defs.hpp"
 #include "common/matrix.hpp"
@@ -35,9 +36,17 @@ bool hydrophones(const std::string in_name, const std::string out_name, Data* da
 		float theta, phi;
 		fscanf(in, " h %f %f", &theta, &phi);
 
-		float x = 0, y = 0, s = 1;
+		float x_i = data->state.x();
+		float y_i = data->state.y();
+		float depth_i = data->state.depth();
+		float yaw_i = data->state.yaw();
 
-		// TODO: compute values
+		float distance = (15-depth_i) * std::tan((-phi) * 2*M_PI);
+		float small_angle = .05;
+
+		float x = x_i + distance * std::cos((theta + yaw_i) * 2*M_PI);
+		float y = y_i + distance * std::sin((theta + yaw_i) * 2*M_PI);
+		float s = (15-depth_i) * (std::tan((-phi+small_angle) * 2*M_PI) - std::tan((-phi-small_angle) * 2*M_PI));
 
 		data->lock();
 			data->evidence.push(Evidence({
@@ -91,7 +100,29 @@ bool buoys(const std::string in_name, const std::string out_name, Data* data)
 				gx, gy, gd, ghs, gds,
 				yx, yy, yd, yhs, yds;
 
-			// TODO: compute values
+			float x_i = data->state.x();
+			float y_i = data->state.y();
+			float depth_i = data->state.depth();
+			float yaw_i = data->state.yaw();
+			float small_angle = .05;
+
+			rx = x_i + rr * std::cos(rp * 2*M_PI) * std::cos((rt + yaw_i) * 2*M_PI);
+			ry = y_i + rr * std::cos(rp * 2*M_PI) * std::sin((rt + yaw_i) * 2*M_PI);
+			rd = depth_i + rr * std::sin(rp * 2*M_PI);
+			rhs = rr * std::abs(std::cos((rp + small_angle)*2*M_PI) - std::cos((rp - small_angle)*2*M_PI));
+			rds = rr * std::abs(std::sin((rp + small_angle)*2*M_PI) - std::sin((rp - small_angle)*2*M_PI));
+
+			gx = x_i + gr * std::cos(gp * 2*M_PI) * std::cos((gt + yaw_i) * 2*M_PI);
+			gy = y_i + gr * std::cos(gp * 2*M_PI) * std::sin((gt + yaw_i) * 2*M_PI);
+			gd = depth_i + gr * std::sin(gp * 2*M_PI);
+			ghs = gr * std::abs(std::cos((gp + small_angle)*2*M_PI) - std::cos((gp - small_angle)*2*M_PI));
+			gds = gr * std::abs(std::sin((gp + small_angle)*2*M_PI) - std::sin((gp - small_angle)*2*M_PI));
+
+			yx = x_i + yr * std::cos(yp * 2*M_PI) * std::cos((yt + yaw_i) * 2*M_PI);
+			yy = y_i + yr * std::cos(yp * 2*M_PI) * std::sin((yt + yaw_i) * 2*M_PI);
+			yd = depth_i + yr * std::sin(yp * 2*M_PI);
+			yhs = yr * std::abs(std::cos((yp + small_angle)*2*M_PI) - std::cos((yp - small_angle)*2*M_PI));
+			yds = yr * std::abs(std::sin((yp + small_angle)*2*M_PI) - std::sin((yp - small_angle)*2*M_PI));
 
 			data->lock();
 				data->evidence.push(Evidence({
