@@ -373,7 +373,6 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
-	FILE* config = openStream("config/initial_model.conf", "r");
 
 	// initialize model
 	fprintf(out, "s\n");
