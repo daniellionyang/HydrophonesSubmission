@@ -1,5 +1,5 @@
 #include "buoys/buoys.hpp"
-
+#include "image/image.hpp"
 //Creates an equalized distribution of certain colors
 //Read more at http://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/histogram_equalization/histogram_equalization.html
 cv::Mat equalColorHist(cv::Mat& img, bool red, bool green, bool blue)
@@ -62,7 +62,7 @@ float scaley = 0.2;
 int diffDist = 8;
 //End supposedly config values that I suspect were never acually modified
 
-float rx, ry, gx, gy, yx, yy;
+float rx, ry, rz, gx, gy, gz, yx, yy, yz;
 //this was global in the original buoys so stop blaming me luk
 cv::Mat processedImage; 
 
@@ -70,8 +70,7 @@ int main(int argc, char** argv) {
 	//offset = 0;
 	// obtain images from the front camera.
  
-	//TODO: replace with interface thing.
-	cv::Mat image = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);
+	cv::Mat image = imageRead(stdin);
 
 	if(! image.data ){
 	std::cout <<  "Could not open or find the image" << std::endl ;
@@ -233,12 +232,15 @@ int main(int argc, char** argv) {
 
 	rx = (rx - image.cols/2) / image.cols;
 	ry = (image.rows/2 - ry) / image.rows;
+	rz = 1;
 	gx = (gx - image.cols/2) / image.cols;
 	gy = (image.rows/2 - gy) / image.rows+offset;
+	gz = 1;
 	yx = (yx - image.cols/2) / image.cols;
 	yy = (image.rows/2 - yy) / image.rows;
+	yz = 1;
 
-	std::cout << "buoys: " << rx << " " << ry << " " << gx << " " << gy << " " << yx << " " << yy << "\n "; 
+	std::cout << rx << " " << ry << " " << rz << " " << gx << " " << gy << " " << gz << " " << yx << " " << yy << " " << yz << "\n "; 
  
 	return 0;
 }
