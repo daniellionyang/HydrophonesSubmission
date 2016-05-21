@@ -64,7 +64,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera image_read image_show sim_state
+EXE_NAMES = modeling interface mission camera image_read image_show sim_state dropper buoys
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
 all: $(EXE)
@@ -87,15 +87,15 @@ $(BIN)/image_read: $(IMAGE_READ)
 $(BIN)/image_show: $(IMAGE_SHOW)
 	$(CC) $^ $(LFLAGS) $(IMAGE_SHOW_LFLAGS) -o $@
 
-dropper: $(DROPPER) 
+$(BIN)/dropper: $(DROPPER) 
 	$(CC) $^ $(LFLAGS) $(DROPPER_LFLAGS) -o $@
  
-buoys: $(BUOYS) 
+$(BIN)/buoys: $(BUOYS) 
 	$(CC) $^ $(LFLAGS) $(BUOYS_LFLAGS) -o $@
  
 $(BIN)/sim_state: $(SIM_STATE)
 	$(CC) $^ $(LFLAGS) $(SIM_STATE_LFLAGS) -o $@
-
+ 
 $(BUILD)/common/%.o: $(SRC)/common/%.cpp
 	$(CC) $(CFLAGS) $< -o $@
 
