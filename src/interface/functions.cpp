@@ -12,21 +12,168 @@
 #include "model/evidence.hpp"
 #include "model/system.hpp"
 
+FILE* openStream(const std::string name, const char* mode)
+{
+	FILE* f = NULL;
+	while (true)
+	{
+		f = fopen(name.c_str(), mode);
+		if (f) return f;
+		else std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+}
+
+bool hydrophones(const std::string in_name, const std::string out_name, Data* data)
+{
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
+
+	bool quit = false;
+	while (!quit)
+	{
+		float theta, phi;
+		fscanf(in, " h %f %f", &theta, &phi);
+
+		float x = 0, y = 0, s = 1;
+
+		// TODO: compute values
+
+		data->lock();
+			data->evidence.push(Evidence({
+				{M_PINGER_X, x, s},
+				{M_PINGER_Y, y, s},
+			}));
+		data->unlock();
+	}
+
+	return true;
+}
+
+bool buoys(const std::string in_name, const std::string out_name, Data* data)
+{
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
+
+	uint32_t imageID = 0;
+
+	bool quit = false;
+	while (!quit)
+	{
+		bool newImage = false;
+		cv::Mat img;
+		data->lock();
+			if (data->imageFrontID > imageID)
+			{
+				img = data->imageFront;
+				imageID = data->imageFrontID;
+				newImage = true;
+			}
+		data->unlock();
+
+		if (newImage)
+		{
+			imageWrite(out, img);
+
+			float // theta, phi, rho
+				rt, rp, rr,
+				gt, gp, gr,
+				yt, yp, yr;
+
+			fscanf(in, " %f %f %f %f %f %f %f %f %f",
+				rt, rp, rr,
+				gt, gp, gr,
+				yt, yp, yr
+			);
+
+			float // x, y, depth, horizontal variance, depth variance
+				rx, ry, rd, rhs, rds,
+				gx, gy, gd, ghs, gds,
+				yx, yy, yd, yhs, yds;
+
+			// TODO: compute values
+
+			data->lock();
+				data->evidence.push(Evidence({
+					{M_RBUOY_X, rx, rhs},
+					{M_RBUOY_Y, ry, rhs},
+					{M_RBUOY_D, rd, rds},
+				}));
+				data->evidence.push(Evidence({
+					{M_GBUOY_X, gx, ghs},
+					{M_GBUOY_Y, gy, ghs},
+					{M_GBUOY_D, gd, gds},
+				}));
+				data->evidence.push(Evidence({
+					{M_YBUOY_X, yx, yhs},
+					{M_YBUOY_Y, yy, yhs},
+					{M_YBUOY_D, yd, yds},
+				}));
+			data->unlock();
+		}
+	}
+
+	return true;
+}
+
+bool bins(const std::string in_name, const std::string out_name, Data* data)
+{
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
+
+	uint32_t imageID = 0;
+
+	bool quit = false;
+	while (!quit)
+	{
+		bool newImage = false;
+		cv::Mat img;
+		data->lock();
+			if (data->imageDownID > imageID)
+			{
+				img = data->imageDown;
+				imageID = data->imageDownID;
+				newImage = true;
+			}
+		data->unlock();
+
+		if (newImage)
+		{
+			imageWrite(out, img);
+
+			float
+				ox, oy,
+				cx, cy;
+
+			fscanf(in, " %f %f %f %f",
+				ox, oy,
+				cx, cy
+			);
+
+			// variance
+			float cs = 0, os = 0;
+
+			// TODO: compute variance
+			// TODO: transform values so angle isn't linear with position
+
+			data->lock();
+				data->evidence.push(Evidence({
+					{M_OBIN_X, ox, os},
+					{M_OBIN_Y, oy, os},
+				}));
+				data->evidence.push(Evidence({
+					{M_CBIN_X, cx, cs},
+					{M_CBIN_Y, cy, cs},
+				}));
+			data->unlock();
+		}
+	}
+
+	return true;
+}
 bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -49,19 +196,8 @@ bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 
 bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -84,19 +220,8 @@ bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 
 bool mission(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)
@@ -245,25 +370,9 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 
 bool modeling(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-	FILE* config = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!config)
-	{
-		config = fopen("config/initial_model.conf", "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
+	FILE* config = openStream("config/initial_model.conf", "r");
 
 	int c;
 	while ((c = fgetc(config)) != EOF)
@@ -302,19 +411,8 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 
 bool control(const std::string in_name, const std::string out_name, Data* data)
 {
-	FILE* in = NULL;
-	FILE* out = NULL;
-
-	while (!in) 
-	{
-		in = fopen(in_name.c_str(), "r");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
-	while (!out)
-	{
-		out = fopen(out_name.c_str(), "w");
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
+	FILE* in = openStream(in_name, "r");
+	FILE* out = openStream(out_name, "w");
 
 	bool quit = false;
 	while (!quit)

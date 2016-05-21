@@ -16,6 +16,7 @@ class Evidence
 {
 public:
 	Evidence();
+	Evidence(const std::vector<Variable>&);
 	Evidence(FILE*);
 
 	size_t write(FILE*) const;

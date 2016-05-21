@@ -5,6 +5,11 @@
 
 #include "interface/data.hpp"
 
+bool hydrophones(const std::string, const std::string, Data*);
+
+bool buoys(const std::string, const std::string, Data*);
+bool bins(const std::string, const std::string, Data*);
+
 bool camera_f(const std::string, const std::string, Data*);
 bool camera_d(const std::string, const std::string, Data*);
 

@@ -11,7 +11,7 @@ enum
 	M_RBUOY_D,
 	M_GBUOY_X,
 	M_GBUOY_Y,
-	M_GBUOY,D,
+	M_GBUOY_D,
 	M_YBUOY_X,
 	M_YBUOY_Y,
 	M_YBUOY_D,
