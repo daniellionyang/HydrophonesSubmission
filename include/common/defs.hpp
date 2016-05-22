@@ -1,6 +1,10 @@
 #ifndef MISSION_DEFS_HPP
 #define MISSION_DEFS_HPP
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 enum
 {
 	M_ZERO = 0,
