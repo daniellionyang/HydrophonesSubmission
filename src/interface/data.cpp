@@ -1,5 +1,20 @@
 #include "interface/data.hpp"
 
+#include "interface/config.hpp"
+
+Data::Data() :
+	stateID(0),
+	imageID({0,0}),
+	modelID(0),
+	setState(false),
+	drop(false),
+	grab(false),
+	release(false),
+	shoot(false),
+	model(initialModel())
+{
+}
+
 bool Data::lock()
 {
 	mutex.lock();

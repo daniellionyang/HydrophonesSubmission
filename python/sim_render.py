@@ -114,9 +114,9 @@ def run():
 		loc[1] = state.y
 		loc[2] = state.depth
 
-		att[0] = state.yaw
-		att[1] = state.pitch
-		att[2] = state.roll
+		att[0] = state.pitch
+		att[1] = state.roll
+		att[2] = state.yaw
 
 		print("Rendering images")
 		img_f = renderFrame(scene, cam_f)

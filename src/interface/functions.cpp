@@ -4,6 +4,7 @@
 #include <queue>
 #include <thread>
 #include <chrono>
+#include <cmath>
 
 #include "common/defs.hpp"
 #include "common/matrix.hpp"
@@ -24,7 +25,7 @@ FILE* openStream(const std::string name, const char* mode)
 	}
 }
 
-bool hydrophones(const std::string in_name, const std::string out_name, Data* data)
+bool hydrophones(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -35,9 +36,17 @@ bool hydrophones(const std::string in_name, const std::string out_name, Data* da
 		float theta, phi;
 		fscanf(in, " h %f %f", &theta, &phi);
 
-		float x = 0, y = 0, s = 1;
+		float x_i = data->state.x();
+		float y_i = data->state.y();
+		float depth_i = data->state.depth();
+		float yaw_i = data->state.yaw();
 
-		// TODO: compute values
+		float distance = (15-depth_i) * std::tan((-phi) * 2*M_PI);
+		float small_angle = .05;
+
+		float x = x_i + distance * std::cos((theta + yaw_i) * 2*M_PI);
+		float y = y_i + distance * std::sin((theta + yaw_i) * 2*M_PI);
+		float s = (15-depth_i) * (std::tan((-phi+small_angle) * 2*M_PI) - std::tan((-phi-small_angle) * 2*M_PI));
 
 		data->lock();
 			data->evidence.push(Evidence({
@@ -50,128 +59,54 @@ bool hydrophones(const std::string in_name, const std::string out_name, Data* da
 	return true;
 }
 
-bool buoys(const std::string in_name, const std::string out_name, Data* data)
+bool vision(Data* data, const std::string in_name, const std::string out_name, size_t vpid, size_t image_index)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
 
-	uint32_t imageID = 0;
+	uint32_t imageID = {};
 
 	bool quit = false;
 	while (!quit)
 	{
-		bool newImage = false;
-		cv::Mat img;
+		// check if we should process this frame
+		bool running;
 		data->lock();
-			if (data->imageFrontID > imageID)
-			{
-				img = data->imageFront;
-				imageID = data->imageFrontID;
-				newImage = true;
-			}
+			running = data->run_vision_process.at(vpid);
 		data->unlock();
 
-		if (newImage)
+		if (running)
 		{
-			imageWrite(out, img);
-
-			float // theta, phi, rho
-				rt, rp, rr,
-				gt, gp, gr,
-				yt, yp, yr;
-
-			fscanf(in, " %f %f %f %f %f %f %f %f %f",
-				rt, rp, rr,
-				gt, gp, gr,
-				yt, yp, yr
-			);
-
-			float // x, y, depth, horizontal variance, depth variance
-				rx, ry, rd, rhs, rds,
-				gx, gy, gd, ghs, gds,
-				yx, yy, yd, yhs, yds;
-
-			// TODO: compute values
-
+			bool newImage = false;
+			cv::Mat img;
 			data->lock();
-				data->evidence.push(Evidence({
-					{M_RBUOY_X, rx, rhs},
-					{M_RBUOY_Y, ry, rhs},
-					{M_RBUOY_D, rd, rds},
-				}));
-				data->evidence.push(Evidence({
-					{M_GBUOY_X, gx, ghs},
-					{M_GBUOY_Y, gy, ghs},
-					{M_GBUOY_D, gd, gds},
-				}));
-				data->evidence.push(Evidence({
-					{M_YBUOY_X, yx, yhs},
-					{M_YBUOY_Y, yy, yhs},
-					{M_YBUOY_D, yd, yds},
-				}));
+				if (data->imageID.at(image_index) > imageID)
+				{
+					img = data->image.at(image_index);
+					imageID = data->imageID.at(image_index);
+					newImage = true;
+				}
 			data->unlock();
+
+			if (newImage)
+			{
+				imageWrite(out, img);
+
+				Evidence evidence(in);
+
+				data->lock();
+					data->evidence.push(evidence);
+				data->unlock();
+			}
+			else std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
+		else std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return true;
 }
 
-bool bins(const std::string in_name, const std::string out_name, Data* data)
-{
-	FILE* in = openStream(in_name, "r");
-	FILE* out = openStream(out_name, "w");
-
-	uint32_t imageID = 0;
-
-	bool quit = false;
-	while (!quit)
-	{
-		bool newImage = false;
-		cv::Mat img;
-		data->lock();
-			if (data->imageDownID > imageID)
-			{
-				img = data->imageDown;
-				imageID = data->imageDownID;
-				newImage = true;
-			}
-		data->unlock();
-
-		if (newImage)
-		{
-			imageWrite(out, img);
-
-			float
-				ox, oy,
-				cx, cy;
-
-			fscanf(in, " %f %f %f %f",
-				ox, oy,
-				cx, cy
-			);
-
-			// variance
-			float cs = 0, os = 0;
-
-			// TODO: compute variance
-			// TODO: transform values so angle isn't linear with position
-
-			data->lock();
-				data->evidence.push(Evidence({
-					{M_OBIN_X, ox, os},
-					{M_OBIN_Y, oy, os},
-				}));
-				data->evidence.push(Evidence({
-					{M_CBIN_X, cx, cs},
-					{M_CBIN_Y, cy, cs},
-				}));
-			data->unlock();
-		}
-	}
-
-	return true;
-}
-bool camera_f(const std::string in_name, const std::string out_name, Data* data)
+bool camera(Data* data, const std::string in_name, const std::string out_name, size_t image_index)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -185,8 +120,8 @@ bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 
 		// store image
 		data->lock();
-			data->imageFront = std::move(img);
-			data->imageFrontID++;
+			data->image.at(image_index) = std::move(img);
+			data->imageID.at(image_index)++;
 		data->unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -195,31 +130,7 @@ bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool camera_d(const std::string in_name, const std::string out_name, Data* data)
-{
-	FILE* in = openStream(in_name, "r");
-	FILE* out = openStream(out_name, "w");
-
-	bool quit = false;
-	while (!quit)
-	{
-		fprintf(out, "i\n"); // request image
-		fflush(out);
-		auto img = imageRead(in); // read image
-
-		// store image
-		data->lock();
-			data->imageDown = std::move(img);
-			data->imageDownID++;
-		data->unlock();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	}
-
-	return true;
-}
-
-bool mission(const std::string in_name, const std::string out_name, Data* data)
+bool mission(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -256,7 +167,7 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 							case 'f': // front
 							{
 								data->lock();
-									auto img = data->imageFront;
+									auto img = data->image.at(I_FRONT);
 								data->unlock();
 
 								imageWrite(out, img);
@@ -266,7 +177,7 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 							case 'd': // down
 							{
 								data->lock();
-									auto img = data->imageDown;
+									auto img = data->image.at(I_DOWN);
 								data->unlock();
 
 								imageWrite(out, img);
@@ -369,11 +280,10 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool modeling(const std::string in_name, const std::string out_name, Data* data)
+bool modeling(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
-	FILE* config = openStream("config/initial_model.conf", "r");
 
 	// initialize model
 	fprintf(out, "s\n");
@@ -410,7 +320,7 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool control(const std::string in_name, const std::string out_name, Data* data)
+bool control(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");

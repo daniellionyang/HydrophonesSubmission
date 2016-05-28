@@ -7,6 +7,7 @@
 #include <cv.h>
 #include <cstdint>
 
+#include "common/defs.hpp"
 #include "common/matrix.hpp"
 #include "common/state.hpp"
 #include "model/evidence.hpp"
@@ -14,28 +15,30 @@
 class Data
 {
 public:
+	Data();
+
 	bool lock();
 	bool unlock();
 
 	State state;
-	uint32_t stateID = 0;
+	uint32_t stateID;
 
-	cv::Mat imageFront;
-	uint32_t imageFrontID = 0;
-	cv::Mat imageDown;
-	uint32_t imageDownID = 0;
+	std::array<cv::Mat, NUM_IMAGES> image;
+	std::array<uint32_t, NUM_IMAGES> imageID;
+
+	std::array<bool, NUM_VPIDS> run_vision_process;
 
 	Matrix model;
-	uint32_t modelID = 0;
+	uint32_t modelID;
 
 	std::queue<Evidence> evidence;
 
 	State desiredState;
-	bool setState = false;
-	bool drop = false;
-	bool grab = false;
-	bool release = false;
-	char shoot = 0;
+	bool setState;
+	bool drop;
+	bool grab;
+	bool release;
+	char shoot;
 
 private:
 	std::mutex mutex;
