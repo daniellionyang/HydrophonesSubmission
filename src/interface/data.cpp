@@ -1,5 +1,7 @@
 #include "interface/data.hpp"
 
+#include "interface/config.hpp"
+
 Data::Data() :
 	stateID(0),
 	imageFrontID(0),
@@ -9,7 +11,8 @@ Data::Data() :
 	drop(false),
 	grab(false),
 	release(false),
-	shoot(false)
+	shoot(false),
+	model(initialModel())
 {
 }
 
