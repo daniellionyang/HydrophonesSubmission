@@ -71,8 +71,8 @@ State convertRelative(const State& sub, const State& target, const State& offset
 {
 	float hyp = sqrt(pow(sub.x() - target.x(), 2) + pow(sub.y() - target.y(), 2));
 	return State(
-		(sub.x() - target.x()) / hyp * offset.x() + (sub.y() - target.y()) / hyp * offset.y(),
-		(sub.y() - target.y()) / hyp * offset.x() + (sub.x() - target.x()) / hyp * offset.y(),
+		(target.x() - sub.x()) / hyp * offset.x() + (target.y() - sub.y()) / hyp * offset.y(),
+		(target.y() - sub.y()) / hyp * offset.x() + (target.x() - sub.x()) / hyp * offset.y(),
 		offset.depth()
 	);
 }

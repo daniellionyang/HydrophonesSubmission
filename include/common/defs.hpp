@@ -1,6 +1,8 @@
 #ifndef MISSION_DEFS_HPP
 #define MISSION_DEFS_HPP
 
+float POOL_D = 16;
+
 enum
 {
 	M_ZERO = 0,
