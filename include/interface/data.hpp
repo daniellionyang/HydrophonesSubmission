@@ -14,28 +14,30 @@
 class Data
 {
 public:
+	Data();
+
 	bool lock();
 	bool unlock();
 
 	State state;
-	uint32_t stateID = 0;
+	uint32_t stateID;
 
 	cv::Mat imageFront;
-	uint32_t imageFrontID = 0;
+	uint32_t imageFrontID;
 	cv::Mat imageDown;
-	uint32_t imageDownID = 0;
+	uint32_t imageDownID;
 
 	Matrix model;
-	uint32_t modelID = 0;
+	uint32_t modelID;
 
 	std::queue<Evidence> evidence;
 
 	State desiredState;
-	bool setState = false;
-	bool drop = false;
-	bool grab = false;
-	bool release = false;
-	char shoot = 0;
+	bool setState;
+	bool drop;
+	bool grab;
+	bool release;
+	char shoot;
 
 private:
 	std::mutex mutex;
