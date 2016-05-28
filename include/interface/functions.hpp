@@ -10,8 +10,7 @@ bool hydrophones(Data*, const std::string, const std::string);
 bool buoys(Data*, const std::string, const std::string);
 bool bins(Data*, const std::string, const std::string);
 
-bool camera_f(Data*, const std::string, const std::string);
-bool camera_d(Data*, const std::string, const std::string);
+bool camera(Data*, const std::string, const std::string, int);
 
 bool mission(Data*, const std::string, const std::string);
 bool modeling(Data*, const std::string, const std::string);

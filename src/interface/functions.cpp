@@ -202,7 +202,8 @@ bool bins(Data* data, const std::string in_name, const std::string out_name)
 
 	return true;
 }
-bool camera_f(Data* data, const std::string in_name, const std::string out_name)
+
+bool camera(Data* data, const std::string in_name, const std::string out_name, size_t image_index)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -216,32 +217,8 @@ bool camera_f(Data* data, const std::string in_name, const std::string out_name)
 
 		// store image
 		data->lock();
-			data->image.at(I_FRONT) = std::move(img);
-			data->imageID.at(I_FRONT)++;
-		data->unlock();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	}
-
-	return true;
-}
-
-bool camera_d(Data* data, const std::string in_name, const std::string out_name)
-{
-	FILE* in = openStream(in_name, "r");
-	FILE* out = openStream(out_name, "w");
-
-	bool quit = false;
-	while (!quit)
-	{
-		fprintf(out, "i\n"); // request image
-		fflush(out);
-		auto img = imageRead(in); // read image
-
-		// store image
-		data->lock();
-			data->image.at(I_DOWN) = std::move(img);
-			data->imageID.at(I_DOWN)++;
+			data->image.at(image_index) = std::move(img);
+			data->imageID.at(image_index)++;
 		data->unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
