@@ -1,4 +1,5 @@
 #include"dropper/droppers.hpp"
+#include "model/evidence.hpp"
 
 cv::Mat img_enhanced;
 static std::vector< std::array<double,2> > black_vals (3);
@@ -13,7 +14,27 @@ int white_min_area = 20;
 int white_hull_min_area = 3500;
 bool black_fallback = false;
  
-std::vector<cv::Point2f> bin_contours(cv::Mat img_bgr_enhanced, std::vector<cv::Mat> *masks, std::vector< std::vector<cv::Point> > *hulls)
+ 
+//hard-coded competition values
+float color_correct_low = 0.06;
+float color_correct_high = 0.06;
+//// min amount of 'redness' for bins to even be considered
+int red_min_integrand = 500000;	 //might be plus or minus a zero
+//// the min contour areas, contours below which will be ignored
+// enhancement might need to turned off for simulator
+bool useenhance = false;
+// how good subs position over the bin must be before dropping
+// how long sub should move forward directly prior to dropping to
+// account for the dropper being behind the camera
+//// if true it will look for more bins with the black areas directly
+//// if less than the maximum amount of bins are found originally
+// how close sub needs to be so that it will not readjust its
+// heading while approaching the bin
+// heading to turn to before beginning bins
+
+std::vector<cv::Point2f> bin_contours(cv::Mat img_bgr_enhanced,
+		std::vector<cv::Mat> *masks,
+		std::vector< std::vector<cv::Point> > *hulls)
 {
 	cv::Mat img_hsv;
 	cv::cvtColor(img_bgr_enhanced, img_hsv, CV_BGR2HSV, 0);
@@ -62,7 +83,8 @@ std::vector<cv::Point2f> bin_contours(cv::Mat img_bgr_enhanced, std::vector<cv::
 			hulls_white);
 
 	// filter these hulls by area now
-	color_crop::filter(color_crop::filter_contours_area(hulls_white, white_hull_min_area), hulls_white);
+	color_crop::filter(color_crop::filter_contours_area(hulls_white,
+				white_hull_min_area), hulls_white);
 
 	// remove white contours that do not contain a black contour
 	color_crop::filter(scores_area_black, contours_black.first);
@@ -147,8 +169,7 @@ std::vector<cv::Point2f> bin_contours(cv::Mat img_bgr_enhanced, std::vector<cv::
 			color_crop::contours_sort_by_area(hulls_white));
 
 	// log the image with contours	
-	cv::Mat processedImage;
-	processedImage = color_crop::draw_contours(
+	 auto processedImage = color_crop::draw_contours(
 			hulls_white, img_bgr_enhanced);
 
 	std::vector<cv::Point2f> centroids(hulls_white.size());
@@ -177,29 +198,13 @@ std::vector<cv::Point2f> bin_contours(cv::Mat img_bgr_enhanced, std::vector<cv::
 
 	return centroids;
 }
- 
- 
-int getBins(bool sim, cv::Mat image)
-{
-	//hard-coded competition values
-	float color_correct_low = 0.06;
-	float color_correct_high = 0.06;
-	//// min amount of 'redness' for bins to even be considered
-	int red_min_integrand = 500000;	 //might be plus or minus a zero
-	//// the min contour areas, contours below which will be ignored
-	// enhancement might need to turned off for simulator
-	bool use_enhance = true;
-	// how good subs position over the bin must be before dropping
-	// how long sub should move forward directly prior to dropping to
-	// account for the dropper being behind the camera
-	//// if true it will look for more bins with the black areas directly
-	//// if less than the maximum amount of bins are found originally
-	// how close sub needs to be so that it will not readjust its
-	// heading while approaching the bin
-	// heading to turn to before beginning bins
-	// how long to go forward before looking for bins
- 
-	if (use_enhance)
+void getBins() {
+	// obtain image from the down camera.
+	cv::Mat image = imageRead(stdin);
+
+	// get the centroids of all bins
+	cv::Mat img_enhanced;
+	if (useenhance)
 	{
 		// if image does not contain enough high enough value red,
 		// it very likely does not contain a bin, and the lack of red
@@ -210,9 +215,9 @@ int getBins(bool sim, cv::Mat image)
 		cv::split(image, channels);
 		if (color_crop::integrate(channels[2], 175, 255) < red_min_integrand)
 		{
-			std::cout<<"found 0 bins \n" << std::endl;
-			std::cout<<"bins: \n";
-			return 0;
+			//std::cout << "found no bins\n";
+			//std::cout << "bins: \n";
+			return;
 		}
 
 		color_crop::whitebalance_simple_wrapper(image,
@@ -222,7 +227,7 @@ int getBins(bool sim, cv::Mat image)
 	{
 		img_enhanced = image;
 	}
-	std::vector<cv::Point2f> centroids = bin_contours(img_enhanced, nullptr, nullptr);
+	std::vector<cv::Point2f> centroids = bin_contours(img_enhanced, false, false);
 
 	numBins = 0;
 	for (; (numBins < centroids.size()) &&
@@ -232,17 +237,28 @@ int getBins(bool sim, cv::Mat image)
 		bins[numBins].y = .5f - centroids[numBins].y/img_enhanced.rows;
 	}
 
-	std::cout << numBins << "\n";
+	std::vector<Variable> dropper_evidence_variables;
+	for(int i = 0; i < 2*numBins; i++){
+		dropper_evidence_variables.push_back(Variable());
+		dropper_evidence_variables[i].index = i;
+		dropper_evidence_variables[i].variance = 1;
+	}
+	Evidence dropper_evidence(dropper_evidence_variables);
+
+	//std::cout << "found " << numBins << " bins\n";
+	//std::cout << "bins: ";
 	for (int i = 0; i < numBins; i++)
 	{
-		std::cout<< bins[i] << "\n" ;
+		//std::cout << " " << bins[i];
+		dropper_evidence_variables[2*i].value = bins[i].x;
+		dropper_evidence_variables[(2*i)+1].value = bins[i].y;
+		
 	}
-	std::cout<< std::endl;
-	return 0;
-}
+	dropper_evidence.write(stdout);
+	//std::cout << "\n";
 
+}
 int main(int argc,char **argv) {
-	auto image = imageRead(stdin);
-	getBins(*argv[2] == 's',image);
+	getBins();
 	return 0;
 }

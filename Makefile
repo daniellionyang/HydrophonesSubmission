@@ -50,7 +50,7 @@ IMAGE_SHOW = $(patsubst %,$(BUILD)/image_show/%.o,main) $(IMAGE) $(COMMON)
 IMAGE_SHOW_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_SHOW_LFLAGS = $(OPENCV_LFLAGS)
 
-DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE)
+DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE) $(MODEL) $(COMMON)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS) 
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
  
@@ -64,7 +64,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera image_read image_show sim_state dropper buoys model
+EXE_NAMES = modeling interface mission camera image_read image_show sim_state dropper buoys 
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
 all: $(EXE)
