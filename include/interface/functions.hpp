@@ -7,8 +7,7 @@
 
 bool hydrophones(Data*, const std::string, const std::string);
 
-bool buoys(Data*, const std::string, const std::string);
-bool bins(Data*, const std::string, const std::string);
+bool vision(Data*, const std::string, const std::string, size_t, size_t);
 
 bool camera(Data*, const std::string, const std::string, int);
 

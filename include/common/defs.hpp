@@ -46,5 +46,14 @@ enum
 	NUM_IMAGES
 };
 
+enum
+{
+	V_BUOYS,
+	V_BINS,
+	V_TORPS,
+	V_PVC,
+	NUM_VPIDS
+};
+
 #endif
 

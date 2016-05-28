@@ -59,145 +59,48 @@ bool hydrophones(Data* data, const std::string in_name, const std::string out_na
 	return true;
 }
 
-bool buoys(Data* data, const std::string in_name, const std::string out_name)
+bool vision(Data* data, const std::string in_name, const std::string out_name, size_t vpid, size_t image_index)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
 
-	uint32_t imageID = 0;
+	uint32_t imageID = {};
 
 	bool quit = false;
 	while (!quit)
 	{
-		bool newImage = false;
-		cv::Mat img;
+		// check if we should process this frame
+		bool running;
 		data->lock();
-			if (data->imageID.at(I_FRONT) > imageID)
-			{
-				img = data->image.at(I_FRONT);
-				imageID = data->imageID.at(I_FRONT);
-				newImage = true;
-			}
+			running = data->run_vision_process.at(vpid);
 		data->unlock();
 
-		if (newImage)
+		if (running)
 		{
-			imageWrite(out, img);
-
-			float // theta, phi, rho
-				rt, rp, rr,
-				gt, gp, gr,
-				yt, yp, yr;
-
-			fscanf(in, " %f %f %f %f %f %f %f %f %f",
-				rt, rp, rr,
-				gt, gp, gr,
-				yt, yp, yr
-			);
-
-			float // x, y, depth, horizontal variance, depth variance
-				rx, ry, rd, rhs, rds,
-				gx, gy, gd, ghs, gds,
-				yx, yy, yd, yhs, yds;
-
-			float x_i = data->state.x();
-			float y_i = data->state.y();
-			float depth_i = data->state.depth();
-			float yaw_i = data->state.yaw();
-			float small_angle = .05;
-
-			rx = x_i + rr * std::cos(rp * 2*M_PI) * std::cos((rt + yaw_i) * 2*M_PI);
-			ry = y_i + rr * std::cos(rp * 2*M_PI) * std::sin((rt + yaw_i) * 2*M_PI);
-			rd = depth_i + rr * std::sin(rp * 2*M_PI);
-			rhs = rr * std::abs(std::cos((rp + small_angle)*2*M_PI) - std::cos((rp - small_angle)*2*M_PI));
-			rds = rr * std::abs(std::sin((rp + small_angle)*2*M_PI) - std::sin((rp - small_angle)*2*M_PI));
-
-			gx = x_i + gr * std::cos(gp * 2*M_PI) * std::cos((gt + yaw_i) * 2*M_PI);
-			gy = y_i + gr * std::cos(gp * 2*M_PI) * std::sin((gt + yaw_i) * 2*M_PI);
-			gd = depth_i + gr * std::sin(gp * 2*M_PI);
-			ghs = gr * std::abs(std::cos((gp + small_angle)*2*M_PI) - std::cos((gp - small_angle)*2*M_PI));
-			gds = gr * std::abs(std::sin((gp + small_angle)*2*M_PI) - std::sin((gp - small_angle)*2*M_PI));
-
-			yx = x_i + yr * std::cos(yp * 2*M_PI) * std::cos((yt + yaw_i) * 2*M_PI);
-			yy = y_i + yr * std::cos(yp * 2*M_PI) * std::sin((yt + yaw_i) * 2*M_PI);
-			yd = depth_i + yr * std::sin(yp * 2*M_PI);
-			yhs = yr * std::abs(std::cos((yp + small_angle)*2*M_PI) - std::cos((yp - small_angle)*2*M_PI));
-			yds = yr * std::abs(std::sin((yp + small_angle)*2*M_PI) - std::sin((yp - small_angle)*2*M_PI));
-
+			bool newImage = false;
+			cv::Mat img;
 			data->lock();
-				data->evidence.push(Evidence({
-					{M_RBUOY_X, rx, rhs},
-					{M_RBUOY_Y, ry, rhs},
-					{M_RBUOY_D, rd, rds},
-				}));
-				data->evidence.push(Evidence({
-					{M_GBUOY_X, gx, ghs},
-					{M_GBUOY_Y, gy, ghs},
-					{M_GBUOY_D, gd, gds},
-				}));
-				data->evidence.push(Evidence({
-					{M_YBUOY_X, yx, yhs},
-					{M_YBUOY_Y, yy, yhs},
-					{M_YBUOY_D, yd, yds},
-				}));
+				if (data->imageID.at(image_index) > imageID)
+				{
+					img = data->image.at(image_index);
+					imageID = data->imageID.at(image_index);
+					newImage = true;
+				}
 			data->unlock();
-		}
-	}
 
-	return true;
-}
-
-bool bins(Data* data, const std::string in_name, const std::string out_name)
-{
-	FILE* in = openStream(in_name, "r");
-	FILE* out = openStream(out_name, "w");
-
-	uint32_t imageID = 0;
-
-	bool quit = false;
-	while (!quit)
-	{
-		bool newImage = false;
-		cv::Mat img;
-		data->lock();
-			if (data->imageID.at(I_DOWN) > imageID)
+			if (newImage)
 			{
-				img = data->image.at(I_DOWN);
-				imageID = data->imageID.at(I_DOWN);
-				newImage = true;
+				imageWrite(out, img);
+
+				Evidence evidence(in);
+
+				data->lock();
+					data->evidence.push(evidence);
+				data->unlock();
 			}
-		data->unlock();
-
-		if (newImage)
-		{
-			imageWrite(out, img);
-
-			float
-				ox, oy,
-				cx, cy;
-
-			fscanf(in, " %f %f %f %f",
-				ox, oy,
-				cx, cy
-			);
-
-			// variance
-			float cs = 0, os = 0;
-
-			// TODO: compute variance
-			// TODO: transform values so angle isn't linear with position
-
-			data->lock();
-				data->evidence.push(Evidence({
-					{M_OBIN_X, ox, os},
-					{M_OBIN_Y, oy, os},
-				}));
-				data->evidence.push(Evidence({
-					{M_CBIN_X, cx, cs},
-					{M_CBIN_Y, cy, cs},
-				}));
-			data->unlock();
+			else std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
+		else std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return true;
