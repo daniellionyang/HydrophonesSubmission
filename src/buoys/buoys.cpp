@@ -1,5 +1,15 @@
 #include "buoys/buoys.hpp"
 #include "image/image.hpp"
+#include "model/evidence.hpp"
+const int RX = 0;
+const int RY = 1;
+const int RZ = 2;
+const int GX = 3;
+const int GY = 4;
+const int GZ = 5;
+const int YX = 6;
+const int YY = 7;
+const int YZ = 8;
 //Creates an equalized distribution of certain colors
 //Read more at http://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/histogram_equalization/histogram_equalization.html
 cv::Mat equalColorHist(cv::Mat& img, bool red, bool green, bool blue)
@@ -54,6 +64,10 @@ cv::Mat generateDiffMap(cv::Mat& img, int diff)
 //These values were originally in config for l_gate but i don't see a need for them to be configurable. 
 //If you would like them to be configurable, talk to Varun. If Varun has graduated/quit for the Blue Devils by this point, I wish you the best of luck
 //This is Evan. I think the point is to make basically all the constants configurable if need be. I will make them configurable. Later.
+//But Luke said something about not having config files this year though. Please write back soon.
+// Sincrely, Varun.
+// P.S. I don't think I'm doing Blue Devils
+// P.P.S. first one to find the xkcd wins
 float cropx = 1.0;
 float cropy = 1.0;
 float offset = .9 * (1-cropy);
@@ -62,21 +76,33 @@ float scaley = 0.2;
 int diffDist = 8;
 //End supposedly config values that I suspect were never acually modified
 
-float rx, ry, rz, gx, gy, gz, yx, yy, yz;
-//this was global in the original buoys so stop blaming me luk
-cv::Mat processedImage; 
+
 
 int main(int argc, char** argv) {
 	//offset = 0;
 	// obtain images from the front camera.
  
 	cv::Mat image = imageRead(stdin);
+	cv::Mat processedImage; 
 
 	if(! image.data ){
 	std::cout <<  "Could not open or find the image" << std::endl ;
 	return -1;
 	}
 	// reset processedImage and define the image size
+ 
+	//initialize evidence variables 
+	//Evidence buoy_evidence;
+ 
+ 
+	std::vector<Variable> buoy_evidence_variables;
+	for(int i = 0; i < 9; i++){
+		buoy_evidence_variables.push_back(Variable()); 
+		buoy_evidence_variables[i].index = i;
+	}
+			
+	Evidence buoy_evidence(buoy_evidence_variables);	
+ 
  
 	processedImage.create(360, 640, CV_8UC3);
 
@@ -88,7 +114,7 @@ int main(int argc, char** argv) {
 				image.cols*cropx, image.rows*cropy)), image, 
 			cv::Size(image.cols*cropx*scalex, image.rows*cropy*scaley));
 
-	// create temporary image to store lower smaller processed image
+	// create temporabuoy_evidence_variables[RY].value image to store lower smaller processed image
 	cv::Mat output(image.rows, image.cols, CV_8UC3, cv::Scalar(0, 0, 0));
 	unsigned char* op = output.ptr();
 
@@ -189,8 +215,8 @@ int main(int argc, char** argv) {
 		if (maxR[i][0] > rMax)
 		{
 			rMax = maxR[i][0];
-			rx = (int)maxR[i][1];
-			ry = (int)maxR[i][2];
+			buoy_evidence_variables[RX].value = (int)maxR[i][1];
+			buoy_evidence_variables[RY].value = (int)maxR[i][2];
 		}
 		if (maxR[i][3] < rMin)
 		{
@@ -199,14 +225,14 @@ int main(int argc, char** argv) {
 		if (maxY[i][0] > yMax)
 		{
 			yMax = maxY[i][0];
-			yx = maxY[i][1];
-			yy = maxY[i][2];
+			buoy_evidence_variables[YX].value = maxY[i][1];
+			buoy_evidence_variables[YY].value = maxY[i][2];
 		}
 		if (maxG[i][0] > gMax)
 		{
 			gMax = maxG[i][0];
-			gx = (int)maxG[i][1];
-			gy = (int)maxG[i][2];
+			buoy_evidence_variables[GX].value = (int)maxG[i][1];
+			buoy_evidence_variables[GY].value = (int)maxG[i][2];
 		}
 		if (maxG[i][3] < gMin)
 		{
@@ -215,32 +241,34 @@ int main(int argc, char** argv) {
 	}
 
 	// highlight buoys on processed image
-	op[(int)(3*(ry*image.cols+rx))] = 0;
-	op[(int)(3*(ry*image.cols+rx))+1] = 0;
-	op[(int)(3*(gy*image.cols+gx))] = 0;
-	op[(int)(3*(gy*image.cols+gx))+2] = 0;
-	op[(int)(3*(yy*image.cols+yx))+1] = 0;
-	op[(int)(3*(yy*image.cols+yx))+2] = 0;
-	op[(int)(3*(gy*image.cols+gx))+1] = 255;
-	op[(int)(3*(ry*image.cols+rx))+2] = 255;
-	op[(int)(3*(yy*image.cols+yx))] = 255;
+	op[(int)(3*(buoy_evidence_variables[RY].value*image.cols+buoy_evidence_variables[RX].value))] = 0;
+	op[(int)(3*(buoy_evidence_variables[RY].value*image.cols+buoy_evidence_variables[RX].value))+1] = 0;
+	op[(int)(3*(buoy_evidence_variables[GY].value*image.cols+buoy_evidence_variables[GX].value))] = 0;
+	op[(int)(3*(buoy_evidence_variables[GY].value*image.cols+buoy_evidence_variables[GX].value))+2] = 0;
+	op[(int)(3*(buoy_evidence_variables[YY].value*image.cols+buoy_evidence_variables[YX].value))+1] = 0;
+	op[(int)(3*(buoy_evidence_variables[YY].value*image.cols+buoy_evidence_variables[YX].value))+2] = 0;
+	op[(int)(3*(buoy_evidence_variables[GY].value*image.cols+buoy_evidence_variables[GX].value))+1] = 255;
+	op[(int)(3*(buoy_evidence_variables[RY].value*image.cols+buoy_evidence_variables[RX].value))+2] = 255;
+	op[(int)(3*(buoy_evidence_variables[YY].value*image.cols+buoy_evidence_variables[YX].value))] = 255;
 
 	// resize filtered image for processed image
 	cv::resize(output, processedImage(cv::Rect(processedImage.cols*(1-cropx)/2, processedImage.rows*(1-cropy-offset)/2, 
 				processedImage.cols*cropx, processedImage.rows*cropy)), 
 			cv::Size(processedImage.cols*cropx, processedImage.rows*cropy), 0, 0, cv::INTER_NEAREST);
 
-	rx = (rx - image.cols/2) / image.cols;
-	ry = (image.rows/2 - ry) / image.rows;
-	rz = 1;
-	gx = (gx - image.cols/2) / image.cols;
-	gy = (image.rows/2 - gy) / image.rows+offset;
-	gz = 1;
-	yx = (yx - image.cols/2) / image.cols;
-	yy = (image.rows/2 - yy) / image.rows;
-	yz = 1;
+	buoy_evidence_variables[RX].value = (buoy_evidence_variables[RX].value - image.cols/2) / image.cols;
+	buoy_evidence_variables[RY].value = (image.rows/2 - buoy_evidence_variables[RY].value) / image.rows;
+	buoy_evidence_variables[RZ].value = 1;
+	buoy_evidence_variables[GX].value = (buoy_evidence_variables[GX].value - image.cols/2) / image.cols;
+	buoy_evidence_variables[GY].value = (image.rows/2 - buoy_evidence_variables[GY].value) / image.rows+offset;
+	buoy_evidence_variables[GZ].value = 1;
+	buoy_evidence_variables[YX].value = (buoy_evidence_variables[YX].value - image.cols/2) / image.cols;
+	buoy_evidence_variables[YY].value = (image.rows/2 - buoy_evidence_variables[YY].value) / image.rows;
+	buoy_evidence_variables[YZ].value = 1;
+	
 
-	std::cout << rx << " " << ry << " " << rz << " " << gx << " " << gy << " " << gz << " " << yx << " " << yy << " " << yz << "\n "; 
+	//std::cout << buoy_evidence_variables[RX].value << " " << buoy_evidence_variables[RY].value << " " << buoy_evidence_variables[RZ].value << " " << buoy_evidence_variables[GX].value << " " << buoy_evidence_variables[GY].value << " " << buoy_evidence_variables[GZ].value << " " << buoy_evidence_variables[YX].value << " " << buoy_evidence_variables[YY].value << " " << buoy_evidence_variables[YZ].value << "\n "; 
+	buoy_evidence.write(stdout);
  
 	return 0;
 }

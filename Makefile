@@ -54,7 +54,7 @@ DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS) 
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
  
-BUOYS = $(patsubst %, $(BUILD)/buoys/%.o,buoys) $(IMAGE)
+BUOYS = $(patsubst %, $(BUILD)/buoys/%.o,buoys) $(IMAGE) $(MODEL) $(COMMON)
 BUOYS_CFLAGS = $(OPENCV_CFLAGS) 
 BUOYS_LFLAGS = $(OPENCV_LFLAGS)
 
@@ -64,13 +64,10 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera image_read image_show sim_state dropper buoys
+EXE_NAMES = modeling interface mission camera image_read image_show sim_state dropper buoys model
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
 all: $(EXE)
-
-$(BIN)/modeling: $(MODELING)
-	$(CC) $^ $(LFLAGS) $(MODELING_LFLAGS) -o $@
 
 $(BIN)/interface: $(INTERFACE)
 	$(CC) $^ $(LFLAGS) $(INTERFACE_LFLAGS) -o $@
@@ -95,12 +92,12 @@ $(BIN)/buoys: $(BUOYS)
  
 $(BIN)/sim_state: $(SIM_STATE)
 	$(CC) $^ $(LFLAGS) $(SIM_STATE_LFLAGS) -o $@
+
+$(BIN)/sim_state: $(SIM_STATE)
+	$(CC) $^ $(LFLAGS) $(SIM_STATE_LFLAGS) -o $@
  
 $(BUILD)/common/%.o: $(SRC)/common/%.cpp
 	$(CC) $(CFLAGS) $< -o $@
-
-$(BUILD)/model/%.o: $(SRC)/model/%.cpp
-	$(CC) $(CFLAGS) $(MODEL_CFLAGS) $< -o $@
 
 $(BUILD)/image/%.o: $(SRC)/image/%.cpp
 	$(CC) $(CFLAGS) $(IMAGE_CFLAGS) $< -o $@
@@ -129,6 +126,8 @@ $(BUILD)/dropper/%.o: $(SRC)/dropper/%.cpp
 $(BUILD)/buoys/%.o: $(SRC)/buoys/%.cpp
 	$(CC) $(CFLAGS) $(BUOYS_CFLAGS) $< -o $@
 
+$(BUILD)/model/%.o: $(SRC)/model/%.cpp
+	$(CC) $(CFLAGS) $(DROPPER_CFLAGS) $< -o $@
 clean:
 	rm -f modeling
 	rm -f interface
