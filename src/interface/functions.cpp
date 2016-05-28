@@ -25,7 +25,7 @@ FILE* openStream(const std::string name, const char* mode)
 	}
 }
 
-bool hydrophones(const std::string in_name, const std::string out_name, Data* data)
+bool hydrophones(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -59,7 +59,7 @@ bool hydrophones(const std::string in_name, const std::string out_name, Data* da
 	return true;
 }
 
-bool buoys(const std::string in_name, const std::string out_name, Data* data)
+bool buoys(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -147,7 +147,7 @@ bool buoys(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool bins(const std::string in_name, const std::string out_name, Data* data)
+bool bins(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -202,7 +202,7 @@ bool bins(const std::string in_name, const std::string out_name, Data* data)
 
 	return true;
 }
-bool camera_f(const std::string in_name, const std::string out_name, Data* data)
+bool camera_f(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -226,7 +226,7 @@ bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool camera_d(const std::string in_name, const std::string out_name, Data* data)
+bool camera_d(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -250,7 +250,7 @@ bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool mission(const std::string in_name, const std::string out_name, Data* data)
+bool mission(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -400,7 +400,7 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool modeling(const std::string in_name, const std::string out_name, Data* data)
+bool modeling(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
@@ -440,7 +440,7 @@ bool modeling(const std::string in_name, const std::string out_name, Data* data)
 	return true;
 }
 
-bool control(const std::string in_name, const std::string out_name, Data* data)
+bool control(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
