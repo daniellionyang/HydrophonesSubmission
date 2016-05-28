@@ -39,5 +39,12 @@ enum
 	M_PINGER_Y,
 };
 
+enum
+{
+	I_FRONT,
+	I_DOWN,
+	NUM_IMAGES
+};
+
 #endif
 

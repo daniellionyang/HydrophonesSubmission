@@ -4,8 +4,7 @@
 
 Data::Data() :
 	stateID(0),
-	imageFrontID(0),
-	imageDownID(0),
+	imageID({0,0}),
 	modelID(0),
 	setState(false),
 	drop(false),

@@ -72,10 +72,10 @@ bool buoys(const std::string in_name, const std::string out_name, Data* data)
 		bool newImage = false;
 		cv::Mat img;
 		data->lock();
-			if (data->imageFrontID > imageID)
+			if (data->imageID.at(I_FRONT) > imageID)
 			{
-				img = data->imageFront;
-				imageID = data->imageFrontID;
+				img = data->image.at(I_FRONT);
+				imageID = data->imageID.at(I_FRONT);
 				newImage = true;
 			}
 		data->unlock();
@@ -160,10 +160,10 @@ bool bins(const std::string in_name, const std::string out_name, Data* data)
 		bool newImage = false;
 		cv::Mat img;
 		data->lock();
-			if (data->imageDownID > imageID)
+			if (data->imageID.at(I_DOWN) > imageID)
 			{
-				img = data->imageDown;
-				imageID = data->imageDownID;
+				img = data->image.at(I_DOWN);
+				imageID = data->imageID.at(I_DOWN);
 				newImage = true;
 			}
 		data->unlock();
@@ -216,8 +216,8 @@ bool camera_f(const std::string in_name, const std::string out_name, Data* data)
 
 		// store image
 		data->lock();
-			data->imageFront = std::move(img);
-			data->imageFrontID++;
+			data->image.at(I_FRONT) = std::move(img);
+			data->imageID.at(I_FRONT)++;
 		data->unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -240,8 +240,8 @@ bool camera_d(const std::string in_name, const std::string out_name, Data* data)
 
 		// store image
 		data->lock();
-			data->imageDown = std::move(img);
-			data->imageDownID++;
+			data->image.at(I_DOWN) = std::move(img);
+			data->imageID.at(I_DOWN)++;
 		data->unlock();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -287,7 +287,7 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 							case 'f': // front
 							{
 								data->lock();
-									auto img = data->imageFront;
+									auto img = data->image.at(I_FRONT);
 								data->unlock();
 
 								imageWrite(out, img);
@@ -297,7 +297,7 @@ bool mission(const std::string in_name, const std::string out_name, Data* data)
 							case 'd': // down
 							{
 								data->lock();
-									auto img = data->imageDown;
+									auto img = data->image.at(I_DOWN);
 								data->unlock();
 
 								imageWrite(out, img);

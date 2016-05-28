@@ -7,6 +7,7 @@
 #include <cv.h>
 #include <cstdint>
 
+#include "common/defs.hpp"
 #include "common/matrix.hpp"
 #include "common/state.hpp"
 #include "model/evidence.hpp"
@@ -22,10 +23,8 @@ public:
 	State state;
 	uint32_t stateID;
 
-	cv::Mat imageFront;
-	uint32_t imageFrontID;
-	cv::Mat imageDown;
-	uint32_t imageDownID;
+	std::array<cv::Mat, NUM_IMAGES> image;
+	std::array<uint32_t, NUM_IMAGES> imageID;
 
 	Matrix model;
 	uint32_t modelID;
