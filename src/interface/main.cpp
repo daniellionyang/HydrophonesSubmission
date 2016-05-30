@@ -12,7 +12,7 @@ int main()
 	size_t numThreads = 0;
 
 	for (auto c : defaultConnections())
-		threads[numThreads++] = std::thread(c.function, c.in_name, c.out_name, &data);
+		threads[numThreads++] = std::thread(c.function, &data);
 
 	for (size_t i = 0; i < numThreads; i++)
 		threads[i].join();

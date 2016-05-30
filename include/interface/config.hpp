@@ -8,12 +8,19 @@
 
 struct Connection
 {
-	const std::function<bool(const std::string, const std::string, Data*)> function;
-	const std::string in_name;
-	const std::string out_name;
+	template <typename F, typename... A>
+	Connection(F _function, A... args) :
+		function(std::bind(_function, std::placeholders::_1, args...))
+	{
+	}
+
+	const std::function<bool(Data*)> function;
 };
 
 std::vector<Connection> defaultConnections();
+
+Matrix initialModel();
+Matrix initialVariance();
 
 #endif
 

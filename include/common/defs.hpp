@@ -1,6 +1,11 @@
 #ifndef MISSION_DEFS_HPP
 #define MISSION_DEFS_HPP
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#define POOL_D 16
+#endif
+
 enum
 {
 	M_ZERO = 0,
@@ -33,6 +38,22 @@ enum
 	M_H4_Y,
 	M_PINGER_X,
 	M_PINGER_Y,
+};
+
+enum
+{
+	I_FRONT,
+	I_DOWN,
+	NUM_IMAGES
+};
+
+enum
+{
+	V_BUOYS,
+	V_BINS,
+	V_TORPS,
+	V_PVC,
+	NUM_VPIDS
 };
 
 #endif

@@ -6,6 +6,12 @@ System::System()
 {
 }
 
+System::System(size_t _maxSize, std::vector<Hypothesis> _hypotheses) :
+	maxSize(_maxSize),
+	hypotheses(_hypotheses)
+{
+}
+
 System::System(FILE* in)
 {
 	int size, max_size;

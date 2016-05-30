@@ -5,17 +5,15 @@
 
 #include "interface/data.hpp"
 
-bool hydrophones(const std::string, const std::string, Data*);
+bool hydrophones(Data*, const std::string, const std::string);
 
-bool buoys(const std::string, const std::string, Data*);
-bool bins(const std::string, const std::string, Data*);
+bool vision(Data*, const std::string, const std::string, size_t, size_t);
 
-bool camera_f(const std::string, const std::string, Data*);
-bool camera_d(const std::string, const std::string, Data*);
+bool camera(Data*, const std::string, const std::string, int);
 
-bool mission(const std::string, const std::string, Data*);
-bool modeling(const std::string, const std::string, Data*);
-bool control(const std::string, const std::string, Data*);
+bool mission(Data*, const std::string, const std::string);
+bool modeling(Data*, const std::string, const std::string);
+bool control(Data*, const std::string, const std::string);
 
 #endif
 

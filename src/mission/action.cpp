@@ -61,20 +61,18 @@ bool moveRelative(FILE* in, FILE* out, const State& diff, float minDistance)
 	return moveAbsolute(in, out, target, minDistance);
 }
 
-bool moveAbsRel(FILE* in, FILE* out, float x, float y, float z)
+bool moveDir(FILE* in, FILE* out, const State& change, float minDistance)
 {
-	State state = getState(in, out);
-	return false;
-}
-
-State convertRelative(const State& sub, const State& target, const State& offset)
-{
-	float hyp = sqrt(pow(sub.x() - target.x(), 2) + pow(sub.y() - target.y(), 2));
-	return State(
-		(sub.x() - target.x()) / hyp * offset.x() + (sub.y() - target.y()) / hyp * offset.y(),
-		(sub.y() - target.y()) / hyp * offset.x() + (sub.x() - target.x()) / hyp * offset.y(),
-		offset.depth()
-	);
+	auto state = getState(in, out);
+	
+	auto dx = change.x() * std::cos((state.yaw() + change.yaw()) * 2 * M_PI)
+			- change.y() * std::sin((state.yaw() + change.yaw()) * 2 * M_PI);
+	auto dy = change.x() * std::sin((state.yaw() + change.yaw()) * 2 * M_PI)
+			- change.y() * std::cos((state.yaw() + change.yaw()) * 2 * M_PI);
+	
+	auto target = State(dx, dy, change.depth(), change.yaw(), change.pitch(), change.roll());
+	
+	return moveRelative(in, out, target, minDistance);
 }
 
 bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
@@ -107,12 +105,11 @@ bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, 
 	return true;
 }
 
-bool moveModelRel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
+bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
 {
-	State state = getState(in, out);
-	auto model = getModel(in, out);
-	State target = convertRelative(state, State(model.get(xi), model.get(yi), model.get(zi)), State(xo, yo, zo));
-	return moveModel(in, out, xi, yi, zi, target.x(), target.y(), target.depth(), minDistance);
+	auto target = State(xo, yo, zo, 0, 0, 0);
+	return (moveModel(in, out, xi, yi, zi, 0, 0, 0, minDistance) 
+		&& moveDir(in, out, target, minDistance));
 }
 
 bool dropInBin(FILE* in, FILE* out)

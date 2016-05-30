@@ -5,16 +5,16 @@
 #include "mission/goal.hpp"
 #include "mission/action.hpp"
 
-#define DEFAULTMINDIST 5
+#define DEFAULTMINDIST 0.5
 
 std::vector<Goal> defaultGoals();
 
-std::vector<Action> gateActions(float);
+std::vector<Action> gateActions();
 std::vector<Action> buoyActions();
-std::vector<Action> lgateActions(float);
-std::vector<Action> binsActions(float);
+std::vector<Action> pvcActions();
+std::vector<Action> binsActions();
 std::vector<Action> pingerActions();
-std::vector<Action> hydrophoneActions();
+std::vector<Action> torpedoActions();
 
 #endif
 
