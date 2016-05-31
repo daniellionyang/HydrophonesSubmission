@@ -198,67 +198,72 @@ std::vector<cv::Point2f> bin_contours(cv::Mat img_bgr_enhanced,
 
 	return centroids;
 }
-void getBins() {
-	// obtain image from the down camera.
-	cv::Mat image = imageRead(stdin);
-
-	// get the centroids of all bins
-	cv::Mat img_enhanced;
-	if (useenhance)
+int main(int argc,char **argv) {
+	char ch = fgetc(stdin);
+	while(ch != 'q')
 	{
-		// if image does not contain enough high enough value red,
-		// it very likely does not contain a bin, and the lack of red
-		// would result in a very distorted auto white balance that can
-		// lead to false positives, therefore, we assume zero bins
-		// immediately.
-		cv::Mat channels[image.channels()];
-		cv::split(image, channels);
-		if (color_crop::integrate(channels[2], 175, 255) < red_min_integrand)
+		// obtain image from the down camera.
+		cv::Mat image = imageRead(stdin);
+		
+		if(!image.data)
 		{
-			//std::cout << "found no bins\n";
-			//std::cout << "bins: \n";
-			return;
+			std::cout << "0\n";
+			continue;
 		}
 
-		color_crop::whitebalance_simple_wrapper(image,
-				img_enhanced, color_correct_low, color_correct_high);
-	}
-	else
-	{
-		img_enhanced = image;
-	}
-	std::vector<cv::Point2f> centroids = bin_contours(img_enhanced, false, false);
+		// get the centroids of all bins
+		cv::Mat img_enhanced;
+		if (useenhance)
+		{
+			// if image does not contain enough high enough value red,
+			// it very likely does not contain a bin, and the lack of red
+			// would result in a very distorted auto white balance that can
+			// lead to false positives, therefore, we assume zero bins
+			// immediately.
+			cv::Mat channels[image.channels()];
+			cv::split(image, channels);
+			if (color_crop::integrate(channels[2], 175, 255) < red_min_integrand)
+			{
+				//no bins found
+				std::cout << "0\n";
+				ch = fgetc(stdin);
+				continue;
+			}
 
-	numBins = 0;
-	for (; (numBins < centroids.size()) &&
-			(numBins < sizeof(bins)/sizeof(bins[0])); numBins++)
-	{
-		bins[numBins].x = centroids[numBins].x/img_enhanced.cols - .5f;
-		bins[numBins].y = .5f - centroids[numBins].y/img_enhanced.rows;
-	}
+			color_crop::whitebalance_simple_wrapper(image,
+					img_enhanced, color_correct_low, color_correct_high);
+		}
+		else
+		{
+			img_enhanced = image;
+		}
+		std::vector<cv::Point2f> centroids = bin_contours(img_enhanced, false, false);
 
-	std::vector<Variable> dropper_evidence_variables;
-	for(int i = 0; i < 2*numBins; i++){
-		dropper_evidence_variables.push_back(Variable());
-		dropper_evidence_variables[i].index = i;
-		dropper_evidence_variables[i].variance = 1;
-	}
-	Evidence dropper_evidence(dropper_evidence_variables);
+		numBins = 0;
+		for (; (numBins < centroids.size()) &&
+				(numBins < sizeof(bins)/sizeof(bins[0])); numBins++)
+		{
+			bins[numBins].x = centroids[numBins].x/img_enhanced.cols - .5f;
+			bins[numBins].y = .5f - centroids[numBins].y/img_enhanced.rows;
+		}
 
-	//std::cout << "found " << numBins << " bins\n";
-	//std::cout << "bins: ";
-	for (int i = 0; i < numBins; i++)
-	{
-		//std::cout << " " << bins[i];
-		dropper_evidence_variables[2*i].value = bins[i].x;
-		dropper_evidence_variables[(2*i)+1].value = bins[i].y;
+		std::vector<Variable> dropper_evidence_variables;
+		for(int i = 0; i < 2*numBins; i++){
+			dropper_evidence_variables.push_back(Variable());
+			dropper_evidence_variables[i].index = i;
+			dropper_evidence_variables[i].variance = 1;
+		}
+		Evidence dropper_evidence(dropper_evidence_variables);
+
+		for (int i = 0; i < numBins; i++)
+		{
+			dropper_evidence_variables[2*i].value = bins[i].x;
+			dropper_evidence_variables[(2*i)+1].value = bins[i].y;
+		}
+		dropper_evidence.write(stdout);
 		
+		ch = fgetc(stdin);
 	}
-	dropper_evidence.write(stdout);
-	//std::cout << "\n";
 
-}
-int main(int argc,char **argv) {
-	getBins();
 	return 0;
 }

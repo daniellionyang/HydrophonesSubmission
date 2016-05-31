@@ -63,7 +63,8 @@ int main(int argc, char** argv)
 		if(!image.data)
 		{
 			std::cout << "0\n";
-			return -1;
+			ch = fgetc(stdin);
+			continue;
 		}
 
 		//Initialize evidence variables 
