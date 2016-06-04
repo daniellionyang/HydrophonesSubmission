@@ -42,6 +42,10 @@ CAMERA = $(patsubst %,$(BUILD)/camera/%.o,main) $(IMAGE) $(COMMON)
 CAMERA_CFLAGS = $(OPENCV_CFLAGS) $(FLYCAP_CFLAGS)
 CAMERA_LFLAGS = $(OPENCV_LFLAGS) $(FLYCAP_LFLAGS)
 
+CAMERAPIPE = $(patsubst %,$(BUILD)/camera_pipe/%.o,main) $(IMAGE) $(COMMON)
+CAMERAPIPE_CFLAGS = $(OPENCV_CFLAGS)
+CAMERAPIPE_LFLAGS = $(OPENCV_LFLAGS)
+
 IMAGE_READ = $(patsubst %,$(BUILD)/image_read/%.o,main) $(IMAGE) $(COMMON)
 IMAGE_READ_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_READ_LFLAGS = $(OPENCV_LFLAGS)
@@ -55,7 +59,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera image_read image_show sim_state
+EXE_NAMES = modeling interface mission camera camera_pipe image_read image_show sim_state
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
 all: $(EXE)
@@ -71,6 +75,9 @@ $(BIN)/mission: $(MISSION)
 
 $(BIN)/camera: $(CAMERA)
 	$(CC) $^ $(LFLAGS) $(CAMERA_LFLAGS) -o $@
+
+$(BIN)/camera_pipe: $(CAMERAPIPE)
+	$(CC) $^ $(LFLAGS) $(CAMERAPIPE_LFLAGS) -o $@
 
 $(BIN)/image_read: $(IMAGE_READ)
 	$(CC) $^ $(LFLAGS) $(IMAGE_READ_LFLAGS) -o $@
@@ -101,6 +108,9 @@ $(BUILD)/mission/%.o: $(SRC)/mission/%.cpp
 
 $(BUILD)/camera/%.o: $(SRC)/camera/%.cpp
 	$(CC) $(CFLAGS) $(CAMERA_CFLAGS) $< -o $@
+
+$(BUILD)/camera_pipe/%.o: $(SRC)/camera_pipe/%.cpp
+	$(CC) $(CFLAGS) $(CAMERAPIPE_CFLAGS) $< -o $@
 
 $(BUILD)/image_read/%.o: $(SRC)/image_read/%.cpp
 	$(CC) $(CFLAGS) $(IMAGE_READ_CFLAGS) $< -o $@
