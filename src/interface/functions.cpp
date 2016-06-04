@@ -27,8 +27,8 @@ FILE* openStream(const std::string name, const char* mode)
 
 bool hydrophones(Data* data, const std::string in_name, const std::string out_name)
 {
-	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
+	FILE* in = openStream(in_name, "r");
 
 	bool quit = false;
 	while (!quit)
@@ -61,8 +61,8 @@ bool hydrophones(Data* data, const std::string in_name, const std::string out_na
 
 bool vision(Data* data, const std::string in_name, const std::string out_name, size_t vpid, size_t image_index)
 {
-	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
+	FILE* in = openStream(in_name, "r");
 
 	uint32_t imageID = {};
 
@@ -108,8 +108,8 @@ bool vision(Data* data, const std::string in_name, const std::string out_name, s
 
 bool camera(Data* data, const std::string in_name, const std::string out_name, size_t image_index)
 {
-	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
+	FILE* in = openStream(in_name, "r");
 
 	bool quit = false;
 	while (!quit)
@@ -132,8 +132,8 @@ bool camera(Data* data, const std::string in_name, const std::string out_name, s
 
 bool mission(Data* data, const std::string in_name, const std::string out_name)
 {
-	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
+	FILE* in = openStream(in_name, "r");
 
 	bool quit = false;
 	while (!quit)
@@ -282,8 +282,8 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 
 bool modeling(Data* data, const std::string in_name, const std::string out_name)
 {
-	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
+	FILE* in = openStream(in_name, "r");
 
 	// initialize model
 	fprintf(out, "s\n");
@@ -322,8 +322,8 @@ bool modeling(Data* data, const std::string in_name, const std::string out_name)
 
 bool control(Data* data, const std::string in_name, const std::string out_name)
 {
-	FILE* in = openStream(in_name, "r");
 	FILE* out = openStream(out_name, "w");
+	FILE* in = openStream(in_name, "r");
 
 	bool quit = false;
 	while (!quit)
