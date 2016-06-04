@@ -17,3 +17,4 @@ python/**/*.pyo
 3rdparty/flycapture/lib/**
 
 sim_model.blend*
+pipe/*
