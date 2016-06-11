@@ -38,10 +38,10 @@ std::vector<Buoy> buoys =
 };
 
 const float cropx = 1.0;
-const float cropy = 1.0;
-const float offset = 0.9 * (1 - cropy);
-const float scalex = 64;
-const float scaley = 48;
+const float cropy = 0.8;
+const float offset = 0.0 * (1 - cropy);
+const float scalex = 128;
+const float scaley = 96;
 //const float scalex = 0.2;
 //const float scaley = 0.2;
 const int diffDist = 8;
@@ -147,13 +147,13 @@ int main(int argc, char** argv)
 			auto visited = std::vector<std::vector<bool> >(img.rows, std::vector<bool>(img.cols, false));
 			float size = std::sqrt(floodFill(img, visited, mr, mc, .8 * max) * 4/M_PI);
 
-			float theta = fhFOV * static_cast<float>(mc - img.cols/2) / img.cols;
-			float phi = fvFOV * static_cast<float>(mr - img.rows/2) / img.rows;
-			float dist = std::max(.2, buoyWidth/2 / std::tan(size/img.cols * fvFOV / 2 * 2*M_PI) - 1.f);
+			float theta = cropx *  fhFOV * static_cast<float>(mc - img.cols/2) / img.cols;
+			float phi = cropy * fvFOV * static_cast<float>(mr - img.rows/2) / img.rows;
+			float dist = std::max(.2, buoyWidth/2 / std::tan(size/img.cols * cropy * fvFOV / 2 * 2*M_PI) - 1.f);
 
 			bool cont = false;
 			for (auto f : found)
-				if (std::abs(theta - f.theta) < .05)
+				if (std::abs(theta - f.theta) < .00)
 					cont = true;
 			if (cont) continue;
 
