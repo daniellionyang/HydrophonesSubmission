@@ -1,5 +1,9 @@
 #include "dropper/color_crop.hpp"
 
+#include <set>
+
+#include <opencv2/imgproc/imgproc.hpp>
+
 
 cv::Mat color_crop::multichannel_thresh(const cv::Mat& input,
 		const std::vector< std::array<double, 2> > thresh_params)

@@ -1,6 +1,10 @@
 #include"dropper/droppers.hpp"
 #include "model/evidence.hpp"
 
+#include <iostream>
+
+#include <opencv2/imgproc/imgproc.hpp>
+
 cv::Mat img_enhanced;
 static std::vector< std::array<double,2> > black_vals (3);
 static std::vector< std::array<double,2> > orange_vals (3);
@@ -237,7 +241,7 @@ int main(int argc,char **argv) {
 		{
 			img_enhanced = image;
 		}
-		std::vector<cv::Point2f> centroids = bin_contours(img_enhanced, false, false);
+		std::vector<cv::Point2f> centroids = bin_contours(img_enhanced, NULL, NULL);
 
 		numBins = 0;
 		for (; (numBins < centroids.size()) &&
