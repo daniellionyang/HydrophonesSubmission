@@ -38,7 +38,7 @@ std::vector<Buoy> buoys =
 };
 
 const float cropx = 1.0;
-const float cropy = 0.8;
+const float cropy = 0.6;
 const float offset = 0.0 * (1 - cropy);
 const float scalex = 128;
 const float scaley = 96;
