@@ -3,7 +3,7 @@ SRC = src
 BUILD = build
 BIN = bin
 
-CFLAGS = -ggdb -c -std=c++11 -Iinclude
+CFLAGS = -ggdb -c -std=c++14 -Iinclude
 LFLAGS = 
 
 THIRDPARTY = ./3rdparty/
