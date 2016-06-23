@@ -4,13 +4,14 @@
 
 Data::Data() :
 	stateID(0),
-	imageID({0,0}),
+	imageID({}),
 	modelID(0),
 	setState(false),
 	drop(false),
 	grab(false),
 	release(false),
 	shoot(false),
+	flags({}),
 	model(initialModel())
 {
 }

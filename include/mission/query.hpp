@@ -16,5 +16,7 @@ Matrix getModel(FILE*, FILE*);
 System getSystem(FILE*, FILE*);
 float getCertainty(FILE*, FILE*);
 
+float getFlag(FILE*, FILE*, size_t);
+
 #endif
 

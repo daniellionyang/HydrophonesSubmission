@@ -19,9 +19,9 @@ struct SubState
 class State
 {
 public:
-	State();
-	State(FILE*);
-	State(float, float, float, float yaw = 0, float pitch = 0, float roll = 0);
+	State() noexcept;
+	State(FILE*) noexcept;
+	State(float, float, float, float yaw = 0, float pitch = 0, float roll = 0) noexcept;
 	void write(FILE*) const;
 
 	float x() const;

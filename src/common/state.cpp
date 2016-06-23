@@ -2,11 +2,11 @@
 
 #include <cmath>
 
-State::State()
+State::State() noexcept
 {
 }
 
-State::State(FILE* in)
+State::State(FILE* in) noexcept
 {
 	float x, y, depth, yaw, pitch, roll;
 	fscanf(in, " s %f %f %f %f %f %f",
@@ -21,7 +21,7 @@ State::State(FILE* in)
 	setRoll(roll);
 }
 
-State::State(float x, float y, float depth, float yaw, float pitch, float roll) :
+State::State(float x, float y, float depth, float yaw, float pitch, float roll) noexcept :
 	m_x(x),
 	m_y(y),
 	m_depth(depth),

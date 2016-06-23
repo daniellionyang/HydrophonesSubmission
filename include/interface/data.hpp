@@ -26,7 +26,7 @@ public:
 	std::array<cv::Mat, NUM_IMAGES> image;
 	std::array<uint32_t, NUM_IMAGES> imageID;
 
-	std::array<bool, NUM_VPIDS> run_vision_process;
+	std::array<float, NUM_FLAGS> flags;
 
 	Matrix model;
 	uint32_t modelID;

@@ -44,3 +44,8 @@ void release(FILE* out)
 	fprintf(out, "c g r\n");
 }
 
+void setFlag(FILE* out, size_t idx, float value)
+{
+	fprintf(out, "c f %z %f\n", idx, value);
+}
+

@@ -37,3 +37,12 @@ float getCertainty(FILE* in, FILE* out)
 	return certainty;
 }
 
+float getFlag(FILE* in, FILE* out, size_t idx)
+{
+	fprintf(out, "q f %z\n", idx);
+	fflush(out);
+	float value;
+	fscanf(in, " %f", &value);
+	return value;
+}
+

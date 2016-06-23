@@ -179,3 +179,9 @@ bool uncoverHole(FILE* in, FILE* out)
 	return true;
 }
 
+bool flag(FILE* in, FILE* out, size_t idx, float value)
+{
+	setFlag(out, idx, value);
+	return true;
+}
+

@@ -37,5 +37,7 @@ bool uncoverBin(FILE*, FILE*);
 bool shootInHole(FILE*, FILE*);
 bool uncoverHole(FILE*, FILE*);
 
+bool flag(FILE*, FILE*, size_t, float);
+
 #endif
 

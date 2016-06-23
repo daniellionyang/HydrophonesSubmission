@@ -49,11 +49,11 @@ enum
 
 enum
 {
-	V_BUOYS,
-	V_BINS,
-	V_TORPS,
-	V_PVC,
-	NUM_VPIDS
+	F_BUOYS,
+	F_BINS,
+	F_TORPS,
+	F_PVC,
+	NUM_FLAGS
 };
 
 #endif

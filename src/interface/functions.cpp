@@ -72,7 +72,7 @@ bool vision(Data* data, const std::string in_name, const std::string out_name, s
 		// check if we should process this frame
 		bool running;
 		data->lock();
-			running = data->run_vision_process.at(vpid);
+			running = data->flags.at(vpid) > .5;
 		data->unlock();
 
 		if (running)
@@ -218,6 +218,19 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 						}
 						break;
 					}
+					case 'f': // flag
+					{
+						size_t idx;
+						fscanf(in, " %z", &idx);
+						float value = 0;
+						if (idx < NUM_FLAGS)
+						{
+							data->lock();
+								value = data->flags.at(idx);
+							data->unlock();
+						}
+						fprintf(out, "%f\n", value);
+					}
 				}
 				break;
 			}
@@ -268,6 +281,18 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 							data->shoot = t;
 						data->unlock();
 						break;
+					}
+					case 'f': // flag
+					{
+						size_t idx;
+						float value;
+						fscanf(in, " %z %f", &idx, &value);
+						if (idx < NUM_FLAGS)
+						{
+							data->lock();
+								data->flags.at(idx) = value;
+							data->unlock();
+						}
 					}
 				}
 				break;
