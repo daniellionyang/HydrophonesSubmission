@@ -16,7 +16,7 @@ FLYCAP_CFLAGS = -I$(SRC) -I$(FLYCAP)/include/
 FLYCAP_LFLAGS = -L$(FLYCAP)/lib -lflycapture -Wl,-rpath=$(FLYCAP)/lib/
 
 
-COMMON = $(patsubst %,$(BUILD)/common/%.o,matrix state)
+COMMON = $(patsubst %,$(BUILD)/common/%.o,matrix state config)
 COMMON_CFLAGS = 
 
 MODEL = $(patsubst %,$(BUILD)/model/%.o,system hypothesis evidence)

@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "common/config.hpp"
 #include "interface/data.hpp"
 #include "interface/functions.hpp"
 
@@ -18,9 +19,6 @@ struct Connection
 };
 
 std::vector<Connection> defaultConnections();
-
-Matrix initialModel();
-Matrix initialVariance();
 
 #endif
 

@@ -7,13 +7,14 @@
 #include <thread>
 #include <chrono>
 
+#include "common/config.hpp"
 #include "model/system.hpp"
 
 int process(FILE* in, FILE* out)
 {
 	srand(time(NULL));
 
-	System system;
+	System system = {256, {{1, initialModel, initialVariance }}};
 
 	bool quit = false;
 	while (!quit)

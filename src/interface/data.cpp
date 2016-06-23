@@ -12,7 +12,7 @@ Data::Data() :
 	release(false),
 	shoot(false),
 	flags({}),
-	model(initialModel())
+	model(initialModel)
 {
 }
 

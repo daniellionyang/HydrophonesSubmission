@@ -1,0 +1,10 @@
+#ifndef COMMON_CONFIG_HPP
+#define COMMON_CONFIG_HPP
+
+#include "common/matrix.hpp"
+
+extern const Matrix initialModel;
+extern const Matrix initialVariance;
+
+#endif
+

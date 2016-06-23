@@ -14,19 +14,3 @@ std::vector<Connection> defaultConnections()
 	};
 }
 
-Matrix initialModel()
-{
-	return
-	{
-		0, 12, -6, 20, -10, 2, 22, -8, 2, 21, -9, 2, 29, -15, 22, -26, 23, -26, 26, -26, 0, 0, 0, 0, 0, 0, 0, 0, 42, -25,
-	};
-}
-
-Matrix initialVariance()
-{
-	return
-	{
-		1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	};
-}
-

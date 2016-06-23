@@ -360,11 +360,6 @@ bool modeling(Data* data, const std::string in_name, const std::string out_name)
 	FILE* out = openStream(out_name, "w");
 	FILE* in = openStream(in_name, "r");
 
-	// initialize model
-	fprintf(out, "s\n");
-	System(16, {{1, initialModel(), initialVariance()}}).write(out);
-	fflush(out);
-
 	bool quit = false;
 	while (!quit)
 	{
