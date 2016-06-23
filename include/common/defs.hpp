@@ -38,6 +38,7 @@ enum
 	M_H4_Y,
 	M_PINGER_X,
 	M_PINGER_Y,
+	NUM_VARS
 };
 
 enum

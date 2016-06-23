@@ -25,6 +25,52 @@ FILE* openStream(const std::string name, const char* mode)
 	}
 }
 
+Evidence observation(FILE* in, const State& state)
+{
+	int x, y, d; // indices
+	float theta, phi, rho; // rho is absolute depth if d < 0, 0 phi is horizontal, +phi is down
+	fscanf(in, " %i %i %i %f %f %f\n",
+		&x,     &y,   &d,
+		&theta, &phi, &rho
+	);
+
+	// adjust for existing state
+	theta += state.yaw();
+	float cx = state.x();
+	float cy = state.y();
+	float cd = state.depth();
+
+	// transform to radians
+	theta *= 2 * M_PI;
+	phi *= 2 * M_PI;
+
+	Evidence evidence = {};
+	if (x >= 0 && x < NUM_VARS && y >= 0 && y < NUM_VARS)
+	{
+		if (d >= 0 && d < NUM_VARS)
+		{
+			float hdist = rho*std::cos(phi);
+			return
+			{{
+				{x, cx + hdist*static_cast<float>(std::cos(theta)), static_cast<float>(std::pow(.2 * hdist*std::cos(theta), 2))},
+				{y, cy + hdist*static_cast<float>(std::sin(theta)), static_cast<float>(std::pow(.2 * hdist*std::sin(theta), 2))},
+				{d, cd + rho*static_cast<float>(std::sin(phi)), static_cast<float>(std::pow(.2 * rho*std::sin(phi), 2))}
+			}};
+		}
+		else // depth already known
+		{
+			float rd = rho - cd;
+			float hdist = rd / std::tan(phi);
+			return
+			{{
+				{x, cx + hdist*static_cast<float>(std::cos(theta)), static_cast<float>(std::pow(.2 * hdist*std::cos(theta), 2))},
+				{y, cy + hdist*static_cast<float>(std::sin(theta)), static_cast<float>(std::pow(.2 * hdist*std::sin(theta), 2))},
+			}};
+		}
+	} // otherwise we don't know how to use this observation
+	else return {};
+}
+
 bool hydrophones(Data* data, const std::string in_name, const std::string out_name)
 {
 	FILE* out = openStream(out_name, "w");
@@ -33,26 +79,19 @@ bool hydrophones(Data* data, const std::string in_name, const std::string out_na
 	bool quit = false;
 	while (!quit)
 	{
-		float theta, phi;
-		fscanf(in, " h %f %f", &theta, &phi);
+		State state;
+		data->lock();
+			state = data->state;
+		data->unlock();
 
-		float x_i = data->state.x();
-		float y_i = data->state.y();
-		float depth_i = data->state.depth();
-		float yaw_i = data->state.yaw();
-
-		float distance = (15-depth_i) * std::tan((-phi) * 2*M_PI);
-		float small_angle = .05;
-
-		float x = x_i + distance * std::cos((theta + yaw_i) * 2*M_PI);
-		float y = y_i + distance * std::sin((theta + yaw_i) * 2*M_PI);
-		float s = (15-depth_i) * (std::tan((-phi+small_angle) * 2*M_PI) - std::tan((-phi-small_angle) * 2*M_PI));
+		Evidence evidence = observation(in, state);
 
 		data->lock();
-			data->evidence.push(Evidence({
-				{M_PINGER_X, x, s},
-				{M_PINGER_Y, y, s},
-			}));
+			data->evidence.push(evidence);
+		data->unlock();
+
+		data->lock();
+			data->evidence.push(evidence);
 		data->unlock();
 	}
 
@@ -92,11 +131,22 @@ bool vision(Data* data, const std::string in_name, const std::string out_name, s
 			{
 				imageWrite(out, img);
 
-				Evidence evidence(in);
+				int num_observations = 0;
+				fscanf(in, " %i", &num_observations);
 
-				data->lock();
-					data->evidence.push(evidence);
-				data->unlock();
+				for (int i = 0; i < num_observations; i++)
+				{
+					State state;
+					data->lock();
+						state = data->state;
+					data->unlock();
+
+					Evidence evidence = observation(in, state);
+
+					data->lock();
+						data->evidence.push(evidence);
+					data->unlock();
+				}
 			}
 			else std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
