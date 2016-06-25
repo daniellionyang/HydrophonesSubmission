@@ -7,6 +7,7 @@
 #include <thread>
 #include <chrono>
 
+#include "common/defs.hpp"
 #include "common/config.hpp"
 #include "model/system.hpp"
 
@@ -34,6 +35,17 @@ int process(FILE* in, FILE* out)
 			case 'e': // evidence
 				system.add(Evidence(in));
 				break;
+			case 'v': // variance
+			{
+				size_t idx;
+				float v;
+				fscanf(in, " %z %f", &idx, &v);
+				if (idx >= NUM_VARS)
+					for (size_t i = 0; i < NUM_VARS; i++)
+						system.addVariance(i, v * varianceGrowth.get(i));
+				else system.addVariance(idx, v);
+				break;
+			}
 			case 'q': // quit
 				quit = true;
 				break;

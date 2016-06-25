@@ -20,6 +20,7 @@ public:
 	Matrix mode() const;
 
 	void add(Evidence);
+	void addVariance(size_t, float);
 	void scale(float);
 
 private:

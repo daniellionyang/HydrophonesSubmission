@@ -2,6 +2,7 @@
 #define INTERFACE_DATA_HPP
 
 #include <queue>
+#include <tuple>
 #include <mutex>
 
 #include <cv.h>
@@ -32,6 +33,7 @@ public:
 	uint32_t modelID;
 
 	std::queue<Evidence> evidence;
+	std::queue<std::tuple<size_t, float> > addVariance;
 
 	State desiredState;
 	bool setState;

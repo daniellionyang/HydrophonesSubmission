@@ -2,7 +2,7 @@
 
 #include "mission/action.hpp"
 
-Goal::Goal(float _value, float _time, int _xi, int _yi, int _di, float _xo, float _yo, float _do, std::vector<Action> _actions) :
+Goal::Goal(float _value, float _time, int _xi, int _yi, int _di, float _xo, float _yo, float _do, float _mindist, std::vector<Action> _actions) :
 	m_value(_value),
 	m_time(_time),
 	m_xi(_xi),
@@ -11,6 +11,7 @@ Goal::Goal(float _value, float _time, int _xi, int _yi, int _di, float _xo, floa
 	m_xo(_xo),
 	m_yo(_yo),
 	m_do(_do),
+	m_mindist(_mindist),
 	m_actions(_actions)
 {
 }
@@ -19,10 +20,11 @@ Goal::Goal(FILE* in)
 {
 	int numActions = 0;
 
-	if (fscanf(in, " %f %f %i %i %i %f %f %f %i",
+	if (fscanf(in, " %f %f %i %i %i %f %f %f %f %i",
 		&m_value, &m_time,
 		&m_xi, &m_yi, &m_di,
 		&m_xo, &m_yo, &m_do,
+		&m_mindist,
 		&numActions
 	) < 9)
 		throw 1;
@@ -35,10 +37,11 @@ size_t Goal::write(FILE* out)
 {
 	size_t numBytes = 0;
 
-	numBytes += fprintf(out, "%f %f %i %i %i %f %f %f %i\n",
+	numBytes += fprintf(out, "%f %f %i %i %i %f %f %f %f %i\n",
 		m_value, m_time,
 		m_xi, m_yi, m_di,
 		m_xo, m_yo, m_do,
+		m_mindist,
 		m_actions.size()
 	);
 
@@ -76,5 +79,10 @@ float Goal::value() const
 float Goal::time() const
 {
 	return m_time;
+}
+
+float Goal::mindist() const
+{
+	return m_mindist;
 }
 

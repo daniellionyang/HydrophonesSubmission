@@ -44,6 +44,12 @@ Matrix System::mode()
 	return best.mode();
 }
 
+void System::addVariance(size_t idx, float value)
+{
+	for (auto h : hypotheses)
+		h.addVariance(idx, value);
+}
+
 void System::add(Evidence evidence)
 {
 	std::vector<Hypothesis> newHypotheses;

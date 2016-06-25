@@ -19,6 +19,7 @@ public:
 	Matrix mode();
 
 	void add(Evidence);
+	void addVariance(size_t, float);
 
 private:
 	size_t maxSize;

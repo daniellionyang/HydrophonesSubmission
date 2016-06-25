@@ -2,6 +2,7 @@
 #define MISSION_ACTION_HPP
 
 #include <functional>
+#include <string>
 
 #include "common/state.hpp"
 
@@ -23,6 +24,7 @@ private:
 	std::function<bool(FILE*, FILE*)> m_function;
 };
 
+bool lprintf(FILE*, FILE*, const std::string);
 
 bool wait(FILE*, FILE*, float);
 bool moveAbsolute(FILE*, FILE*, const State&, float);
@@ -34,10 +36,12 @@ bool moveModelDir(FILE*, FILE*, int, int, int, float, float, float, float);
 bool dropInBin(FILE*, FILE*);
 bool uncoverBin(FILE*, FILE*);
 
-bool shootInHole(FILE*, FILE*);
-bool uncoverHole(FILE*, FILE*);
+bool shootInHole(FILE*, FILE*, char);
+bool moveToHole(FILE*, FILE*, size_t, size_t, size_t, float, float);
 
 bool flag(FILE*, FILE*, size_t, float);
+
+bool variance(FILE*, FILE*, size_t, float);
 
 #endif
 

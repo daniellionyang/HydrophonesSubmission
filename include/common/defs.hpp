@@ -18,7 +18,6 @@ enum
 	M_TORP_T_D,    M_TORP_B_D,
 	M_TORP_L_X,    M_TORP_L_Y,
 	M_TORP_R_X,    M_TORP_R_Y,
-	M_OCTAGON_X,   M_OCTAGON_Y,
 	M_PINGER_X,    M_PINGER_Y,
 	NUM_VARS
 };
@@ -27,6 +26,7 @@ enum
 {
 	C_POOL_D,
 	C_PVC_D,
+	C_OCTAGON_X,   C_OCTAGON_Y,
 };
 
 enum
@@ -42,6 +42,8 @@ enum
 	F_BINS,
 	F_TORPS,
 	F_PVC,
+	F_PINGER,
+	F_OCTAGON, // assume pinger is under octagon
 	NUM_FLAGS
 };
 

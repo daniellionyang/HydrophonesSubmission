@@ -343,6 +343,20 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 								data->flags.at(idx) = value;
 							data->unlock();
 						}
+						break;
+					}
+					case 'v': // variance
+					{
+						size_t idx;
+						float value;
+						fscanf(in, " %z %f", &idx, &value);
+						if (idx < NUM_VARS)
+						{
+							data->lock();
+								data->addVariance.push(std::make_tuple(idx, value));
+							data->unlock();
+						}
+						break;
 					}
 				}
 				break;
@@ -368,12 +382,25 @@ bool modeling(Data* data, const std::string in_name, const std::string out_name)
 		auto model = Matrix(in); // read model
 
 		std::queue<Evidence> evidence;
+		std::queue<std::tuple<size_t, float> > variance;
 		// store model and get new evidences
 		data->lock();
 			data->model = std::move(model);
 			data->modelID++;
 			std::swap(evidence, data->evidence);
+			std::swap(variance, data->addVariance);
 		data->unlock();
+
+		// update variance
+		while (!variance.empty())
+		{
+			fprintf(out, "e\n");
+			auto v = variance.front();
+			variance.pop();
+			fprintf(out, "v %z %f\n", std::get<0>(v), std::get<1>(v));
+		}
+		fflush(out);
+
 
 		// send new evidence
 		while (!evidence.empty())
@@ -401,6 +428,16 @@ bool control(Data* data, const std::string in_name, const std::string out_name)
 		fprintf(out, "c\n"); // request state
 		fflush(out);
 		auto state = State(in); // read state
+
+		// compute movement
+		State oldState;
+		data->lock();
+			oldState = data->state;
+		data->unlock();
+		float dist = state.distanceTo(oldState);
+		data->lock();
+			data->addVariance.push(std::make_tuple(static_cast<size_t>(NUM_VARS), dist));
+		data->unlock();
 
 		State desiredState;
 		bool setState, drop, grab, release;

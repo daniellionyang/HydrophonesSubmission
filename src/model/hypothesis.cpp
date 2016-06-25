@@ -43,6 +43,11 @@ Matrix Hypothesis::mode() const
 	return m_values;
 }
 
+void Hypothesis::addVariance(size_t idx, float value)
+{
+	m_variance.set(idx, m_variance.get(idx) + value);
+}
+
 void Hypothesis::add(Evidence evidence)
 {
 	for (auto v : evidence.variables)

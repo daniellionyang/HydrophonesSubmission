@@ -12,6 +12,7 @@ void drop(FILE*);
 void grab(FILE*); // TODO add support for both front and down grabber
 void release(FILE*);
 void setFlag(FILE*, size_t, float);
+void addVariance(FILE*, size_t, float);
 
 #endif
 

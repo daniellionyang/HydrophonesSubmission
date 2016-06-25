@@ -10,7 +10,7 @@
 class Goal
 {
 public:
-	Goal(float, float, int, int, int, float, float, float, std::vector<Action>);
+	Goal(float, float, int, int, int, float, float, float, float, std::vector<Action>);
 
 	Goal(FILE*);
 
@@ -18,6 +18,7 @@ public:
 
 	float value() const;
 	float time() const;
+	float mindist() const;
 
 	State location(const Matrix& model) const;
 
@@ -26,6 +27,7 @@ public:
 private:
 	float m_value;
 	float m_time;
+	float m_mindist;
 
 	int   m_xi, m_yi, m_di;
 	float m_xo, m_yo, m_do;

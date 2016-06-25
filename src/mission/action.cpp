@@ -3,7 +3,9 @@
 #include <thread>
 #include <chrono>
 #include <cmath>
+#include <iostream>
 
+#include "common/defs.hpp"
 #include "mission/command.hpp"
 #include "mission/query.hpp"
 
@@ -23,9 +25,16 @@ bool Action::run(FILE* in, FILE* out)
 	return m_function(in, out);
 }
 
+bool lprintf(FILE*, FILE*, const std::string str)
+{
+	std::cerr << str;
+	return true;
+}
+
 bool wait(FILE* in, FILE* out, float time)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(time * 1000)));
+	return true;
 }
 
 bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
@@ -114,19 +123,12 @@ bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float y
 
 bool dropInBin(FILE* in, FILE* out)
 {
-	// maybe do stuff to aim here
-
 	drop(out);
-
-	wait(in, out, 1);
-
 	return true;
 }
 
 bool uncoverBin(FILE* in, FILE* out)
 {
-	// maybe do stuff to aim here
-
 	auto state = getState(in, out);
 	auto target = state;
 
@@ -150,31 +152,45 @@ bool uncoverBin(FILE* in, FILE* out)
 
 bool shootInHole(FILE* in, FILE* out, char side)
 {
-	// maybe do stuff to aim here
-
 	shoot(out, side);
-
-	wait(in, out, 1);
-
 	return true;
 }
 
-bool uncoverHole(FILE* in, FILE* out)
+bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offset, float mindist)
 {
-	// maybe do stuff to aim here
+	bool close = false;
+	while (!close)
+	{
+		State state = getState(in, out);
+		float cx = state.x();
+		float cy = state.y();
+		float cz = state.depth();
 
-	auto state = getState(in, out);
-	auto target = state;
+		auto model = getModel(in, out);
 
-	grab(out);
-	wait(in, out, 1);
+		float tx = model.get(xi);
+		float ty = model.get(yi);
+		float td = model.get(di);
 
-	moveRelative(in, out, State(.3, .3, 0), .1);
+		float theta = std::atan2(model.get(M_TORP_L_Y) - model.get(M_TORP_R_Y), model.get(M_TORP_L_X) - model.get(M_TORP_R_X)) + M_PI/2;
 
-	release(out);
-	wait(in, out, 1);
+		auto target = State(
+			model.get(xi) - offset*std::cos(theta),
+			model.get(yi) - offset*std::sin(theta),
+			model.get(di),
+			theta / (2*M_PI),
+			0,
+			0
+		);
 
-	moveAbsolute(in, out, state, .1);
+		setState(out, target);
+
+		if (state.distanceTo(target) < mindist)
+			close = true;
+		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
+	}
+
+	stop(in, out);
 
 	return true;
 }
@@ -182,6 +198,12 @@ bool uncoverHole(FILE* in, FILE* out)
 bool flag(FILE* in, FILE* out, size_t idx, float value)
 {
 	setFlag(out, idx, value);
+	return true;
+}
+
+bool variance(FILE* in, FILE* out, size_t idx, float value)
+{
+	addVariance(out, idx, value);
 	return true;
 }
 

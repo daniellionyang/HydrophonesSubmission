@@ -12,7 +12,7 @@ int mission(FILE* in, FILE* out, FILE* config)
 {
 	std::vector<Goal> goals;
 
-	if (config == NULL) goals = defaultGoals();
+	if (config == NULL) goals = initialGoals;
 	else
 	{
 		int numGoals = 0;
@@ -43,7 +43,7 @@ int mission(FILE* in, FILE* out, FILE* config)
 
 		// if close enough, begin goal
 		auto goalLoc = goal.location(model);
-		if (state.distanceTo(goalLoc) < 10)
+		if (state.distanceTo(goalLoc) < goal.mindist())
 		{
 			if (goal.run(in, out)) goals.pop_back();
 			// do something here if it fails
