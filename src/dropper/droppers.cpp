@@ -1,5 +1,7 @@
 #include"dropper/droppers.hpp"
 #include "model/evidence.hpp"
+#include "common/defs.hpp"
+#include "common/config.hpp"
 
 #include <iostream>
 
@@ -250,23 +252,26 @@ int main(int argc,char **argv) {
 			bins[numBins].x = centroids[numBins].x/img_enhanced.cols - .5f;
 			bins[numBins].y = .5f - centroids[numBins].y/img_enhanced.rows;
 		}
-
-		std::vector<Variable> dropper_evidence_variables;
-		for(int i = 0; i < 2*numBins; i++){
-			dropper_evidence_variables.push_back(Variable());
-			dropper_evidence_variables[i].index = i;
-			dropper_evidence_variables[i].variance = 1;
-		}
-		Evidence dropper_evidence(dropper_evidence_variables);
-
-		for (int i = 0; i < numBins; i++)
-		{
-			dropper_evidence_variables[2*i].value = bins[i].x;
-			dropper_evidence_variables[(2*i)+1].value = bins[i].y;
-		}
-		dropper_evidence.write(stdout);
 		
 		ch = fgetc(stdin);
+	
+		float camera_pixel_x = 480; //RANDOM PX VALS ON IMAGE TAKEN
+		float camera_pixel_y = 256;
+		float angle_width_bottom = 125; //ANGLE OF BOTTOM CAMERA
+		float angle_height_bottom = 80;
+	
+		float theta;	
+		float phi; 
+
+		for(int g=0; g<numBins; g++)
+		{
+			theta = (bins[g].x/camera_pixel_x)*angle_width_bottom - angle_width_bottom/2;
+			phi = (bins[g].y/camera_pixel_y)*angle_height_bottom - angle_height_bottom/2;
+			std::cout << M_OBIN_X << M_OBIN_Y << -1 << theta << phi << constants.get(C_POOL_D); //d and rho are random as on floor bottom
+		
+		}
+
+
 	}
 
 	return 0;
