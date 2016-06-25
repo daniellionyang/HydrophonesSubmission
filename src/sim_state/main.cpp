@@ -15,7 +15,7 @@ bool update(std::atomic<State>* state, std::atomic<State>* des)
 	float dPitch = 1;
 	float dRoll = 1;
 
-	float freq = 30;
+	float freq = 5;
 
 	while (true)
 	{
