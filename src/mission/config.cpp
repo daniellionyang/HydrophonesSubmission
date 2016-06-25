@@ -1,5 +1,7 @@
 #include "mission/config.hpp"
 
+#include "common/config.hpp"
+
 std::vector<Goal> defaultGoals()
 {
 	return
@@ -23,7 +25,7 @@ std::vector<Goal> defaultGoals()
 		{  2900, 0, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 0,
 			binsActions(),
 		},
-		{  1000, 0, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, POOL_D,
+		{  1000, 0, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, constants.get(C_POOL_D),
 			pingerActions(),
 		},
 	};
@@ -72,7 +74,7 @@ std::vector<Action> pingerActions()
 {
 	return
 	{
-		{  moveModelDir, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, POOL_D, DEFAULTMINDIST },
+		{  moveModelDir, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, constants.get(C_POOL_D), DEFAULTMINDIST },
 	};
 }
 

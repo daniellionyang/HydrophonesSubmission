@@ -5,6 +5,7 @@
 
 extern const Matrix initialModel;
 extern const Matrix initialVariance;
+extern const Matrix constants;
 
 #endif
 
