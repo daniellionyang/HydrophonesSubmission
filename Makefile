@@ -25,6 +25,9 @@ MODEL_CFLAGS =
 IMAGE = $(patsubst %,$(BUILD)/image/%.o,image)
 IMAGE_CFLAGS = $(OPENCV_CFLAGS)
 
+VISION = $(patsubst %,$(BUILD)/vision/%.o,config)
+VISION_CFLAGS = 
+
 
 MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
@@ -42,7 +45,7 @@ CAMERA = $(patsubst %,$(BUILD)/camera/%.o,main) $(IMAGE) $(COMMON)
 CAMERA_CFLAGS = $(OPENCV_CFLAGS) $(FLYCAP_CFLAGS)
 CAMERA_LFLAGS = $(OPENCV_LFLAGS) $(FLYCAP_LFLAGS)
 
-BUOYS = $(patsubst %,$(BUILD)/buoys/%.o,buoys) $(IMAGE) $(MODEL) $(COMMON)
+BUOYS = $(patsubst %,$(BUILD)/buoys/%.o,buoys) $(IMAGE) $(VISION) $(COMMON)
 BUOYS_CFLAGS = $(OPENCV_CFLAGS)
 BUOYS_LFLAGS = $(OPENCV_LFLAGS)
 
@@ -111,6 +114,9 @@ $(BUILD)/model/%.o: $(SRC)/model/%.cpp
 
 $(BUILD)/image/%.o: $(SRC)/image/%.cpp
 	$(CC) $(CFLAGS) $(IMAGE_CFLAGS) $< -o $@
+
+$(BUILD)/vision/%.o: $(SRC)/vision/%.cpp
+	$(CC) $(CFLAGS) $(VISION_CFLAGS) $< -o $@
 
 $(BUILD)/modeling/%.o: $(SRC)/modeling/%.cpp
 	$(CC) $(CFLAGS) $(MODELING_CFLAGS) $< -o $@

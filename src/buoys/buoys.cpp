@@ -1,6 +1,51 @@
-#include "buoys/buoys.hpp"
+#include <vector>
+#include <functional>
+#include <algorithm>
+#include <thread>
+#include <chrono>
+
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <cv.h>
+
+#include "common/defs.hpp"
+#include "vision/config.hpp"
 #include "image/image.hpp"
-#include "model/evidence.hpp"
+
+struct Buoy
+{
+	size_t x_idx, y_idx, d_idx;
+	float color[3];
+	std::function<float(float, float, float)> filter;
+};
+
+std::vector<Buoy> buoys =
+{
+	{
+		M_RBUOY_X, M_RBUOY_Y, M_RBUOY_D, {0,0,1},
+		[](float r, float g, float b){ return .7*r/(g+.001) - 1.20*g/(b+.001)-(g+b)*0.01; }
+//		[](float r, float g, float b){ return r; }
+	},
+	{
+		M_GBUOY_X, M_GBUOY_Y, M_GBUOY_D, {0,1,0},
+		[](float r, float g, float b){ return (g+0.4*r)/(b+0.7*r+3.01)-0.004*r; }
+//		[](float r, float g, float b){ return g; }
+	},
+	{
+		M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, {0,1,1},
+		[](float r, float g, float b){ return .5+(r+g-b)/4; }
+//		[](float r, float g, float b){ return b; }
+	},
+};
+
+const float cropx = 1.0;
+const float cropy = 1.0;
+const float offset = 0.9 * (1 - cropy);
+const float scalex = 0.2;
+const float scaley = 0.2;
+const int diffDist = 8;
+const float buoyWidth = .2;
 
 //Creates an equalized distribution of certain colors
 //Read more at http://docs.opencv.org/2.4/doc/tutorials/imgproc/histograms/histogram_equalization/histogram_equalization.html
@@ -51,169 +96,133 @@ cv::Mat generateDiffMap(cv::Mat& img, int diff)
  
 	return diffMap;
 }
-	
+
+cv::Mat scaleIntensity(const cv::Mat& img)
+{
+	const float* iptr = img.ptr<float>();
+
+	cv::Mat res(img.size(), CV_32F);
+	float* rptr = res.ptr<float>();
+
+	float min = 9999999, max = -9999999;
+	for (size_t i = 0; i < img.rows * img.cols; i++)
+	{
+		if (iptr[i] < min) min = iptr[i];
+		if (iptr[i] > max) max = iptr[i];
+	}
+
+	float range = max - min;
+
+	for (size_t i = 0; i < img.rows * img.cols; i++)
+		rptr[i] = (iptr[i] - min) / range;
+
+	return res;
+}
+
+int floodFill(const cv::Mat& img, std::vector<std::vector<bool> >& visited, int row, int col, float threshold)
+{
+	if (row < 0 || col < 0 || row >= img.rows || col >= img.cols || visited.at(row).at(col) || img.at<float>(row, col) < threshold)
+		return 0;
+	else
+	{
+		visited.at(row).at(col) = true;
+		return 1 +
+			floodFill(img, visited, row + 1, col, threshold) +
+			floodFill(img, visited, row - 1, col, threshold) +
+			floodFill(img, visited, row, col + 1, threshold) +
+			floodFill(img, visited, row, col - 1, threshold);
+	}
+}
+
 int main(int argc, char** argv)
 {
-	char ch = fgetc(stdin);
-	while(ch != 'q')
+	FILE* in = stdin;
+	FILE* out = stdout;
+	FILE* log = stderr;
+
+	while(true)
 	{
 		//Obtain image from the front camera.
-		cv::Mat image = imageRead(stdin);
-	
+		cv::Mat image = imageRead(in);
+
 		if(!image.data)
 		{
-			std::cout << "0\n";
-			ch = fgetc(stdin);
+			fprintf(out, "0\n");
 			continue;
 		}
 
-		//Initialize evidence variables 
-		std::vector<Variable> buoy_evidence_variables;
-		for(int i = 0; i < 9; i++)
-		{
-			buoy_evidence_variables.push_back(Variable()); 
-			buoy_evidence_variables[i].index = i;
-		}
-				
-		Evidence buoy_evidence(buoy_evidence_variables);	
-	 
-		//Reset processedImage and define the image size
-		cv::Mat processedImage; 
-		processedImage.create(360, 640, CV_8UC3);
-		memset(processedImage.ptr(), 100, processedImage.rows*processedImage.cols*3);
-		int image_size = image.rows*image.cols;
-
 		//Crop and resize image
 		cv::resize(image(cv::Rect(image.cols*(1-cropx)/2, image.rows*(1-cropy-offset)/2, 
-					image.cols*cropx, image.rows*cropy)), image, 
-				cv::Size(image.cols*cropx*scalex, image.rows*cropy*scaley));
+			image.cols*cropx, image.rows*cropy)), image, 
+			cv::Size(image.cols*cropx*scalex, image.rows*cropy*scaley));
+		size_t rows = image.rows;
+		size_t cols = image.cols;
+		unsigned char* ptr = image.ptr();
 
-		//Create temporabuoy_evidence_variables[RY].value image to store lower smaller processed image
-		cv::Mat output(image.rows, image.cols, CV_8UC3, cv::Scalar(0, 0, 0));
-		unsigned char* op = output.ptr();
+		fprintf(out, "%u\n", buoys.size());
 
-		cv::Mat imgR, imgG, imgY;
-		imgR.create(image.rows, image.cols, CV_8UC1);
-		imgG.create(image.rows, image.cols, CV_8UC1);
-		imgY.create(image.rows, image.cols, CV_8UC1);
+		cv::Mat imgP;
+		image.copyTo(imgP);
 
-		unsigned char* rPtr = imgR.ptr(), *gPtr = imgG.ptr(), *yPtr = imgY.ptr();
-
-		const unsigned char* ip = image.ptr();
-
-		//Filter for green
-		cv::Mat grMat(image.size(), CV_32F, cv::Scalar(0));
-		cv::Mat reMat(image.size(), CV_32F, cv::Scalar(0));
-		float* gp = grMat.ptr<float>();
-		float* rp = reMat.ptr<float>();
-		cv::Mat histo = equalColorHist(image, false, false, false);
-		unsigned char* hp = histo.ptr();
-		for (int i = 0; i < image.rows*image.cols; i++)
+		for (auto b : buoys)
 		{
-			int b = hp[3*i], g = hp[3*i+1], r = (int)hp[3*i+2];
-			//gp[i] = 40.0*(g-0.4*r)/(b+3.0*r+10.1);
-			gp[i] = (g+0.4*r)/(b+0.7*r+3.01)-0.004*r;
-			rp[i] = 70.0*r/(g+1.0) - 120.0*g/(b+1.0)-(g+b)*0.1;
+			cv::Mat imgF;
+			imgF.create(rows, cols, CV_32F);
+			float* fptr = imgF.ptr<float>();
+
+			for (size_t i = 0; i < rows * cols; i++)
+				fptr[i] = b.filter(ptr[3*i+2]/256.f, ptr[3*i+1]/256.f, ptr[3*i+0]/256.f);
+
+			auto imgD = generateDiffMap(imgF, diffDist);
+
+			cv::Mat imgB = cv::Mat(imgD.size(), CV_32F, cv::Scalar(0));
+			cv::blur(imgD, imgB, cv::Size(3, 3));
+
+			cv::Mat imgS = scaleIntensity(imgD);
+
+			auto img = imgS;
+
+			/*
+			auto imgPB = img;
+			cv::Mat imgP(imgPB.size(), CV_8UC3);
+			for (size_t i = 0; i < imgPB.rows*imgPB.cols; i++)
+			{
+				int value = imgPB.ptr<float>()[i] * 255;
+				imgP.ptr()[3*i] = b.color[0]*value;
+				imgP.ptr()[3*i+1] = b.color[1]*value;
+				imgP.ptr()[3*i+2] = b.color[2]*value;
+			}
+			imageWrite(log, imgP);
+			*/
+
+			float max = -1000000;
+			int mr = 0;
+			int mc = 0;
+			for (int r = 0; r < rows; r++)
+				for (int c = 0; c < cols; c++)
+					if (img.at<float>(r, c) > max)
+					{
+						max = img.at<float>(r, c);
+						mr = r;
+						mc = c;
+					}
+
+			auto visited = std::vector<std::vector<bool> >(img.rows, std::vector<bool>(img.cols, false));
+			float size = std::sqrt(floodFill(img, visited, mr, mc, .9 * max));
+
+			float theta = fhFOV * static_cast<float>(mc - img.cols/2) / img.cols;
+			float phi = fvFOV * static_cast<float>(mr - img.rows/2) / img.rows;
+			float dist = buoyWidth/2 / std::tan(size/img.cols * fhFOV / 2 * 2*M_PI);
+
+			fprintf(out, "%zu %zu %zu\n%f %f %f\n",
+				b.x_idx, b.y_idx, b.d_idx,
+				theta,   phi,     dist
+			);
+
+			cv::ellipse(imgP, cv::Point(mr, mc), cv::Size(4, 4), 0, 0, 360, cv::Scalar(255*b.color[0], 255*b.color[1], 255*b.color[2]));
 		}
-	 
-		cv::Mat diMap = generateDiffMap(grMat, diffDist);
-		cv::Mat drMap = generateDiffMap(reMat, diffDist);
 
-		cv::blur(diMap, diMap, cv::Size(3,3));
-
-		float* drffp = drMap.ptr<float>();
-		float* diffp = diMap.ptr<float>();
-
-		float maxR[4] = {-1000, 0, 0, 1000};
-		int maxY[3] = {-1};
-		float maxG[4] = {-1000, 0, 0, 1000};
-		for (int i = 0; i < image.cols*image.rows; i++)
-		{
-			int b = ip[3*i], g = ip[3*i+1], r = (int)ip[3*i+2];
-			
-			op[3*i+2] = drffp[i]/10+128;
-
-			//Filter for red
-			if (drffp[i] > maxR[0])
-			{
-				maxR[0] = drffp[i];
-				maxR[1] = i % image.cols;
-				maxR[2] = i / image.cols;
-			}
-			if (drffp[i] < maxR[3])
-			{
-				maxR[3] = drffp[i];
-			}
-
-			//Filter for yellow
-			yPtr[i] = std::max(0, std::min(255, 128+(r+g-b)/4));
-			op[3*i] = yPtr[i];
-
-			//Find yellow buoy
-			if (yPtr[i] > maxY[0])
-			{
-				maxY[0] = yPtr[i];
-				maxY[1] = i % image.cols;
-				maxY[2] = i / image.cols;
-			}
-
-			op[3*i+1] = diffp[i]+128;
-			//Find green buoy and max/min values
-			if (diffp[i] > maxG[0])
-			{
-				maxG[0] = diffp[i];
-				maxG[1] = i % image.cols;
-				maxG[2] = i / image.cols;
-			}
-			if (diffp[i] < maxG[3])
-			{
-				maxG[3] = diffp[i];
-			}
-		}
-		buoy_evidence_variables[RX].value = (int)maxR[1];
-		buoy_evidence_variables[RY].value = (int)maxR[2];
-		buoy_evidence_variables[YX].value = maxY[1];
-		buoy_evidence_variables[YY].value = maxY[2];
-		buoy_evidence_variables[GX].value = (int)maxG[1];
-		buoy_evidence_variables[GY].value = (int)maxG[2];
-		
-		if(ch == 'i')
-		{
-			//Highlight buoys on processed image
-			op[(int)(3*(buoy_evidence_variables[RY].value*image.cols+buoy_evidence_variables[RX].value))] = 0;
-			op[(int)(3*(buoy_evidence_variables[RY].value*image.cols+buoy_evidence_variables[RX].value))+1] = 0;
-			op[(int)(3*(buoy_evidence_variables[GY].value*image.cols+buoy_evidence_variables[GX].value))] = 0;
-			op[(int)(3*(buoy_evidence_variables[GY].value*image.cols+buoy_evidence_variables[GX].value))+2] = 0;
-			op[(int)(3*(buoy_evidence_variables[YY].value*image.cols+buoy_evidence_variables[YX].value))+1] = 0;
-			op[(int)(3*(buoy_evidence_variables[YY].value*image.cols+buoy_evidence_variables[YX].value))+2] = 0;
-			op[(int)(3*(buoy_evidence_variables[GY].value*image.cols+buoy_evidence_variables[GX].value))+1] = 255;
-			op[(int)(3*(buoy_evidence_variables[RY].value*image.cols+buoy_evidence_variables[RX].value))+2] = 255;
-			op[(int)(3*(buoy_evidence_variables[YY].value*image.cols+buoy_evidence_variables[YX].value))] = 255;
-		
-			// resize filtered image for processed image
-			cv::resize(output, processedImage(cv::Rect(processedImage.cols*(1-cropx)/2, processedImage.rows*(1-cropy-offset)/2, 
-					processedImage.cols*cropx, processedImage.rows*cropy)), 
-					cv::Size(processedImage.cols*cropx, processedImage.rows*cropy), 0, 0, cv::INTER_NEAREST);
-			
-			imageWrite(stdout, output);
-		}
-		
-		else if(ch == 'e')
-		{
-			buoy_evidence_variables[RX].value = (buoy_evidence_variables[RX].value - image.cols/2) / image.cols;
-			buoy_evidence_variables[RY].value = (image.rows/2 - buoy_evidence_variables[RY].value) / image.rows;
-			buoy_evidence_variables[RZ].value = 1;
-			buoy_evidence_variables[GX].value = (buoy_evidence_variables[GX].value - image.cols/2) / image.cols;
-			buoy_evidence_variables[GY].value = (image.rows/2 - buoy_evidence_variables[GY].value) / image.rows+offset;
-			buoy_evidence_variables[GZ].value = 1;
-			buoy_evidence_variables[YX].value = (buoy_evidence_variables[YX].value - image.cols/2) / image.cols;
-			buoy_evidence_variables[YY].value = (image.rows/2 - buoy_evidence_variables[YY].value) / image.rows;
-			buoy_evidence_variables[YZ].value = 1;
-
-			buoy_evidence.write(stdout);
-		}
-		
-		ch = fgetc(stdin);
+		imageWrite(log, imgP);
 	}
 		 
 	return 0;
