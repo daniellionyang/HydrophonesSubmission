@@ -52,9 +52,9 @@ Evidence observation(FILE* in, const State& state)
 			float hdist = rho*std::cos(phi);
 			return
 			{{
-				{x, cx + hdist*static_cast<float>(std::cos(theta)), static_cast<float>(std::pow(.2 * hdist*std::cos(theta), 2))},
-				{y, cy + hdist*static_cast<float>(std::sin(theta)), static_cast<float>(std::pow(.2 * hdist*std::sin(theta), 2))},
-				{d, cd + rho*static_cast<float>(std::sin(phi)), static_cast<float>(std::pow(.2 * rho*std::sin(phi), 2))}
+				{x, cx + hdist*static_cast<float>(std::cos(theta)), static_cast<float>(std::pow(.2 * hdist*std::cos(theta) + .01, 2))},
+				{y, cy + hdist*static_cast<float>(std::sin(theta)), static_cast<float>(std::pow(.2 * hdist*std::sin(theta) + .01, 2))},
+				{d, cd + rho*static_cast<float>(std::sin(phi)), static_cast<float>(std::pow(.2 * rho*std::sin(phi) + .01, 2))}
 			}};
 		}
 		else // depth already known
