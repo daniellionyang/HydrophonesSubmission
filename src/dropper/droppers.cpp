@@ -2,6 +2,7 @@
 #include "model/evidence.hpp"
 #include "common/defs.hpp"
 #include "common/config.hpp"
+#include "vision/config.hpp"
 
 #include <iostream>
 

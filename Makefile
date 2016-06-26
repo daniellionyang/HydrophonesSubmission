@@ -49,7 +49,7 @@ BUOYS = $(patsubst %,$(BUILD)/buoys/%.o,buoys) $(IMAGE) $(VISION) $(COMMON)
 BUOYS_CFLAGS = $(OPENCV_CFLAGS)
 BUOYS_LFLAGS = $(OPENCV_LFLAGS)
 
-DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE) $(MODEL) $(COMMON)
+DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE) $(MODEL) $(COMMON) $(VISION)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS)
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
 
