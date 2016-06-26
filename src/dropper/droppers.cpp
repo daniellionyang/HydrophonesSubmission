@@ -255,22 +255,22 @@ int main(int argc,char **argv) {
 		
 		ch = fgetc(stdin);
 	
-		float camera_pixel_x = 480; //RANDOM PX VALS ON IMAGE TAKEN
-		float camera_pixel_y = 256;
-		float angle_width_bottom = 125; //ANGLE OF BOTTOM CAMERA
-		float angle_height_bottom = 80;
+		float camera_pixel_x = image.cols; //RANDOM PX VALS ON IMAGE TAKEN
+		float camera_pixel_y = image.rows;
+		float angle_width_bottom = dhFOV; //ANGLE OF BOTTOM CAMERA
+		float angle_height_bottom = dvFOV;
 	
 		float theta;	
 		float phi; 
+
+		std::cout << numBins << " ";
 
 		for(int g=0; g<numBins; g++)
 		{
 			theta = (bins[g].x/camera_pixel_x)*angle_width_bottom - angle_width_bottom/2;
 			phi = (bins[g].y/camera_pixel_y)*angle_height_bottom - angle_height_bottom/2;
-			std::cout << M_OBIN_X << M_OBIN_Y << -1 << theta << phi << constants.get(C_POOL_D); //d and rho are random as on floor bottom
-		
+			std::cout << M_OBIN_X << " " << M_OBIN_Y << " " << -1 << " " << theta << " " << phi << " " << constants.get(C_POOL_D) << std::endl; //d and rho are random as on floor bottom
 		}
-
 
 	}
 
