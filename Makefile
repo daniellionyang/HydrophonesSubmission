@@ -25,9 +25,9 @@ MODEL_CFLAGS =
 IMAGE = $(patsubst %,$(BUILD)/image/%.o,image)
 IMAGE_CFLAGS = $(OPENCV_CFLAGS)
 
-VISION = $(patsubst %,$(BUILD)/vision/%.o,config)
-VISION_CFLAGS = 
-
+VISION = $(patsubst %,$(BUILD)/vision/%.o,config vision)
+VISION_CFLAGS = $(OPENCV_CFLAGS)
+VISION_LFLAGS = $(OPENCV_LFLAGS)
 
 MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
@@ -48,6 +48,10 @@ CAMERA_LFLAGS = $(OPENCV_LFLAGS) $(FLYCAP_LFLAGS)
 BUOYS = $(patsubst %,$(BUILD)/buoys/%.o,buoys) $(IMAGE) $(VISION) $(COMMON)
 BUOYS_CFLAGS = $(OPENCV_CFLAGS)
 BUOYS_LFLAGS = $(OPENCV_LFLAGS)
+
+PVC = $(patsubst %,$(BUILD)/pvc/%.o,pvc) $(IMAGE) $(VISION) $(COMMON)
+PVC_CFLAGS = $(OPENCV_CFLAGS)
+PVC_LFLAGS = $(OPENCV_LFLAGS)
 
 DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE) $(MODEL) $(COMMON) $(VISION)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS)
@@ -70,7 +74,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera camera_pipe buoys dropper image_read image_show sim_state
+EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc dropper image_read image_show sim_state
 
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
@@ -90,6 +94,9 @@ $(BIN)/camera: $(CAMERA)
 
 $(BIN)/buoys: $(BUOYS) 
 	$(CC) $^ $(LFLAGS) $(BUOYS_LFLAGS) -o $@
+
+$(BIN)/pvc: $(PVC) 
+	$(CC) $^ $(LFLAGS) $(PVC_LFLAGS) -o $@
 
 $(BIN)/dropper: $(DROPPER) 
 	$(CC) $^ $(LFLAGS) $(DROPPER_LFLAGS) -o $@
@@ -132,6 +139,9 @@ $(BUILD)/camera/%.o: $(SRC)/camera/%.cpp
 
 $(BUILD)/buoys/%.o: $(SRC)/buoys/%.cpp
 	$(CC) $(CFLAGS) $(BUOYS_CFLAGS) $< -o $@
+
+$(BUILD)/pvc/%.o: $(SRC)/pvc/%.cpp
+	$(CC) $(CFLAGS) $(PVC_CFLAGS) $< -o $@
 
 $(BUILD)/dropper/%.o: $(SRC)/dropper/%.cpp
 	$(CC) $(CFLAGS) $(DROPPER_CFLAGS) $< -o $@

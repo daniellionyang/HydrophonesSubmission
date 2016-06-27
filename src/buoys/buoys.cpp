@@ -11,6 +11,7 @@
 
 #include "common/defs.hpp"
 #include "vision/config.hpp"
+#include "vision/vision.hpp"
 #include "image/image.hpp"
 
 struct Buoy
@@ -70,53 +71,6 @@ cv::Mat equalColorHist(cv::Mat& img, bool red, bool green, bool blue)
 	cv::Mat result;
 	cv::merge(channels, result);
 	return result;
-}
-
-//Turns the mat into a diffmap (make each pixel the difference between it and its neighbors)
-//Useful because the water near the top usually looks like the green buoys near the bottom
-cv::Mat generateDiffMap(cv::Mat& img, int diff)
-{
-	cv::Mat diffMap = cv::Mat(img.size(), CV_32F, cv::Scalar(0));
-
-	float* ip = img.ptr<float>();
-	float* op = diffMap.ptr<float>();
-
-	for (int c = diff; c < img.cols - diff; c++)
-	{
-		for (int r = diff; r < img.rows - diff; r++)
-		{
-			// make the value equal to how much it stands out from its\
-				horizontal or vertical neighbors, whichever is less
-			float vert = (2*ip[(r*img.cols+c)]-ip[((r-diff)*img.cols+c)]-ip[((r+diff)*img.cols+c)]);
-			float hori = (2*ip[(r*img.cols+c)]-ip[(r*img.cols+c+diff)]-ip[(r*img.cols+c-diff)]);
-			float weak = (std::abs(vert) < std::abs(hori)) ? vert : hori;
-			op[r*img.cols+c] = weak;
-		}
-	}
- 
-	return diffMap;
-}
-
-cv::Mat scaleIntensity(const cv::Mat& img)
-{
-	const float* iptr = img.ptr<float>();
-
-	cv::Mat res(img.size(), CV_32F);
-	float* rptr = res.ptr<float>();
-
-	float min = 9999999, max = -9999999;
-	for (size_t i = 0; i < img.rows * img.cols; i++)
-	{
-		if (iptr[i] < min) min = iptr[i];
-		if (iptr[i] > max) max = iptr[i];
-	}
-
-	float range = max - min;
-
-	for (size_t i = 0; i < img.rows * img.cols; i++)
-		rptr[i] = (iptr[i] - min) / range;
-
-	return res;
 }
 
 int floodFill(const cv::Mat& img, std::vector<std::vector<bool> >& visited, int row, int col, float threshold)
