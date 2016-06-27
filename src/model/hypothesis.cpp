@@ -45,7 +45,8 @@ Matrix Hypothesis::mode() const
 
 void Hypothesis::addVariance(size_t idx, float value)
 {
-	m_variance.set(idx, m_variance.get(idx) + value);
+	if (idx < m_variance.size())
+		m_variance.set(idx, m_variance.get(idx) + value);
 }
 
 void Hypothesis::add(Evidence evidence)

@@ -8,8 +8,8 @@
 
 bool update(std::atomic<State>* state, std::atomic<State>* des)
 {
-	float dX = 1;
-	float dY = 1;
+	float dX = .6;
+	float dY = .6;
 	float dDepth = 1;
 	float dYaw = 1;
 	float dPitch = 1;

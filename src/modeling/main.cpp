@@ -39,7 +39,7 @@ int process(FILE* in, FILE* out)
 			{
 				size_t idx;
 				float v;
-				fscanf(in, " %z %f", &idx, &v);
+				fscanf(in, " %zu %f", &idx, &v);
 				if (idx >= NUM_VARS)
 					for (size_t i = 0; i < NUM_VARS; i++)
 						system.addVariance(i, v * varianceGrowth.get(i));

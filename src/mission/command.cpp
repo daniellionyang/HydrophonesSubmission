@@ -46,11 +46,11 @@ void release(FILE* out)
 
 void setFlag(FILE* out, size_t idx, float value)
 {
-	fprintf(out, "c f %z %f\n", idx, value);
+	fprintf(out, "c f %zu %f\n", idx, value);
 }
 
 void addVariance(FILE* out, size_t idx, float value)
 {
-	fprintf(out, "c v %z %f\n", idx, value);
+	fprintf(out, "c v %zu %f\n", idx, value);
 }
 

@@ -57,12 +57,12 @@ void System::add(Evidence evidence)
 	for (auto h : hypotheses)
 	{
 		auto a = h;
-		a.scale(.95);
+		a.scale(.8);
 		a.add(evidence);
 		newHypotheses.push_back(a);
 
 		auto b = h;
-		b.scale(.05);
+		b.scale(.2);
 		newHypotheses.push_back(b);
 	}
 
