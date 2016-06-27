@@ -170,6 +170,7 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 
 int main(int argc, char** argv)
 {
+
 	FlyCapture2::Error error;
 
 	FlyCapture2::BusManager busMgr;
@@ -189,28 +190,32 @@ int main(int argc, char** argv)
 
 	FlyCapture2::PGRGuid guid;
 
-	char c;
-	fscanf(stdin, "%c", &c);
-	switch (c)
+	if (argc < 3)
+	{
+		fprintf(stderr, "Error: Not enough arguments.\n");
+		return 1;
+	}
+
+	switch (argv[1][0])
 	{
 		case 'i': // index
 		{
 			unsigned int sn;
-			fscanf(stdin, "%i", &sn);
+			sscanf(argv[2], "%i", &sn);
 			error = busMgr.GetCameraFromIndex(sn, &guid);
 			break;
 		}
 		case 'u': // usb serial number
 		{
 			unsigned int sn;
-			fscanf(stdin, "%i", &sn);
+			sscanf(argv[2], "%i", &sn);
 			error = busMgr.GetCameraFromSerialNumber(sn, &guid);
 			break;
 		}
 		case 'n': // network ip address
 		{
 			unsigned int ip[4];
-			fscanf(stdin, "%i.%i.%i.%i", &ip[0], &ip[1], &ip[2], &ip[3]);
+			sscanf(argv[2], "%i.%i.%i.%i", &ip[0], &ip[1], &ip[2], &ip[3]);
 			unsigned int ip32 = ip[0] * (1 << 24) + ip[1] * (1 << 16) + ip[2] * (1 << 8) + ip[3];
 			error = busMgr.GetCameraFromIPAddress(FlyCapture2::IPAddress(ip32), &guid);
 			break;
