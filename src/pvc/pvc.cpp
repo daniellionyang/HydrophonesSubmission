@@ -13,10 +13,13 @@
 #include "vision/vision.hpp"
 #include "image/image.hpp"
 
+const float cropx = 1.0;
+const float cropy = 0.4;
+const float offset = 0.0 * (1 - cropy);
+const float scalex = 512;
+const float scaley = 240;
 const float pvcWidth = 2;
 const float minDist = 8;
-const float scalex = 0.4;
-const float scaley = 0.4;
 const float cutoff = 0.8;
 
 std::vector<cv::Point2f> flatten(cv::Mat& img)
@@ -110,7 +113,9 @@ int main(int argc, char** argv)
 	{
 		cv::Mat img = imageRead(in); //Read image
 
-		cv::resize(img, img, cv::Size(img.cols*scalex, img.rows*scaley));
+		cv::resize(img(cv::Rect(img.cols*(1-cropx)/2, img.rows*(1-cropy-offset)/2, 
+			img.cols*cropx, img.rows*cropy)), img, 
+			cv::Size(cropx*scalex, cropy*scaley));
 
 		cv::Mat yelo = filter(img, getYellow); //Enhance to make pvc show up
 
