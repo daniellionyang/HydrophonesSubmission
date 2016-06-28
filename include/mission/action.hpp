@@ -26,6 +26,7 @@ private:
 
 bool lprintf(FILE*, FILE*, const std::string);
 
+bool doTorpedoes(FILE*, FILE*);
 bool wait(FILE*, FILE*, float);
 bool moveExt(FILE*, FILE*, float, float, int, int, float, float, int, int, float, int, int, float, int, int, float, float, float);
 bool turnTo(FILE*, FILE*, int, int);

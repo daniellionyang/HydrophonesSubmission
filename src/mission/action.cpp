@@ -38,6 +38,81 @@ bool wait(FILE* in, FILE* out, float time)
 	return true;
 }
 
+bool doTorpedoes(FILE* in, FILE* out)
+{
+	float vertDist = .1;
+	float horDir = 1;
+
+	setSpeed(in, out, .1);
+
+	FILE* sin = fopen("pipe/sonar_out", "r");
+	FILE* sout = fopen("pipe/sonar_in", "w");
+
+	int idx;
+	float dist;
+
+	fprintf(sout, "f\n");
+	fflush(sout);
+	fscanf(sin, " %i, %f\n", &idx, &dist);
+
+	while (true)
+	{
+		fprintf(sout, "f\n");
+		fflush(sout);
+		fscanf(sin, " %i, %f\n", &idx, &dist);
+
+		if (dist > 6) moveDir(in, out, State(1, 0, 0), 10);
+		else
+		{
+			moveDir(in, out, State(0, 0, 0), 10);
+			break;
+		}
+	}
+
+	moveDir(in, out, State(0, 0, vertDist), .01);
+
+	while (true)
+	{
+		int prev = idx;
+
+		fprintf(sout, "f\n");
+		fflush(sout);
+		fscanf(sin, " %i, %f\n", &idx, &dist);
+
+		if (idx == prev) moveDir(in, out, State(0, horDir, 0), 10);
+		else
+		{
+			moveDir(in, out, State(0, 0, 0), 10);
+			break;
+		}
+	}
+
+	shoot(out, 'l');
+
+	int hole = idx;
+
+	while (true)
+	{
+		int prev = idx;
+
+		fprintf(sout, "f\n");
+		fflush(sout);
+		fscanf(sin, " %i, %f\n", &idx, &dist);
+
+		if (idx <= hole + 1) moveDir(in, out, State(0, -2*horDir, 0), 10);
+		else
+		{
+			moveDir(in, out, State(0, 0, 0), 10);
+			break;
+		}
+	}
+
+	moveDir(in, out, State(0, 0, -2*vertDist), .01);
+	shoot(out, 'r');
+
+	return true;
+}
+
 bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 {
 	setState(out, target);
