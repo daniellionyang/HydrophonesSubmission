@@ -15,6 +15,8 @@
 
 const float pvcWidth = 2;
 const float minDist = 30;
+const float scalex = 0.2;
+const float scaley = 0.2;
 
 std::vector<cv::Point2f> flatten(cv::Mat& img)
 {
@@ -106,13 +108,15 @@ int main(int argc, char** argv)
 	{
 		cv::Mat img = imageRead(in); //Read image
 
-		cv::Mat diff = generateDiffMap(img, 8, true);
+		cv::resize(img, img, cv::Size(img.cols*scalex, img.rows*scaley));
 
-		cv::Mat yellower = colorize(diff, getYellow); //Enhance to make pvc show up
+		cv::Mat yellower = scaleIntensity(colorize(img, getYellow)); //Enhance to make pvc show up
+
+		cv::Mat diff = generateDiffMap(yellower, 8, false);
 		
-		std::vector<cv::Point2f> pts = bestPoints(flatten(yellower), 2);
+		std::vector<cv::Point2f> pts = bestPoints(flatten(diff), 2);
 		
-		imageWrite(err, dispPoints(scaleIntensity(diff), pts, 5));
+		imageWrite(err, dispPoints(yellower, pts, 5));
 		pResults(in, out, pts, img.cols);
 	}
 }

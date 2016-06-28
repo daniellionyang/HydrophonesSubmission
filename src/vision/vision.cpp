@@ -29,7 +29,14 @@ cv::Mat generateDiffMap(cv::Mat& img, int diff, bool bigger)
 			float hori = (2*ip[(r*img.cols+c)]-ip[(r*img.cols+c+diff)]-ip[(r*img.cols+c-diff)]);
 			float weak = (std::abs(vert) < std::abs(hori)) ? vert : hori;
 			float strong = (std::abs(vert) > std::abs(hori)) ? vert : hori;
-			op[r*img.cols+c] = bigger ? strong : weak;
+			if(bigger)
+			{
+				op[r*img.cols+c] = strong;
+			}
+			else
+			{
+				op[r*img.cols+c] = weak;
+			}
 		}
 	}
  
