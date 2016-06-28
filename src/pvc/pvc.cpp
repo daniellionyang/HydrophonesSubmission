@@ -79,7 +79,7 @@ cv::Mat dispPoints(cv::Mat img, std::vector<cv::Point2f> pts, int cwidth)
 	cv::Mat disp(img);
 	for(cv::Point2f p : pts)
 	{
-		cv::ellipse(disp, cv::Point(p.x, cwidth), cv::Size(cwidth, cwidth), 0, 0, 360, cv::Scalar(0, 0, 255));
+		cv::ellipse(disp, cv::Point(p.x, cwidth), cv::Size(cwidth, cwidth), 0, 0, 360, cv::Scalar(255, 255, 255));
 	}
 	return disp;
 }
@@ -110,13 +110,16 @@ int main(int argc, char** argv)
 
 		cv::resize(img, img, cv::Size(img.cols*scalex, img.rows*scaley));
 
-		cv::Mat yellower = scaleIntensity(colorize(img, getYellow)); //Enhance to make pvc show up
+		cv::Mat yelo = colorize(img, getYellow); //Enhance to make pvc show up
 
-		cv::Mat diff = generateDiffMap(yellower, 8, false);
+		cv::Mat diff = generateDiffMap(yelo, 8, false);
+
+		cv::Mat scaled = scaleIntensity(diff);
 		
-		std::vector<cv::Point2f> pts = bestPoints(flatten(diff), 2);
+		std::vector<cv::Point2f> pts = bestPoints(flatten(scaled), 2);
 		
-		imageWrite(err, dispPoints(yellower, pts, 5));
+		cv::imshow("HI", dispPoints(scaled, pts, 5));
+		cv::waitKey(0);
 		pResults(in, out, pts, img.cols);
 	}
 }

@@ -10,6 +10,16 @@
 #include "vision/config.hpp"
 #include "image/image.hpp"
 
+cv::Mat fToU(cv::Mat& img)
+{
+	cv::Mat out = cv::Mat(img.size(), CV_8UC3);
+
+	float* ip = img.ptr<float>();
+	uchar* op = out.ptr();
+	
+	return out;
+}
+
 //Turns the mat into a diffmap (make each pixel the difference between it and its neighbors)
 //Useful because the water near the top usually looks like the green buoys near the bottom
 cv::Mat generateDiffMap(cv::Mat& img, int diff, bool bigger)
