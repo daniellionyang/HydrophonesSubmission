@@ -41,9 +41,9 @@ const std::vector<Goal> initialGoals =
 
 		// pvc
 		{ lprintf, "pvc\n" },
-		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 0, 0, .1 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, .1 },
 		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, .1 },
-		{ moveModel, M_PVC_X, M_PVC_Y, M_ZERO, 0, 0, 4, 6 },
+		{ moveModel, M_PVC_X, M_PVC_Y, M_ZERO, 0, 0, 3, 6 },
 		{ flag, F_PVC, 1 },
 		{ wait, 5 },
 		{ turnTo, M_PVC_X, M_PVC_Y },
