@@ -79,13 +79,21 @@ const std::vector<Goal> initialGoals =
 		{ flag, F_PINGER, 1 },
 
 		// torpedoes
-		{ lprintf, "torp\n" },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .2, .1 },
-		{ moveDir, State(0, .5, 0, 0, 0, 0), .1 }, // remove cover
-		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, .2, .1 },
+		{ lprintf, "torpedoes\n" },
+		{ moveModel, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 0, 0, 0, 3 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
+		{ wait, 3 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
+		{ moveDir, State(.3, 0, 0, 0, 0, 0), .1 }, // remove cover
+		{ moveDir, State(0, .5, 0, 0, 0, 0), .1 },
+		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, 1, .1 },
+		{ wait, 3 },
+		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, .5, .1 },
 		{ shootInHole, 'r' },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .2, .1 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
+		{ wait, 3 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
 		{ shootInHole, 'l' },
 		{ wait, 3 },
 

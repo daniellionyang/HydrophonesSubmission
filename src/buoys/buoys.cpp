@@ -11,6 +11,7 @@
 
 #include "common/defs.hpp"
 #include "vision/config.hpp"
+#include "vision/vision.hpp"
 #include "image/image.hpp"
 
 struct Buoy
@@ -94,43 +95,6 @@ cv::Mat generateDiffMap(cv::Mat& img, int diff)
 	}
  
 	return diffMap;
-}
-
-cv::Mat scaleIntensity(const cv::Mat& img)
-{
-	const float* iptr = img.ptr<float>();
-
-	cv::Mat res(img.size(), CV_32F);
-	float* rptr = res.ptr<float>();
-
-	float min = 9999999, max = -9999999;
-	for (size_t i = 0; i < img.rows * img.cols; i++)
-	{
-		if (iptr[i] < min) min = iptr[i];
-		if (iptr[i] > max) max = iptr[i];
-	}
-
-	float range = max - min;
-
-	for (size_t i = 0; i < img.rows * img.cols; i++)
-		rptr[i] = (iptr[i] - min) / range;
-
-	return res;
-}
-
-int floodFill(const cv::Mat& img, std::vector<std::vector<bool> >& visited, int row, int col, float threshold)
-{
-	if (row < 0 || col < 0 || row >= img.rows || col >= img.cols || visited.at(row).at(col) || img.at<float>(row, col) < threshold)
-		return 0;
-	else
-	{
-		visited.at(row).at(col) = true;
-		return 1 +
-			floodFill(img, visited, row + 1, col, threshold) +
-			floodFill(img, visited, row - 1, col, threshold) +
-			floodFill(img, visited, row, col + 1, threshold) +
-			floodFill(img, visited, row, col - 1, threshold);
-	}
 }
 
 int main(int argc, char** argv)

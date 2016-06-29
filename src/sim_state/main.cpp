@@ -59,8 +59,16 @@ bool handleCPU(std::atomic<State>* state, std::atomic<State>* des)
 		switch (c)
 		{
 			case 'c': state->load().write(out); break;
-			case 'd': des->load().write(out); break;
 			case 's': des->store(State(in)); break;
+			case 't':
+			{
+				char s;
+				fscanf(in, " %c", &s);
+				break;
+			}
+			case 'd': break;
+			case 'g': break;
+			case 'r': break;
 		}
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(1000 / freq)));
