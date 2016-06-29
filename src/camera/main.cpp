@@ -9,7 +9,23 @@
 
 #include "image/image.hpp"
 
-int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
+void flipImage(cv::Mat& img)
+{
+	int rows = img.rows;
+	int cols = img.cols;
+	for(int r = 0; r < rows/2; r++)
+	{
+		for(int c = 0; c < cols/2; c++)
+		{
+			int a = img.at<int>(r, c);
+			img.at<int>(r, c) = img.at<int>(rows - 1 - r, cols - 1 - c);
+			img.at<int>(rows - 1 - r, cols - 1 - c) = a;
+		}
+	}
+	return;
+}
+
+int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid, bool flip)
 {
 	FlyCapture2::Error error;
 	FlyCapture2::Camera cam;
@@ -133,6 +149,10 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 				// convert to opencv mat
 				cv::Mat image(bgr.GetRows(), bgr.GetCols(), CV_8UC3, bgr.GetData(), bgr.GetStride());
 
+				// flip image if flip == true
+				if(flip)
+					flipImage(image);
+
 				// send image
 				imageWrite(out, image);
 
@@ -227,6 +247,12 @@ int main(int argc, char** argv)
 		error.PrintErrorTrace();
 		return 1;
 	}
+	
+	bool flip = false;
+	if(argc >= 4)
+	{
+		flip = (argv[3][0] == '1') ? true : false;
+	}
 
-	return startCamera(stdin, stdout, stderr, guid);
+	return startCamera(stdin, stdout, stderr, guid, false);
 }
