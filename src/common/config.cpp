@@ -54,8 +54,8 @@ const Matrix varianceGrowth =
 const Matrix constants =
 {
 	4.8,
-	3,
+	4,
 	30,    -15,
-	4.5,
+	5,
 };
 
