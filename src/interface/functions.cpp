@@ -29,7 +29,7 @@ Evidence observation(FILE* in, const State& state)
 {
 	int x, y, d; // indices
 	float theta, phi, rho; // rho is absolute depth if d < 0, 0 phi is horizontal, +phi is down
-	fscanf(in, " %i %i %i %f %f %f\n",
+	fscanf(in, " %i %i %i %f %f %f",
 		&x,     &y,   &d,
 		&theta, &phi, &rho
 	);
@@ -52,9 +52,9 @@ Evidence observation(FILE* in, const State& state)
 			float hdist = rho*std::cos(phi);
 			return
 			{{
-				{x, cx + hdist*static_cast<float>(std::cos(theta)), static_cast<float>(std::pow(.2 * hdist*std::cos(theta), 2))},
-				{y, cy + hdist*static_cast<float>(std::sin(theta)), static_cast<float>(std::pow(.2 * hdist*std::sin(theta), 2))},
-				{d, cd + rho*static_cast<float>(std::sin(phi)), static_cast<float>(std::pow(.2 * rho*std::sin(phi), 2))}
+				{x, cx + hdist*static_cast<float>(std::cos(theta)), 9},
+				{y, cy + hdist*static_cast<float>(std::sin(theta)), 9},
+				{d, cd + rho*static_cast<float>(std::sin(phi)), 1}
 			}};
 		}
 		else // depth already known
@@ -63,8 +63,8 @@ Evidence observation(FILE* in, const State& state)
 			float hdist = rd / std::tan(phi);
 			return
 			{{
-				{x, cx + hdist*static_cast<float>(std::cos(theta)), static_cast<float>(std::pow(.2 * hdist*std::cos(theta), 2))},
-				{y, cy + hdist*static_cast<float>(std::sin(theta)), static_cast<float>(std::pow(.2 * hdist*std::sin(theta), 2))},
+				{x, cx + hdist*static_cast<float>(std::cos(theta)), 1},
+				{y, cy + hdist*static_cast<float>(std::sin(theta)), 1},
 			}};
 		}
 	} // otherwise we don't know how to use this observation
@@ -129,18 +129,18 @@ bool vision(Data* data, const std::string in_name, const std::string out_name, s
 
 			if (newImage)
 			{
+				State state;
+				data->lock();
+					state = data->state;
+				data->unlock();
+
 				imageWrite(out, img);
 
-				int num_observations = 0;
-				fscanf(in, " %i", &num_observations);
+				size_t num_observations = 0;
+				fscanf(in, " %zu", &num_observations);
 
 				for (int i = 0; i < num_observations; i++)
 				{
-					State state;
-					data->lock();
-						state = data->state;
-					data->unlock();
-
 					Evidence evidence = observation(in, state);
 
 					data->lock();
@@ -336,7 +336,7 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 					{
 						size_t idx;
 						float value;
-						fscanf(in, " %z %f", &idx, &value);
+						fscanf(in, " %zu %f", &idx, &value);
 						if (idx < NUM_FLAGS)
 						{
 							data->lock();
@@ -349,7 +349,7 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 					{
 						size_t idx;
 						float value;
-						fscanf(in, " %z %f", &idx, &value);
+						fscanf(in, " %zu %f", &idx, &value);
 						if (idx < NUM_VARS)
 						{
 							data->lock();
@@ -394,10 +394,9 @@ bool modeling(Data* data, const std::string in_name, const std::string out_name)
 		// update variance
 		while (!variance.empty())
 		{
-			fprintf(out, "e\n");
 			auto v = variance.front();
 			variance.pop();
-			fprintf(out, "v %z %f\n", std::get<0>(v), std::get<1>(v));
+			fprintf(out, "v %zu %f\n", std::get<0>(v), std::get<1>(v));
 		}
 		fflush(out);
 
@@ -435,9 +434,12 @@ bool control(Data* data, const std::string in_name, const std::string out_name)
 			oldState = data->state;
 		data->unlock();
 		float dist = state.distanceTo(oldState);
-		data->lock();
-			data->addVariance.push(std::make_tuple(static_cast<size_t>(NUM_VARS), dist));
-		data->unlock();
+		if (dist > .01)
+		{
+			data->lock();
+				data->addVariance.push(std::make_tuple(static_cast<size_t>(NUM_VARS), dist));
+			data->unlock();
+		}
 
 		State desiredState;
 		bool setState, drop, grab, release;

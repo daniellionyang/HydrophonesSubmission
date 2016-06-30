@@ -16,7 +16,7 @@ FLYCAP_CFLAGS = -I$(SRC) -I$(FLYCAP)/include/
 FLYCAP_LFLAGS = -L$(FLYCAP)/lib -lflycapture -Wl,-rpath=$(FLYCAP)/lib/
 
 
-COMMON = $(patsubst %,$(BUILD)/common/%.o,matrix state config)
+COMMON = $(patsubst %,$(BUILD)/common/%.o,matrix state observation config)
 COMMON_CFLAGS = 
 
 MODEL = $(patsubst %,$(BUILD)/model/%.o,system hypothesis evidence)
@@ -25,9 +25,8 @@ MODEL_CFLAGS =
 IMAGE = $(patsubst %,$(BUILD)/image/%.o,image)
 IMAGE_CFLAGS = $(OPENCV_CFLAGS)
 
-VISION = $(patsubst %,$(BUILD)/vision/%.o,config vision)
+VISION = $(patsubst %,$(BUILD)/vision/%.o,vision blob blob_detection config)
 VISION_CFLAGS = $(OPENCV_CFLAGS)
-VISION_LFLAGS = $(OPENCV_LFLAGS)
 
 MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
@@ -53,6 +52,10 @@ PVC = $(patsubst %,$(BUILD)/pvc/%.o,pvc) $(IMAGE) $(VISION) $(COMMON)
 PVC_CFLAGS = $(OPENCV_CFLAGS)
 PVC_LFLAGS = $(OPENCV_LFLAGS)
 
+TORPEDOES = $(patsubst %,$(BUILD)/torpedoes/%.o,main) $(IMAGE) $(VISION) $(COMMON)
+TORPEDOES_CFLAGS = $(OPENCV_CFLAGS)
+TORPEDOES_LFLAGS = $(OPENCV_LFLAGS)
+
 DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE) $(MODEL) $(COMMON) $(VISION)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS)
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
@@ -74,7 +77,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc dropper image_read image_show sim_state
+EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc torpedoes dropper image_read image_show sim_state
 
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
@@ -97,6 +100,9 @@ $(BIN)/buoys: $(BUOYS)
 
 $(BIN)/pvc: $(PVC) 
 	$(CC) $^ $(LFLAGS) $(PVC_LFLAGS) -o $@
+
+$(BIN)/torpedoes: $(TORPEDOES) 
+	$(CC) $^ $(LFLAGS) $(TORPEDOES_LFLAGS) -o $@
 
 $(BIN)/dropper: $(DROPPER) 
 	$(CC) $^ $(LFLAGS) $(DROPPER_LFLAGS) -o $@
@@ -136,6 +142,9 @@ $(BUILD)/mission/%.o: $(SRC)/mission/%.cpp
 
 $(BUILD)/camera/%.o: $(SRC)/camera/%.cpp
 	$(CC) $(CFLAGS) $(CAMERA_CFLAGS) $< -o $@
+
+$(BUILD)/torpedoes/%.o: $(SRC)/torpedoes/%.cpp
+	$(CC) $(CFLAGS) $(TORPEDOES_CFLAGS) $< -o $@
 
 $(BUILD)/buoys/%.o: $(SRC)/buoys/%.cpp
 	$(CC) $(CFLAGS) $(BUOYS_CFLAGS) $< -o $@

@@ -9,30 +9,34 @@ const std::vector<Goal> initialGoals =
 		// gate
 		{ lprintf, "gate\n" },
 		{ moveModel, M_GATE_X, M_GATE_Y, M_ZERO, 0, 0, 1, 1 },
-		{ moveDir, State(3, 0, 0, 0, 0, 0), 1 },
+		{ moveDir, State(3.5, 0, 0, 0, 0, 0), 1 },
 
 		{ flag, F_BUOYS, 1 },
 
 		// red buoy
 		{ lprintf, "rbuoy\n" },
 		{ moveModel, M_RBUOY_X, M_RBUOY_Y, M_RBUOY_D, 0, 0, 0, 1 },
-		{ moveDir, State(3, 0, 0, 0, 0, 0), 1 },
-		{ moveDir, State(-6, 0, 0, 0, 0, 0), 1 },
+		{ flag, F_BUOYS, 0 },
+		{ moveDir, State(2, 0, 0, 0, 0, 0), 1 },
+		{ moveDir, State(-4, 0, 0, 0, 0, 0), 1 },
+		{ flag, F_BUOYS, 1 },
 
 		// green buoy
 		{ lprintf, "gbuoy\n" },
 		{ moveModel, M_GBUOY_X, M_GBUOY_Y, M_GBUOY_D, 0, 0, 0, 1 },
-		{ moveDir, State(3, 0, 0, 0, 0, 0), 1 },
-		{ moveDir, State(-6, 0, 0, 0, 0, 0), 1 },
+		{ flag, F_BUOYS, 0 },
+		{ moveDir, State(2, 0, 0, 0, 0, 0), 1 },
+		{ moveDir, State(-4, 0, 0, 0, 0, 0), 1 },
+		{ flag, F_BUOYS, 1 },
 
 		// yellow buoy
 		{ lprintf, "ybuoy\n" },
 		{ moveModel, M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, 0, 0, 0, 1 },
-		{ moveDir, State(2, 0, -.3, 0, 0, 0), .1 },
-		{ moveDir, State(0, 0, .8, 0, 0, 0), .1 },
-		{ moveDir, State(-6, 0, 0, 0, 0, 0), 1 },
-
 		{ flag, F_BUOYS, 0 },
+		{ moveDir, State(2, 0, -.5, 0, 0, 0), 1 },
+		{ moveDir, State(0, 0, .8, 0, 0, 0), 1 },
+		{ moveDir, State(4, 1, 0, 0, 0, 0), 1 },
+
 		{ flag, F_PINGER, 1 }, // activate pinger early
 		{ flag, F_PVC, 1 },
 
@@ -75,13 +79,21 @@ const std::vector<Goal> initialGoals =
 		{ flag, F_PINGER, 1 },
 
 		// torpedoes
-		{ lprintf, "torp\n" },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .2, .1 },
-		{ moveDir, State(0, .5, 0, 0, 0, 0), .1 }, // remove cover
-		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, .2, .1 },
+		{ lprintf, "torpedoes\n" },
+		{ moveModel, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 0, 0, 0, 3 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
+		{ wait, 3 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
+		{ moveDir, State(.3, 0, 0, 0, 0, 0), .1 }, // remove cover
+		{ moveDir, State(0, .5, 0, 0, 0, 0), .1 },
+		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, 1, .1 },
+		{ wait, 3 },
+		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, .5, .1 },
 		{ shootInHole, 'r' },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .2, .1 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
+		{ wait, 3 },
+		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
 		{ shootInHole, 'l' },
 		{ wait, 3 },
 

@@ -10,16 +10,6 @@
 #include "vision/config.hpp"
 #include "image/image.hpp"
 
-cv::Mat fToU(cv::Mat& img)
-{
-	cv::Mat out = cv::Mat(img.size(), CV_8UC3);
-
-	float* ip = img.ptr<float>();
-	uchar* op = out.ptr();
-	
-	return out;
-}
-
 //Turns the mat into a diffmap (make each pixel the difference between it and its neighbors)
 //Useful because the water near the top usually looks like the green buoys near the bottom
 cv::Mat generateDiffMap(cv::Mat& img, int diff, bool bigger)
@@ -53,6 +43,27 @@ cv::Mat generateDiffMap(cv::Mat& img, int diff, bool bigger)
 	return diffMap;
 }
 
+float hAngle(const cv::Mat& img, float cols)
+{
+	return fhFOV * cols / img.cols;
+}
+
+float vAngle(const cv::Mat& img, float rows)
+{
+	return fvFOV * rows / img.rows;
+}
+
+cv::Mat filter(const cv::Mat& img, std::function<float(float, float, float)> f)
+{
+	cv::Mat res(img.size(), CV_32F);
+
+	for (size_t row = 0; row < img.rows; row++)
+		for (size_t col = 0; col < img.cols; col++)
+			res.at<float>(row, col) = f(img.at<cv::Vec3b>(row, col)[2], img.at<cv::Vec3b>(row, col)[1], img.at<cv::Vec3b>(row, col)[0]);
+
+	return res;
+}
+
 cv::Mat scaleIntensity(const cv::Mat& img)
 {
 	const float* iptr = img.ptr<float>();
@@ -75,22 +86,17 @@ cv::Mat scaleIntensity(const cv::Mat& img)
 	return res;
 }
 
-cv::Mat colorize(cv::Mat& img, std::function<float(int, int, int)> func)
+int floodFill(const cv::Mat& img, std::vector<std::vector<bool> >& visited, int row, int col, float threshold)
 {
-	cv::Mat output(img.rows, img.cols, CV_32F);
-
-	uchar* ptr = img.ptr();
-	float* out = output.ptr<float>();
-	
-	for(int r = 0; r < img.rows; r++)
+	if (row < 0 || col < 0 || row >= img.rows || col >= img.cols || visited.at(row).at(col) || img.at<float>(row, col) < threshold)
+		return 0;
+	else
 	{
-		for(int c = 0; c < img.cols; c++)
-		{
-			out[r*img.cols+c] = func(
-							ptr[3*(r*img.cols+c)],
-							ptr[3*(r*img.cols+c)+1],
-							ptr[3*(r*img.cols+c)+2]);
-		}
+		visited.at(row).at(col) = true;
+		return 1 +
+			floodFill(img, visited, row + 1, col, threshold) +
+			floodFill(img, visited, row - 1, col, threshold) +
+			floodFill(img, visited, row, col + 1, threshold) +
+			floodFill(img, visited, row, col - 1, threshold);
 	}
-	return output;
 }

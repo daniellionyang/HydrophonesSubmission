@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 
 		cv::resize(img, img, cv::Size(img.cols*scalex, img.rows*scaley));
 
-		cv::Mat yelo = colorize(img, getYellow); //Enhance to make pvc show up
+		cv::Mat yelo = filter(img, getYellow); //Enhance to make pvc show up
 
 		cv::Mat diff = generateDiffMap(yelo, 8, false);
 

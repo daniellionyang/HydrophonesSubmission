@@ -39,12 +39,12 @@ bool wait(FILE* in, FILE* out, float time)
 
 bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 {
+	setState(out, target);
+
 	bool close = false;
 	while (!close)
 	{
 		State state = getState(in, out);
-
-		move(out, state, target);
 
 		if (state.distanceTo(target) < minDistance)
 			close = true;
@@ -77,7 +77,7 @@ bool moveDir(FILE* in, FILE* out, const State& change, float minDistance)
 	auto dx = change.x() * std::cos((state.yaw() + change.yaw()) * 2 * M_PI)
 			- change.y() * std::sin((state.yaw() + change.yaw()) * 2 * M_PI);
 	auto dy = change.x() * std::sin((state.yaw() + change.yaw()) * 2 * M_PI)
-			- change.y() * std::cos((state.yaw() + change.yaw()) * 2 * M_PI);
+			+ change.y() * std::cos((state.yaw() + change.yaw()) * 2 * M_PI);
 	
 	auto target = State(dx, dy, change.depth(), change.yaw(), change.pitch(), change.roll());
 	

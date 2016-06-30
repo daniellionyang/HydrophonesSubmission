@@ -9,7 +9,23 @@
 
 #include "image/image.hpp"
 
-int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
+void flipImage(cv::Mat& img)
+{
+	int rows = img.rows;
+	int cols = img.cols;
+	for(int r = 0; r < rows/2; r++)
+	{
+		for(int c = 0; c < cols/2; c++)
+		{
+			int a = img.at<int>(r, c);
+			img.at<int>(r, c) = img.at<int>(rows - 1 - r, cols - 1 - c);
+			img.at<int>(rows - 1 - r, cols - 1 - c) = a;
+		}
+	}
+	return;
+}
+
+int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid, bool flip)
 {
 	FlyCapture2::Error error;
 	FlyCapture2::Camera cam;
@@ -133,6 +149,10 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 				// convert to opencv mat
 				cv::Mat image(bgr.GetRows(), bgr.GetCols(), CV_8UC3, bgr.GetData(), bgr.GetStride());
 
+				// flip image if flip == true
+				if(flip)
+					flipImage(image);
+
 				// send image
 				imageWrite(out, image);
 
@@ -170,6 +190,7 @@ int startCamera(FILE* in, FILE* out, FILE* log, FlyCapture2::PGRGuid guid)
 
 int main(int argc, char** argv)
 {
+
 	FlyCapture2::Error error;
 
 	FlyCapture2::BusManager busMgr;
@@ -189,28 +210,32 @@ int main(int argc, char** argv)
 
 	FlyCapture2::PGRGuid guid;
 
-	char c;
-	fscanf(stdin, "%c", &c);
-	switch (c)
+	if (argc < 3)
+	{
+		fprintf(stderr, "Error: Not enough arguments.\n");
+		return 1;
+	}
+
+	switch (argv[1][0])
 	{
 		case 'i': // index
 		{
 			unsigned int sn;
-			fscanf(stdin, "%i", &sn);
+			sscanf(argv[2], "%i", &sn);
 			error = busMgr.GetCameraFromIndex(sn, &guid);
 			break;
 		}
 		case 'u': // usb serial number
 		{
 			unsigned int sn;
-			fscanf(stdin, "%i", &sn);
+			sscanf(argv[2], "%i", &sn);
 			error = busMgr.GetCameraFromSerialNumber(sn, &guid);
 			break;
 		}
 		case 'n': // network ip address
 		{
 			unsigned int ip[4];
-			fscanf(stdin, "%i.%i.%i.%i", &ip[0], &ip[1], &ip[2], &ip[3]);
+			sscanf(argv[2], "%i.%i.%i.%i", &ip[0], &ip[1], &ip[2], &ip[3]);
 			unsigned int ip32 = ip[0] * (1 << 24) + ip[1] * (1 << 16) + ip[2] * (1 << 8) + ip[3];
 			error = busMgr.GetCameraFromIPAddress(FlyCapture2::IPAddress(ip32), &guid);
 			break;
@@ -222,6 +247,12 @@ int main(int argc, char** argv)
 		error.PrintErrorTrace();
 		return 1;
 	}
+	
+	bool flip = false;
+	if(argc >= 4)
+	{
+		flip = (argv[3][0] == '1') ? true : false;
+	}
 
-	return startCamera(stdin, stdout, stderr, guid);
+	return startCamera(stdin, stdout, stderr, guid, false);
 }

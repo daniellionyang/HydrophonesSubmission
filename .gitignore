@@ -18,3 +18,5 @@ python/**/*.pyo
 
 sim_model.blend*
 pipe/*
+logs/*
+

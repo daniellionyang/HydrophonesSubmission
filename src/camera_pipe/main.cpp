@@ -17,10 +17,15 @@ int main(int argc, char** argv)
 	// read images
 	auto r = std::thread([](FILE* camera, cv::Mat* image, std::mutex* lock)
 	{
-		auto img = imageRead(camera);
-		lock->lock();
-			*image = std::move(img);
-		lock->unlock();
+		bool quit = false;
+
+		while (!quit)
+		{
+			auto img = imageRead(camera);
+			lock->lock();
+				*image = std::move(img);
+			lock->unlock();
+		}
 	}, camera, &image, &lock);
 
 	// send image on request
