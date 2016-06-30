@@ -115,11 +115,6 @@ int main(int argc, char** argv)
 
 		cv::Mat imgF = filter(image, yfilter);
 
-		cv::Mat imgB = cv::Mat(imgF.size(), CV_32F, cv::Scalar(0));
-		cv::blur(imgF, imgB, cv::Size(3, 3));
-
-		auto imgD = generateDiffMap(imgB, diffDist);
-
 		cv::Mat imgS = scaleIntensity(imgF);
 
 		auto img = imgS;
@@ -140,8 +135,11 @@ int main(int argc, char** argv)
 			}
 		}
 
+		cv::Mat imgB;
+		cv::blur(imgS, imgB, cv::Size(2, 2));
+
 		cv::Mat imgT;
-		cv::threshold(imgS, imgT, .8 * max, 1, cv::THRESH_BINARY);
+		cv::threshold(imgS, imgT, .5 * max, 1, cv::THRESH_BINARY);
 		imgT.convertTo(imgT, CV_8UC1, 255);
 
 /*
@@ -156,11 +154,22 @@ int main(int argc, char** argv)
 		}
 */
 		cv::Mat imgP;
-		image.copyTo(imgP);
+//		image.copyTo(imgP);
+		cv::cvtColor(imgT, imgP, CV_GRAY2BGR);
+		cv::circle(imgP, cv::Point(mc, mr), 3, cv::Scalar(255, 255, 255));
 
 		std::vector<Observation> observations;
 
 		auto yblobs = blob_detection(imgT);
+		// remove blobs not containing highest pixel
+		yblobs.erase(std::remove_if(yblobs.begin(), yblobs.end(), [=](const Blob b)
+		{
+			return
+				b.max_x < mc ||
+				b.min_x > mc ||
+				b.max_y < mr ||
+				b.min_y > mr;
+		}));
 		if (yblobs.size() > 0)
 		{
 			auto board = yblobs.at(0);
@@ -178,7 +187,13 @@ int main(int argc, char** argv)
 					b.min_x < board.min_x ||
 					b.max_x > board.max_x ||
 					b.min_y < board.min_y ||
-					b.max_y > board.max_y;
+					b.max_y > board.max_y ||
+
+					b.area < 5 ||
+					static_cast<float>(b.max_x - b.min_x + 1) / (b.max_y - b.min_y + 1) > 1.5f ||
+					static_cast<float>(b.max_x - b.min_x + 1) / (b.max_y - b.min_y + 1) < 1/1.5f ||
+
+					false;
 			}), nyblobs.end());
 
 			auto mkObservation = [&](int x_idx, int y_idx, int d_idx, Blob hole, float objHeight)
