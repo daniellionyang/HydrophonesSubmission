@@ -14,9 +14,9 @@
 #include "image/image.hpp"
 
 const float pvcWidth = 2;
-const float minDist = 30;
-const float scalex = 0.2;
-const float scaley = 0.2;
+const float minDist = 8;
+const float scalex = 0.4;
+const float scaley = 0.4;
 
 std::vector<cv::Point2f> flatten(cv::Mat& img)
 {
@@ -39,7 +39,7 @@ std::vector<cv::Point2f> flatten(cv::Mat& img)
 	return points;
 }
 
-float getYellow(float b, float g, float r)
+float getYellow(float r, float g, float b)
 {
 	return (g - b) * 5 + r;
 }
@@ -86,9 +86,9 @@ cv::Mat dispPoints(cv::Mat img, std::vector<cv::Point2f> pts, int cwidth)
 
 void pResults(FILE* in, FILE* out, std::vector<cv::Point2f>& pts, int cols)
 {
-	fprintf(out, "%i\n", pts.size() == 2 ? 1 : 0);
+	if(pts.size() != 2 || pts[1].y < 0.9*pts[0].y) {fprintf(out, "0\n"); return;}
 
-	if(pts.size() != 2) {return;}
+	fprintf(out, "2\n");
 
 	float theta = fhFOV * (pts[0].x + pts[1].x - cols) / (2*cols);
 	float dist = pvcWidth/2 / std::tan((pts[0].x - pts[1].x)/cols * fhFOV / 2 * 2*M_PI);
@@ -112,14 +112,16 @@ int main(int argc, char** argv)
 
 		cv::Mat yelo = filter(img, getYellow); //Enhance to make pvc show up
 
-		cv::Mat diff = generateDiffMap(yelo, 8, false);
+		cv::Mat diff = generateDiffMap(yelo, minDist/2, true);
 
 		cv::Mat scaled = scaleIntensity(diff);
 		
 		std::vector<cv::Point2f> pts = bestPoints(flatten(scaled), 2);
 		
-		cv::imshow("HI", dispPoints(scaled, pts, 5));
-		cv::waitKey(0);
+		//Uncomment to see images
+		//cv::imshow("HI", dispPoints(scaled, pts, 5));
+		//cv::waitKey(0);
+
 		pResults(in, out, pts, img.cols);
 	}
 }

@@ -31,7 +31,7 @@ cv::Mat generateDiffMap(cv::Mat& img, int diff, bool bigger)
 			float strong = (std::abs(vert) > std::abs(hori)) ? vert : hori;
 			if(bigger)
 			{
-				op[r*img.cols+c] = strong;
+				op[r*img.cols+c] = hori;
 			}
 			else
 			{
