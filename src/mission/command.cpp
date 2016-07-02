@@ -27,30 +27,36 @@ void setState(FILE* out, const State& state)
 void shoot(FILE* out, char side)
 {
 	fprintf(out, "c t %c\n", side);
+	fflush(out);
 }
 
 void drop(FILE* out)
 {
 	fprintf(out, "c d\n");
+	fflush(out);
 }
 
 void grab(FILE* out)
 {
 	fprintf(out, "c g g\n");
+	fflush(out);
 }
 
 void release(FILE* out)
 {
 	fprintf(out, "c g r\n");
+	fflush(out);
 }
 
 void setFlag(FILE* out, size_t idx, float value)
 {
 	fprintf(out, "c f %zu %f\n", idx, value);
+	fflush(out);
 }
 
 void addVariance(FILE* out, size_t idx, float value)
 {
 	fprintf(out, "c v %zu %f\n", idx, value);
+	fflush(out);
 }
 
