@@ -10,6 +10,6 @@ stty -F /dev/ttyUSB0 -echo -echoe -echok
 cat /dev/ttyUSB0 > pipe/control_out &
 cat pipe/control_in > /dev/ttyUSB0 &
 
-bin/camera i 0 < pipe/camera_f_in | tee pipe/camera_f_out > /ram/images &
+bin/camera i 0 1 < pipe/camera_f_in | tee pipe/camera_f_out > /ram/images &
 
 cat
