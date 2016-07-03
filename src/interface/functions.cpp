@@ -279,7 +279,7 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 					case 'f': // flag
 					{
 						size_t idx;
-						fscanf(in, " %z", &idx);
+						fscanf(in, " %zu", &idx);
 						float value = 0;
 						if (idx < NUM_FLAGS)
 						{
