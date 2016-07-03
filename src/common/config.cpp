@@ -13,7 +13,7 @@ const Matrix initialModel =
 	2.5,     3,
 	18.8,  -11.2,
 	19.2,  -10.8,
-	24,    -12,
+	18,    -10,
 };
 
 const Matrix initialVariance =
@@ -53,5 +53,6 @@ const Matrix constants =
 	4.8,
 	3,
 	30,    -15,
+	4.5,
 };
 

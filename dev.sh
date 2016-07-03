@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 trap "exit" INT TERM
 trap "echo caught exit signal; kill 0" EXIT

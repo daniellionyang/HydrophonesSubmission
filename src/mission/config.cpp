@@ -58,29 +58,39 @@ const std::vector<Goal> initialGoals =
 
 		{ flag, F_PINGER, 0 },
 		{ flag, F_BINS, 1 },
-		{ flag, F_TORPS, 1 },
 
 		// droppers
 		{ lprintf, "dropper\n" },
 		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 1, 1 }, // look around
-		{ wait, 5 },
+		{ wait, 3 },
 		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 3, .1 },
+		{ wait, 3 },
+		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 4, .1 },
+		{ flag, F_BINS, 0 },
 		{ uncoverBin },
 		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 3, .1 },
 		{ dropInBin },
-		{ wait, 3 },
-		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 3, .1 },
+		{ wait, 1 },
 		{ dropInBin },
-		{ wait, 3 },
+		{ wait, 1 },
 
-		{ flag, F_BINS, 0 },
 		{ variance, M_PINGER_X, 400 },
 		{ variance, M_PINGER_Y, 400 },
 		{ flag, F_PINGER, 1 },
 
+		{ flag, F_TORPS, 1 },
+
 		// torpedoes
 		{ lprintf, "torpedoes\n" },
-		{ moveModel, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 0, 0, 0, 3 },
+		{ moveDir, State(0, 0, 0, 0, 0, 0), .1 }, // scan
+		{ wait, .3 },
+		{ moveDir, State(0, 0, 0, .25, 0, 0), .1 },
+		{ wait, .3 },
+		{ moveDir, State(0, 0, 0, .5, 0, 0), .1 },
+		{ wait, .3 },
+		{ moveDir, State(0, 0, 0, .75, 0, 0), .1 },
+		{ wait, .3 },
+		{ moveModel, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 0, 0, 0, 2 }, // approach
 		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
 		{ wait, 3 },
 		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },

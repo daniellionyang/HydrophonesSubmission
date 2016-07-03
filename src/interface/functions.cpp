@@ -57,7 +57,7 @@ Evidence observation(FILE* in, const State& state)
 				{d, cd + rho*static_cast<float>(std::sin(phi)), 1}
 			}};
 		}
-		else // depth already known
+		else if (d == -1) // rho is absolute depth
 		{
 			float rd = rho - cd;
 			float hdist = rd / std::tan(phi);
@@ -65,6 +65,14 @@ Evidence observation(FILE* in, const State& state)
 			{{
 				{x, cx + hdist*static_cast<float>(std::cos(theta)), 1},
 				{y, cy + hdist*static_cast<float>(std::sin(theta)), 1},
+			}};
+		}
+		else if (d == -2) // rho is hdist, phi is ignored
+		{
+			return
+			{{
+				{x, cx + rho*static_cast<float>(std::cos(theta)), 1},
+				{y, cy + rho*static_cast<float>(std::sin(theta)), 1},
 			}};
 		}
 	} // otherwise we don't know how to use this observation

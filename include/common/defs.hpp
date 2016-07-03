@@ -27,6 +27,7 @@ enum
 	C_POOL_D,
 	C_PVC_D,
 	C_OCTAGON_X,   C_OCTAGON_Y,
+	C_BIN_D,
 };
 
 enum
