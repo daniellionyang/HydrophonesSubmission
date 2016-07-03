@@ -53,7 +53,7 @@ TORPEDOES = $(patsubst %,$(BUILD)/torpedoes/%.o,main) $(IMAGE) $(VISION) $(COMMO
 TORPEDOES_CFLAGS = $(OPENCV_CFLAGS)
 TORPEDOES_LFLAGS = $(OPENCV_LFLAGS)
 
-DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,color_crop droppers) $(IMAGE) $(MODEL) $(COMMON)
+DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,main) $(IMAGE) $(VISION) $(MODEL) $(COMMON)
 DROPPER_CFLAGS = $(OPENCV_CFLAGS)
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
 

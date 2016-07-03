@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "common/defs.hpp"
+#include "common/config.hpp"
 #include "mission/command.hpp"
 #include "mission/query.hpp"
 
@@ -132,14 +133,13 @@ bool uncoverBin(FILE* in, FILE* out)
 	auto state = getState(in, out);
 	auto target = state;
 
-	target.setDepth(4.5);
+	target.setDepth(constants.get(C_BIN_D));
 	moveAbsolute(in, out, target, .1);
 
 	grab(out);
 	wait(in, out, 1);
 
-	target.setDepth(4);
-	target.setX(state.x() + 1);
+	target.setX(state.x() + .6);
 	moveAbsolute(in, out, target, .1);
 
 	release(out);
