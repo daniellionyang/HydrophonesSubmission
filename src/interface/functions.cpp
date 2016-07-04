@@ -49,7 +49,7 @@ Evidence observation(FILE* in, const State& state)
 	{
 		if (d >= 0 && d < NUM_VARS)
 		{
-			float hdist = rho*std::cos(phi);
+			float hdist = std::abs(rho*std::cos(phi));
 			return
 			{{
 				{x, cx + hdist*static_cast<float>(std::cos(theta)), 9},
@@ -60,11 +60,11 @@ Evidence observation(FILE* in, const State& state)
 		else if (d == -1) // rho is absolute depth
 		{
 			float rd = rho - cd;
-			float hdist = rd / std::tan(phi);
+			float hdist = std::abs(rd / std::tan(phi));
 			return
 			{{
-				{x, cx + hdist*static_cast<float>(std::cos(theta)), 1},
-				{y, cy + hdist*static_cast<float>(std::sin(theta)), 1},
+				{x, cx + hdist*static_cast<float>(std::cos(theta)), .3},
+				{y, cy + hdist*static_cast<float>(std::sin(theta)), .3},
 			}};
 		}
 		else if (d == -2) // rho is hdist, phi is ignored
