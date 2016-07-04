@@ -28,7 +28,6 @@ IMAGE_CFLAGS = $(OPENCV_CFLAGS)
 VISION = $(patsubst %,$(BUILD)/vision/%.o,vision blob blob_detection config)
 VISION_CFLAGS = $(OPENCV_CFLAGS)
 
-
 MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
 MODELING_CFLAGS = 
 MODELING_LFLAGS = 
@@ -48,6 +47,10 @@ CAMERA_LFLAGS = $(OPENCV_LFLAGS) $(FLYCAP_LFLAGS)
 BUOYS = $(patsubst %,$(BUILD)/buoys/%.o,buoys) $(IMAGE) $(VISION) $(COMMON)
 BUOYS_CFLAGS = $(OPENCV_CFLAGS)
 BUOYS_LFLAGS = $(OPENCV_LFLAGS)
+
+PVC = $(patsubst %,$(BUILD)/pvc/%.o,pvc) $(IMAGE) $(VISION) $(COMMON)
+PVC_CFLAGS = $(OPENCV_CFLAGS)
+PVC_LFLAGS = $(OPENCV_LFLAGS)
 
 TORPEDOES = $(patsubst %,$(BUILD)/torpedoes/%.o,main) $(IMAGE) $(VISION) $(COMMON)
 TORPEDOES_CFLAGS = $(OPENCV_CFLAGS)
@@ -74,7 +77,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera camera_pipe buoys torpedoes dropper image_read image_show sim_state
+EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc torpedoes dropper image_read image_show sim_state
 
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
@@ -94,6 +97,9 @@ $(BIN)/camera: $(CAMERA)
 
 $(BIN)/buoys: $(BUOYS) 
 	$(CC) $^ $(LFLAGS) $(BUOYS_LFLAGS) -o $@
+
+$(BIN)/pvc: $(PVC) 
+	$(CC) $^ $(LFLAGS) $(PVC_LFLAGS) -o $@
 
 $(BIN)/torpedoes: $(TORPEDOES) 
 	$(CC) $^ $(LFLAGS) $(TORPEDOES_LFLAGS) -o $@
@@ -142,6 +148,9 @@ $(BUILD)/torpedoes/%.o: $(SRC)/torpedoes/%.cpp
 
 $(BUILD)/buoys/%.o: $(SRC)/buoys/%.cpp
 	$(CC) $(CFLAGS) $(BUOYS_CFLAGS) $< -o $@
+
+$(BUILD)/pvc/%.o: $(SRC)/pvc/%.cpp
+	$(CC) $(CFLAGS) $(PVC_CFLAGS) $< -o $@
 
 $(BUILD)/dropper/%.o: $(SRC)/dropper/%.cpp
 	$(CC) $(CFLAGS) $(DROPPER_CFLAGS) $< -o $@

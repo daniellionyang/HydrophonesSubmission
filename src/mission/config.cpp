@@ -35,14 +35,14 @@ const std::vector<Goal> initialGoals =
 		{ flag, F_BUOYS, 0 },
 		{ moveDir, State(2, 0, -.5, 0, 0, 0), 1 },
 		{ moveDir, State(0, 0, .8, 0, 0, 0), 1 },
-		{ moveDir, State(4, 1, 0, 0, 0, 0), 1 },
+		{ moveDir, State(2, 1, 0, 0, 0, 0), 1 },
 
 		{ flag, F_PINGER, 1 }, // activate pinger early
 		{ flag, F_PVC, 1 },
 
 		// pvc
 		{ lprintf, "pvc\n" },
-		{ moveModel, M_PVC_X, M_PVC_Y, M_ZERO, 0, 0, constants.get(C_PVC_D), 2 },
+		{ moveModel, M_PVC_X, M_PVC_Y, M_ZERO, 0, 0, 2.3, 2 },
 		{ moveDir, State(5, 0, 0, 0, 0, 2), 1 }, // barrel roll
 		{ moveDir, State(3, 0, 0, 0, 0, 0), 1 },
 

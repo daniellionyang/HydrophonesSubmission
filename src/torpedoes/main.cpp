@@ -59,31 +59,6 @@ cv::Mat equalColorHist(cv::Mat& img, bool red, bool green, bool blue)
 	return result;
 }
 
-//Turns the mat into a diffmap (make each pixel the difference between it and its neighbors)
-//Useful because the water near the top usually looks like the green buoys near the bottom
-cv::Mat generateDiffMap(cv::Mat& img, int diff)
-{
-	cv::Mat diffMap = cv::Mat(img.size(), CV_32F, cv::Scalar(0));
-
-	float* ip = img.ptr<float>();
-	float* op = diffMap.ptr<float>();
-
-	for (int c = diff; c < img.cols - diff; c++)
-	{
-		for (int r = diff; r < img.rows - diff; r++)
-		{
-			// make the value equal to how much it stands out from its\
-				horizontal or vertical neighbors, whichever is less
-			float vert = (2*ip[(r*img.cols+c)]-ip[((r-diff)*img.cols+c)]-ip[((r+diff)*img.cols+c)]);
-			float hori = (2*ip[(r*img.cols+c)]-ip[(r*img.cols+c+diff)]-ip[(r*img.cols+c-diff)]);
-			float weak = (std::abs(vert) < std::abs(hori)) ? vert : hori;
-			op[r*img.cols+c] = weak;
-		}
-	}
- 
-	return diffMap;
-}
-
 int main(int argc, char** argv)
 {
 	FILE* in = stdin;
