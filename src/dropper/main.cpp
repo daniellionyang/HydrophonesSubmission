@@ -17,7 +17,7 @@
 #include "vision/blob_detection.hpp"
 #include "image/image.hpp"
 
-auto ofilter = [](float r, float g, float b){ return .7*r/(g+.001) - 1.20*g/(b+.001)-(g+b)*0.01; };
+auto ofilter = [](float r, float g, float b){ return .7*r/(g+.001) - .4*g/(b+.001); };
 
 const float cropx = 1.0;
 const float cropy = 1.0;
