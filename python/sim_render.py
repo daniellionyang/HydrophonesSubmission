@@ -115,8 +115,8 @@ def run():
 		loc[1] = state.y
 		loc[2] = state.depth
 
-		att[0] = state.pitch * 2*math.pi
-		att[1] = state.roll * 2*math.pi
+		att[1] = state.pitch * 2*math.pi
+		att[0] = state.roll * 2*math.pi
 		att[2] = state.yaw * 2*math.pi
 
 		print("Rendering images")
