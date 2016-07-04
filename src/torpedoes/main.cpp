@@ -154,9 +154,9 @@ int main(int argc, char** argv)
 		}
 */
 		cv::Mat imgP;
-//		image.copyTo(imgP);
-		cv::cvtColor(imgT, imgP, CV_GRAY2BGR);
-		cv::circle(imgP, cv::Point(mc, mr), 3, cv::Scalar(255, 255, 255));
+		image.copyTo(imgP);
+//		cv::cvtColor(imgT, imgP, CV_GRAY2BGR);
+		cv::circle(imgP, cv::Point(mc, mr), 3, cv::Scalar(0, 255, 255));
 
 		std::vector<Observation> observations;
 
@@ -168,8 +168,10 @@ int main(int argc, char** argv)
 				b.max_x < mc ||
 				b.min_x > mc ||
 				b.max_y < mr ||
-				b.min_y > mr;
-		}));
+				b.min_y > mr ||
+
+				false;
+		}), yblobs.end());
 		if (yblobs.size() > 0)
 		{
 			auto board = yblobs.at(0);
