@@ -149,7 +149,7 @@ int main(int argc, char** argv)
 
 			float theta = fhFOV * static_cast<float>(mc - img.cols/2) / img.cols;
 			float phi = fvFOV * static_cast<float>(mr - img.rows/2) / img.rows;
-			float dist = std::max(.2, buoyWidth/2 / std::tan(size/img.cols * fvFOV / 2 * 2*M_PI) - 1.6);
+			float dist = std::max(.2, buoyWidth/2 / std::tan(size/img.cols * fvFOV / 2 * 2*M_PI) - 1.f);
 
 			bool cont = false;
 			for (auto f : found)
