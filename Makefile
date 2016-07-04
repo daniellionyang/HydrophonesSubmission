@@ -72,12 +72,16 @@ IMAGE_SHOW = $(patsubst %,$(BUILD)/image_show/%.o,main) $(IMAGE) $(COMMON)
 IMAGE_SHOW_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
 IMAGE_SHOW_LFLAGS = $(OPENCV_LFLAGS)
 
+IMAGE_LOG = $(patsubst %,$(BUILD)/image_log/%.o,main) $(IMAGE) $(COMMON)
+IMAGE_LOG_CFLAGS = $(OPENCV_CFLAGS) $(IMAGE_CFLAGS)
+IMAGE_LOG_LFLAGS = $(OPENCV_LFLAGS)
+
 SIM_STATE = $(patsubst %,$(BUILD)/sim_state/%.o,main) $(COMMON)
 SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc torpedoes dropper image_read image_show sim_state
+EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc torpedoes dropper image_read image_show image_log sim_state
 
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
@@ -115,6 +119,9 @@ $(BIN)/image_read: $(IMAGE_READ)
 
 $(BIN)/image_show: $(IMAGE_SHOW)
 	$(CC) $^ $(LFLAGS) $(IMAGE_SHOW_LFLAGS) -o $@
+
+$(BIN)/image_log: $(IMAGE_LOG)
+	$(CC) $^ $(LFLAGS) $(IMAGE_LOG_LFLAGS) -o $@
 
 $(BIN)/sim_state: $(SIM_STATE)
 	$(CC) $^ $(LFLAGS) $(SIM_STATE_LFLAGS) -o $@
@@ -163,6 +170,9 @@ $(BUILD)/image_read/%.o: $(SRC)/image_read/%.cpp
 
 $(BUILD)/image_show/%.o: $(SRC)/image_show/%.cpp
 	$(CC) $(CFLAGS) $(IMAGE_SHOW_CFLAGS) $< -o $@
+
+$(BUILD)/image_log/%.o: $(SRC)/image_log/%.cpp
+	$(CC) $(CFLAGS) $(IMAGE_LOG_CFLAGS) $< -o $@
 
 $(BUILD)/sim_state/%.o: $(SRC)/sim_state/%.cpp
 	$(CC) $(CFLAGS) $(SIM_STATE_CFLAGS) $< -o $@
