@@ -17,6 +17,7 @@ const float pvcWidth = 2;
 const float minDist = 8;
 const float scalex = 0.4;
 const float scaley = 0.4;
+const float cutoff = 0.8;
 
 std::vector<cv::Point2f> flatten(cv::Mat& img)
 {
@@ -86,23 +87,24 @@ cv::Mat dispPoints(cv::Mat img, std::vector<cv::Point2f> pts, int cwidth)
 
 void pResults(FILE* in, FILE* out, std::vector<cv::Point2f>& pts, int cols)
 {
-	if(pts.size() != 2 || pts[1].y < 0.9*pts[0].y) {fprintf(out, "0\n"); return;}
+	if(pts.size() != 2 || pts[1].y < cutoff*pts[0].y) {fprintf(out, "0\n"); return;}
 
-	fprintf(out, "2\n");
+	fprintf(out, "1\n");
 
 	float theta = fhFOV * (pts[0].x + pts[1].x - cols) / (2*cols);
-	float dist = pvcWidth/2 / std::tan((pts[0].x - pts[1].x)/cols * fhFOV / 2 * 2*M_PI);
+	float dist = pvcWidth/2 / std::tan((std::max(pts[0].x - pts[1].x, pts[1].x - pts[0].x))/cols * fhFOV / 2 * 2*M_PI);
 
-	fprintf(out, "%zu %zu -1\n%f %f %f\n",
-		M_GATE_X, M_GATE_Y,
-		theta, constants.get(C_PVC_D), dist);
+	fprintf(out, "%zu %zu -2\n%f 0 %f\n",
+		M_PVC_X, M_PVC_Y,
+		theta, dist);
+	fflush(out);
 }
 
 int main(int argc, char** argv)
 {
 	FILE* in = stdin;
 	FILE* out = stdout;
-	FILE* err = stderr;
+	FILE* log = stderr;
 
 	while(true)
 	{
@@ -118,10 +120,8 @@ int main(int argc, char** argv)
 		
 		std::vector<cv::Point2f> pts = bestPoints(flatten(scaled), 2);
 		
-		//Uncomment to see images
-		//cv::imshow("HI", dispPoints(scaled, pts, 5));
-		//cv::waitKey(0);
-
 		pResults(in, out, pts, img.cols);
+
+		imageWrite(log, dispPoints(img, pts, 5));
 	}
 }
