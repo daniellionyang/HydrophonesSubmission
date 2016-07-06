@@ -473,7 +473,7 @@ bool control(Data* data, const std::string in_name, const std::string out_name)
 		// send commands to arduino
 		if (setState)
 		{
-			fprintf(out, "s\n");
+			fprintf(out, "s ");
 			desiredState.write(out);
 			fflush(out);
 		}
