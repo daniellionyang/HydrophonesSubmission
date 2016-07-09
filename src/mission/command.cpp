@@ -60,3 +60,15 @@ void addVariance(FILE* out, size_t idx, float value)
 	fflush(out);
 }
 
+void maxThrust(FILE* out, float value)
+{
+	fprintf(out, "c p %f\n", value);
+	fflush(out);
+}
+
+void speed(FILE* out, float value)
+{
+	fprintf(out, "c o %f\n", value);
+	fflush(out);
+}
+

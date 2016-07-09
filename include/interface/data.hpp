@@ -13,6 +13,11 @@
 #include "common/state.hpp"
 #include "model/evidence.hpp"
 
+struct Line
+{
+	char str[256];
+};
+
 class Data
 {
 public:
@@ -34,6 +39,7 @@ public:
 
 	std::queue<Evidence> evidence;
 	std::queue<std::tuple<size_t, float> > addVariance;
+	std::queue<Line> send_line;
 
 	State desiredState;
 	bool setState;

@@ -366,6 +366,28 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 						}
 						break;
 					}
+					case 'p': // max thrust / power
+					{
+						float value;
+						fscanf(in, " %f", &value);
+						Line l;
+						snprintf(l.str, sizeof(l.str), "p %f", value);
+						data->lock();
+							data->send_line.push(l);
+						data->unlock();
+						break;
+					}
+					case 'o': // max thrust / power
+					{
+						float value;
+						fscanf(in, " %f", &value);
+						Line l;
+						snprintf(l.str, sizeof(l.str), "o %f", value);
+						data->lock();
+							data->send_line.push(l);
+						data->unlock();
+						break;
+					}
 				}
 				break;
 			}
@@ -484,6 +506,17 @@ bool control(Data* data, const std::string in_name, const std::string out_name)
 		if (drop) fprintf(out, "d\n");
 		if (grab) fprintf(out, "g\n");
 		if (release) fprintf(out, "r\n");
+
+		std::queue<Line> lines;
+		data->lock();
+			std::swap(lines, data->send_line);
+		data->unlock();
+
+		while (!lines.empty())
+		{
+			fprintf(out, "%s\n", lines.front().str);
+			lines.pop();
+		}
 
 		fflush(out);
 
