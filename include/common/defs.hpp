@@ -15,9 +15,9 @@ enum
 	M_PVC_X,       M_PVC_Y,
 	M_OBIN_X,      M_OBIN_Y,
 	M_CBIN_X,      M_CBIN_Y,
-	M_TORP_T_D,    M_TORP_B_D,
-	M_TORP_L_X,    M_TORP_L_Y,
-	M_TORP_R_X,    M_TORP_R_Y,
+	M_TORP_X,      M_TORP_Y,
+	M_TORP_SKEW,
+	M_TORP_D,
 	M_PINGER_X,    M_PINGER_Y,
 	NUM_VARS
 };

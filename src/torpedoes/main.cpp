@@ -27,6 +27,8 @@ const float scaley = 192;
 //const float scaley = 0.2;
 const int diffDist = 8;
 
+const float boardHeight = 1;
+
 const float smallHoleHeight = .1778f;
 const float largeHoleHeight = .3048f;
 const float tlHeight = largeHoleHeight;
@@ -153,68 +155,48 @@ int main(int argc, char** argv)
 
 			board.drawBlob(imgP, cv::Scalar(0, 255, 255));
 
-			cv::Mat imgI;
-			cv::bitwise_not(imgT, imgI);
-			auto nyblobs = blob_detection(imgI);
-
-			nyblobs.erase(std::remove_if(nyblobs.begin(), nyblobs.end(), [=](const Blob b)
+			auto points = board.convexHull;
+			auto c = board.getCentroid();
+			int maxL = board.min_y;
+			int maxR = board.min_y;
+			int minL = board.max_y;
+			int minR = board.max_y;
+			for (auto p : points)
 			{
-				// remove blobs not completely inside board
-				return
-					b.min_x < board.min_x ||
-					b.max_x > board.max_x ||
-					b.min_y < board.min_y ||
-					b.max_y > board.max_y ||
-
-					b.area < 5 ||
-					static_cast<float>(b.max_x - b.min_x + 1) / (b.max_y - b.min_y + 1) > 1.5f ||
-					static_cast<float>(b.max_x - b.min_x + 1) / (b.max_y - b.min_y + 1) < 1/1.5f ||
-
-					false;
-			}), nyblobs.end());
-
-			auto mkObservation = [&](int x_idx, int y_idx, int d_idx, Blob hole, float objHeight)
-			{
-				const cv::Mat& img = imgT;
-				float imgHeight = hole.max_y - hole.min_y + 3;
-				return Observation
+				if (p.x > c.x) // right
 				{
-					x_idx, y_idx, d_idx,
-					hAngle(img, hole.getCentroid().x - img.cols/2),
-					vAngle(img, hole.getCentroid().y - img.cols/2),
-					static_cast<float>(std::max(.2, objHeight/2 / std::max(.001, std::tan(vAngle(img, imgHeight)/2 * 2*M_PI)))),
-				};
-			};
-
-			if (nyblobs.size() == 4)
-			{
-				std::sort(nyblobs.begin(), nyblobs.end(), [](Blob a, Blob b){ return a.getCentroid().x < b.getCentroid().x; });
-
-				bool top = nyblobs.at(0).getCentroid().y < nyblobs.at(1).getCentroid().y;
-				auto tl = nyblobs.at(top ? 0 : 1);
-				auto bl = nyblobs.at(top ? 1 : 0);
-				top = nyblobs.at(2).getCentroid().y < nyblobs.at(3).getCentroid().y;
-				auto tr = nyblobs.at(top ? 2 : 3);
-				auto br = nyblobs.at(top ? 3 : 2);
-
-				tl.drawBlob(imgP, cv::Scalar(255, 0, 0));
-				bl.drawBlob(imgP, cv::Scalar(0, 255, 0));
-				tr.drawBlob(imgP, cv::Scalar(0, 0, 255));
-				br.drawBlob(imgP, cv::Scalar(255, 255, 0));
-
-				observations.push_back(mkObservation(M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, tl, tlHeight));
-				observations.push_back(mkObservation(M_TORP_L_X, M_TORP_L_Y, M_TORP_B_D, bl, blHeight));
-				observations.push_back(mkObservation(M_TORP_R_X, M_TORP_R_Y, M_TORP_T_D, tr, trHeight));
-				observations.push_back(mkObservation(M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, br, brHeight));
+					if (p.y > maxR) maxR = p.y;
+					if (p.y < minR) minR = p.y;
+				}
+				else // left
+				{
+					if (p.y > maxL) maxL = p.y;
+					if (p.y < minL) minL = p.y;
+				}
 			}
-			else
+
+			float ratio = static_cast<float>(maxR - minR) / (maxL - minL);
+
+			float skew = 0;
+
+			observations.push_back(
 			{
-				for (auto b : nyblobs)
-					b.drawBlob(imgP, cv::Scalar(255, 0, 0));
-				// the holes are probably somewhere near the board
-				// TODO: add high variance low certainty observations
-				// don't implement this until variance can be passed through an observation object
-			}
+				M_TORP_SKEW, -1, -3, skew, 0, .3,
+			});
+
+			float theta = fhFOV * static_cast<float>(c.x - img.cols/2) / img.cols;
+			float phi = fvFOV * static_cast<float>(c.y - img.rows/2) / img.rows;
+			float dist = boardHeight/2 / std::tan((board.max_y - board.min_y)/img.rows * fvFOV / 2 * 2*M_PI);
+
+			observations.push_back(
+			{
+				M_TORP_X,
+				M_TORP_Y,
+				-2,
+				theta,
+				phi,
+				dist,
+			});
 		}
 		imageWrite(log, imgP);
 

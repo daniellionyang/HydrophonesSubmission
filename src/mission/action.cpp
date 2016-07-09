@@ -47,7 +47,11 @@ bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 	{
 		State state = getState(in, out);
 
-		if (state.distanceTo(target) < minDistance)
+		if (
+			state.distanceTo(target) < minDistance     &&
+			std::abs(state.yaw() - target.yaw()) < .02 &&
+			true
+		)
 			close = true;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
@@ -172,13 +176,13 @@ bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offs
 		float ty = model.get(yi);
 		float td = model.get(di);
 
-		float theta = std::atan2(model.get(M_TORP_L_Y) - model.get(M_TORP_R_Y), model.get(M_TORP_L_X) - model.get(M_TORP_R_X)) + M_PI/2;
+		float theta = model.get(M_TORP_SKEW);
 
 		auto target = State(
-			model.get(xi) - offset*std::cos(theta),
-			model.get(yi) - offset*std::sin(theta),
+			model.get(xi) - offset*std::cos(theta * 2*M_PI),
+			model.get(yi) - offset*std::sin(theta * 2*M_PI),
 			model.get(di),
-			theta / (2*M_PI),
+			theta,
 			0,
 			0
 		);

@@ -95,20 +95,16 @@ const std::vector<Goal> initialGoals =
 		{ wait, .3 },
 		{ moveDir, State(0, 0, 0, .75, 0, 0), .1 },
 		{ wait, .3 },
-		{ moveModel, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 0, 0, 0, 2 }, // approach
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
+		{ moveModel, M_TORP_X, M_TORP_Y, M_TORP_D, 0, 0, 0, 2 }, // approach
+		{ moveToHole, M_TORP_X, M_TORP_Y, M_TORP_D, 1, .1 },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
-		{ moveDir, State(.3, 0, 0, 0, 0, 0), .1 }, // remove cover
-		{ moveDir, State(0, .5, 0, 0, 0, 0), .1 },
-		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, 1, .1 },
+		{ moveToHole, M_TORP_X, M_TORP_Y, M_TORP_D, .3, .1 },
+		{ moveDir, State(.4, 0, 0, 0, 0, 0), .1 }, // remove cover
+		{ moveDir, State(0, .3, 0, 0, 0, 0), .1 },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, .5, .1 },
+		{ moveDir, State(0, -.3, 0, 0, 0, 0), .1 },
 		{ shootInHole, 'r' },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
-		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
 		{ shootInHole, 'l' },
 		{ wait, 3 },
 
