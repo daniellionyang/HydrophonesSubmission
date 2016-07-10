@@ -52,8 +52,6 @@ bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
 
-	stop(in, out);
-
 	return true;
 }
 
@@ -204,6 +202,18 @@ bool flag(FILE* in, FILE* out, size_t idx, float value)
 bool variance(FILE* in, FILE* out, size_t idx, float value)
 {
 	addVariance(out, idx, value);
+	return true;
+}
+
+bool setMaxThrust(FILE* in, FILE* out, float value)
+{
+	maxThrust(out, value);
+	return true;
+}
+
+bool setSpeed(FILE* in, FILE* out, float value)
+{
+	speed(out, value);
 	return true;
 }
 

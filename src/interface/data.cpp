@@ -7,6 +7,7 @@ Data::Data() :
 	imageID({}),
 	modelID(0),
 	setState(false),
+	send_line(std::queue<Line>{}),
 	drop(false),
 	grab(false),
 	release(false),

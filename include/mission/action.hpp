@@ -43,5 +43,8 @@ bool flag(FILE*, FILE*, size_t, float);
 
 bool variance(FILE*, FILE*, size_t, float);
 
+bool setMaxThrust(FILE*, FILE*, float);
+bool setSpeed(FILE*, FILE*, float);
+
 #endif
 
