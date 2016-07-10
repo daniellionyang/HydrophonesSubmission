@@ -41,6 +41,8 @@ public:
 	std::queue<std::tuple<size_t, float> > addVariance;
 	std::queue<Line> send_line;
 
+	bool alive;
+
 	State desiredState;
 	bool setState;
 	bool drop;

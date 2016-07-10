@@ -58,6 +58,7 @@ bool handleCPU(std::atomic<State>* state, std::atomic<State>* des)
 		int c = fgetc(in);
 		switch (c)
 		{
+			case 'a': fprintf(out, "1\n"); fflush(out); break;
 			case 'c': state->load().write(out); break;
 			case 's': des->store(State(in)); break;
 			case 't':

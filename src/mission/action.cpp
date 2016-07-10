@@ -49,6 +49,7 @@ bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 
 		if (state.distanceTo(target) < minDistance)
 			close = true;
+		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
 
@@ -105,6 +106,7 @@ bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, 
 
 		if (state.distanceTo(target) < minDistance)
 			close = true;
+		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
 
@@ -122,6 +124,7 @@ bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float y
 
 bool dropInBin(FILE* in, FILE* out)
 {
+	if (!alive(in, out)) return false;
 	drop(out);
 	return true;
 }
@@ -132,24 +135,25 @@ bool uncoverBin(FILE* in, FILE* out)
 	auto target = state;
 
 	target.setDepth(constants.get(C_BIN_D));
-	moveAbsolute(in, out, target, .1);
+	if (!moveAbsolute(in, out, target, .1)) return false;
 
 	grab(out);
 	wait(in, out, 1);
 
 	target.setX(state.x() + .6);
-	moveAbsolute(in, out, target, .1);
+	if (!moveAbsolute(in, out, target, .1)) return false;
 
 	release(out);
 	wait(in, out, 1);
 
-	moveAbsolute(in, out, state, .1);
+	if (!moveAbsolute(in, out, state, .1)) return false;
 
 	return true;
 }
 
 bool shootInHole(FILE* in, FILE* out, char side)
 {
+	if (!alive(in, out)) return false;
 	shoot(out, side);
 	return true;
 }
@@ -185,6 +189,7 @@ bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offs
 
 		if (state.distanceTo(target) < mindist)
 			close = true;
+		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
 
@@ -195,24 +200,28 @@ bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offs
 
 bool flag(FILE* in, FILE* out, size_t idx, float value)
 {
+	if (!alive(in, out)) return false;
 	setFlag(out, idx, value);
 	return true;
 }
 
 bool variance(FILE* in, FILE* out, size_t idx, float value)
 {
+	if (!alive(in, out)) return false;
 	addVariance(out, idx, value);
 	return true;
 }
 
 bool setMaxThrust(FILE* in, FILE* out, float value)
 {
+	if (!alive(in, out)) return false;
 	maxThrust(out, value);
 	return true;
 }
 
 bool setSpeed(FILE* in, FILE* out, float value)
 {
+	if (!alive(in, out)) return false;
 	speed(out, value);
 	return true;
 }

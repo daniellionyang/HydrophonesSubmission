@@ -15,7 +15,8 @@ int process(FILE* in, FILE* out)
 {
 	srand(time(NULL));
 
-	System system = {256, {{1, initialModel, initialVariance }}};
+	System initial_system = {256, {{1, initialModel, initialVariance }}};
+	auto system = initial_system;
 
 	bool quit = false;
 	while (!quit)
@@ -23,6 +24,9 @@ int process(FILE* in, FILE* out)
 		int c = fgetc(in);
 		switch (c)
 		{
+			case 'r': // reset
+				system = initial_system;
+				break;
 			case 's': // set
 				system = System(in);
 				break;
