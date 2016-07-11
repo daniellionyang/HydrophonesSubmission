@@ -109,19 +109,18 @@ const std::vector<Goal> initialGoals =
 		{ moveDir, State(0, 0, 0, .75, 0, 0), .1 },
 		{ wait, .3 },
 		{ moveModel, M_TORP_X, M_TORP_Y, M_TORP_D, 0, 0, 0, 2 }, // approach
-		{ moveToHole, M_TORP_X, M_TORP_Y, M_TORP_D, 1, .1 },
+		{ moveExt, 0, -1, M_TORP_X, 0, 0, 0, M_TORP_Y, 0, 0, M_TORP_D, 0, .25, M_TORP_SKEW, 0, 0, 0, .1 }, // align
+		{ flag, F_TORPS, 1 },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_X, M_TORP_Y, M_TORP_D, .3, .1 },
-		{ moveDir, State(.4, 0, 0, 0, 0, 0), .1 }, // remove cover
-		{ moveDir, State(0, .3, 0, 0, 0, 0), .1 },
-		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V }, // center in front of cover
+		{ moveDir, State(1, 0, 0, 0, 0, 0), .1 }, // approach cover
+		{ moveDir, State(0, .3, 0, 0, 0, 0), .1 }, // remove cover
 		{ moveDir, State(0, -.3, 0, 0, 0, 0), .1 },
 		{ shootInHole, 'r' },
 		{ wait, 3 },
 		{ shootInHole, 'l' },
 		{ wait, 3 },
 
-		{ flag, F_TORPS, 0 },
 		{ wait, 10 },
 	}},
 

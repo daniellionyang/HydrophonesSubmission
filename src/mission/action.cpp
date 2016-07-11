@@ -176,6 +176,28 @@ bool turnTo(FILE* in, FILE* out, int xi, int yi)
 	return moveExt(in, out, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, theta, 0, 0, 0, 0, .1);
 }
 
+bool alignWith(FILE* in, FILE* out, int hi, int vi)
+{
+	bool close = false;
+	while (!close)
+	{
+		auto state = getState(in, out);
+		auto model = getModel(in, out);
+
+		float h = model.get(hi);
+		float v = model.get(vi);
+
+		if (std::abs(h) < .05 && std::abs(v) < .05)
+		{
+			close = true;
+			setState(out, state);
+		}
+		else moveDir(in, out, State(0, h * 1, v * 1, 0, 0, 0), .03);
+	}
+
+	return true;
+}
+
 bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
 {
 	auto target = State(xo, yo, zo, 0, 0, 0);
