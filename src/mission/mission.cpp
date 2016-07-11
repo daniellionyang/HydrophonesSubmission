@@ -1,6 +1,8 @@
 #include "mission/mission.hpp"
 
 #include <vector>
+#include <chrono>
+#include <thread>
 #include <algorithm>
 
 #include "mission/command.hpp"
@@ -25,6 +27,16 @@ int mission(FILE* in, FILE* out, FILE* config)
 	bool quit = false;
 	while (!quit)
 	{
+		// killed
+		if (!alive(in, out))
+		{
+			goals = initialGoals;
+
+			// wait until alive
+			while (!alive(in, out))
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		}
+
 		// get current state
 		auto state = getState(in, out);
 		auto model = getModel(in, out);

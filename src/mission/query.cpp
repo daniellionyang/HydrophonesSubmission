@@ -46,3 +46,12 @@ float getFlag(FILE* in, FILE* out, size_t idx)
 	return value;
 }
 
+bool alive(FILE* in, FILE* out)
+{
+	fprintf(out, "q a\n");
+	fflush(out);
+	int value;
+	fscanf(in, " %i", &value);
+	return value != 0;
+}
+

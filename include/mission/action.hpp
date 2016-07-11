@@ -27,6 +27,8 @@ private:
 bool lprintf(FILE*, FILE*, const std::string);
 
 bool wait(FILE*, FILE*, float);
+bool moveExt(FILE*, FILE*, float, float, int, int, float, float, int, int, float, int, int, float, int, int, float, float, float);
+bool turnTo(FILE*, FILE*, int, int);
 bool moveAbsolute(FILE*, FILE*, const State&, float);
 bool moveRelative(FILE*, FILE*, const State&, float);
 bool moveDir(FILE*, FILE*, const State&, float);
@@ -42,6 +44,9 @@ bool moveToHole(FILE*, FILE*, size_t, size_t, size_t, float, float);
 bool flag(FILE*, FILE*, size_t, float);
 
 bool variance(FILE*, FILE*, size_t, float);
+
+bool setMaxThrust(FILE*, FILE*, float);
+bool setSpeed(FILE*, FILE*, float);
 
 #endif
 

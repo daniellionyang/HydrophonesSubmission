@@ -18,5 +18,7 @@ float getCertainty(FILE*, FILE*);
 
 float getFlag(FILE*, FILE*, size_t);
 
+bool alive(FILE*, FILE*);
+
 #endif
 

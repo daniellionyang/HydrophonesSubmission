@@ -292,6 +292,16 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 							data->unlock();
 						}
 						fprintf(out, "%f\n", value);
+						break;
+					}
+					case 'a': // kill state
+					{
+						data->lock();
+							bool alive = data->alive;
+						data->unlock();
+						fprintf(out, "%i\n", alive ? 1 : 0);
+						fflush(out);
+						break;
 					}
 				}
 				break;
@@ -370,6 +380,28 @@ bool mission(Data* data, const std::string in_name, const std::string out_name)
 						}
 						break;
 					}
+					case 'p': // max thrust / power
+					{
+						float value;
+						fscanf(in, " %f", &value);
+						Line l;
+						snprintf(l.str, sizeof(l.str), "p %f", value);
+						data->lock();
+							data->send_line.push(l);
+						data->unlock();
+						break;
+					}
+					case 'o': // max thrust / power
+					{
+						float value;
+						fscanf(in, " %f", &value);
+						Line l;
+						snprintf(l.str, sizeof(l.str), "o %f", value);
+						data->lock();
+							data->send_line.push(l);
+						data->unlock();
+						break;
+					}
 				}
 				break;
 			}
@@ -386,9 +418,20 @@ bool modeling(Data* data, const std::string in_name, const std::string out_name)
 	FILE* out = openStream(out_name, "w");
 	FILE* in = openStream(in_name, "r");
 
+	bool alive_pre = false;
+
 	bool quit = false;
 	while (!quit)
 	{
+		bool alive;
+		data->lock();
+			alive = data->alive;
+		data->unlock();
+		if (alive && !alive_pre)
+			// reset model
+			fprintf(out, "r\n");
+		alive_pre = alive;
+
 		fprintf(out, "m\n"); // request model
 		fflush(out);
 		auto model = Matrix(in); // read model
@@ -440,6 +483,14 @@ bool control(Data* data, const std::string in_name, const std::string out_name)
 		fflush(out);
 		auto state = State(in); // read state
 
+		fprintf(out, "a\n"); // request kill state
+		fflush(out);
+		int kill_state;
+		fscanf(in, " %i", &kill_state);
+		data->lock();
+			data->alive = (kill_state != 0);
+		data->unlock();
+
 		// compute movement
 		State oldState;
 		data->lock();
@@ -488,6 +539,17 @@ bool control(Data* data, const std::string in_name, const std::string out_name)
 		if (drop) fprintf(out, "d\n");
 		if (grab) fprintf(out, "g\n");
 		if (release) fprintf(out, "r\n");
+
+		std::queue<Line> lines;
+		data->lock();
+			std::swap(lines, data->send_line);
+		data->unlock();
+
+		while (!lines.empty())
+		{
+			fprintf(out, "%s\n", lines.front().str);
+			lines.pop();
+		}
 
 		fflush(out);
 

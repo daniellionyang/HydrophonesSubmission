@@ -53,10 +53,9 @@ bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 			true
 		)
 			close = true;
+		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
-
-	stop(in, out);
 
 	return true;
 }
@@ -111,12 +110,70 @@ bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, 
 
 		if (state.distanceTo(target) < minDistance)
 			close = true;
+		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
 
 	stop(in, out);
 
 	return true;
+}
+
+// x/y/d/t/p/r = X / Y / Depth / Yaw / Pitch / Roll
+// a/d/i/r = Absolute Offset / Directional Offset / Index of Model / Current Value Multiplier
+bool moveExt(FILE* in, FILE* out, float xa, float xd, int xi, int xr, float ya, float yd, int yi, int yr, float da, int di, int dr, float ta, int ti, int tr, float pa, float ra, float minDistance)
+{
+	State state = getState(in, out);
+	float cx = state.x();
+	float cy = state.y();
+	float cd = state.depth();
+	float ct = state.yaw();
+
+	bool close = false;
+	while (!close)
+	{
+		auto model = getModel(in, out);
+
+		auto dt = ta + model.get(ti) + tr*ct;
+		auto dtr = dt * 2*M_PI;
+
+		auto dx = xd * std::cos(dtr) - yd * std::sin(dtr);
+		auto dy = xd * std::sin(dtr) + yd * std::cos(dtr);
+
+		auto target = State(
+		{
+			xa + dx + model.get(xi) + xr*cx,
+			ya + dy + model.get(yi) + yr*cy,
+			da + model.get(di) + dr*cd,
+			dt,
+			pa,
+			ra,
+		});
+
+		setState(out, target);
+
+		auto state = getState(in, out);
+
+		if (state.distanceTo(target) < minDistance && std::abs(state.yaw() - dt) < .03)
+			close = true;
+		else if (!alive(in, out)) return false;
+		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
+	}
+
+	return true;
+}
+
+bool turnTo(FILE* in, FILE* out, int xi, int yi)
+{
+	auto state = getState(in, out);
+	auto model = getModel(in, out);
+
+	auto dx = model.get(xi) - state.x();
+	auto dy = model.get(yi) - state.y();
+
+	float theta = std::atan2(dy, dx) / (2 * M_PI);
+
+	return moveExt(in, out, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, theta, 0, 0, 0, 0, .1);
 }
 
 bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
@@ -128,6 +185,7 @@ bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float y
 
 bool dropInBin(FILE* in, FILE* out)
 {
+	if (!alive(in, out)) return false;
 	drop(out);
 	return true;
 }
@@ -138,24 +196,25 @@ bool uncoverBin(FILE* in, FILE* out)
 	auto target = state;
 
 	target.setDepth(constants.get(C_BIN_D));
-	moveAbsolute(in, out, target, .1);
+	if (!moveAbsolute(in, out, target, .1)) return false;
 
 	grab(out);
 	wait(in, out, 1);
 
 	target.setX(state.x() + .6);
-	moveAbsolute(in, out, target, .1);
+	if (!moveAbsolute(in, out, target, .1)) return false;
 
 	release(out);
 	wait(in, out, 1);
 
-	moveAbsolute(in, out, state, .1);
+	if (!moveAbsolute(in, out, state, .1)) return false;
 
 	return true;
 }
 
 bool shootInHole(FILE* in, FILE* out, char side)
 {
+	if (!alive(in, out)) return false;
 	shoot(out, side);
 	return true;
 }
@@ -191,6 +250,7 @@ bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offs
 
 		if (state.distanceTo(target) < mindist)
 			close = true;
+		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
 	}
 
@@ -201,13 +261,29 @@ bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offs
 
 bool flag(FILE* in, FILE* out, size_t idx, float value)
 {
+	if (!alive(in, out)) return false;
 	setFlag(out, idx, value);
 	return true;
 }
 
 bool variance(FILE* in, FILE* out, size_t idx, float value)
 {
+	if (!alive(in, out)) return false;
 	addVariance(out, idx, value);
+	return true;
+}
+
+bool setMaxThrust(FILE* in, FILE* out, float value)
+{
+	if (!alive(in, out)) return false;
+	maxThrust(out, value);
+	return true;
+}
+
+bool setSpeed(FILE* in, FILE* out, float value)
+{
+	if (!alive(in, out)) return false;
+	speed(out, value);
 	return true;
 }
 
