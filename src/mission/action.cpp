@@ -115,6 +115,63 @@ bool moveModel(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, 
 	return true;
 }
 
+// x/y/d/t/p/r = X / Y / Depth / Yaw / Pitch / Roll
+// a/d/i/r = Absolute Offset / Directional Offset / Index of Model / Current Value Multiplier
+bool moveExt(FILE* in, FILE* out, float xa, float xd, int xi, int xr, float ya, float yd, int yi, int yr, float da, int di, int dr, float ta, int ti, int tr, float pa, float ra, float minDistance)
+{
+	State state = getState(in, out);
+	float cx = state.x();
+	float cy = state.y();
+	float cd = state.depth();
+	float ct = state.yaw();
+
+	bool close = false;
+	while (!close)
+	{
+		auto model = getModel(in, out);
+
+		auto dt = ta + model.get(ti) + tr*ct;
+		auto dtr = dt * 2*M_PI;
+
+		auto dx = xd * std::cos(dtr) - yd * std::sin(dtr);
+		auto dy = xd * std::sin(dtr) + yd * std::cos(dtr);
+
+		auto target = State(
+		{
+			xa + dx + model.get(xi) + xr*cx,
+			ya + dy + model.get(yi) + yr*cy,
+			da + model.get(di) + dr*cd,
+			dt,
+			pa,
+			ra,
+		});
+
+		setState(out, target);
+
+		auto state = getState(in, out);
+
+		if (state.distanceTo(target) < minDistance && std::abs(state.yaw() - dt) < .03)
+			close = true;
+		else if (!alive(in, out)) return false;
+		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
+	}
+
+	return true;
+}
+
+bool turnTo(FILE* in, FILE* out, int xi, int yi)
+{
+	auto state = getState(in, out);
+	auto model = getModel(in, out);
+
+	auto dx = model.get(xi) - state.x();
+	auto dy = model.get(yi) - state.y();
+
+	float theta = std::atan2(dy, dx) / (2 * M_PI);
+
+	return moveExt(in, out, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, theta, 0, 0, 0, 0, .1);
+}
+
 bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
 {
 	auto target = State(xo, yo, zo, 0, 0, 0);
