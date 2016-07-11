@@ -17,6 +17,7 @@
 #include "image/image.hpp"
 
 auto yfilter = [](float r, float g, float b){ return r + g - b; };
+auto ofilter = [](float r, float g, float b){ return .7*r/(g+.001) - 1.20*g/(b+.001)-(g+b)*0.01; };
 
 const float cropx = 1.0;
 const float cropy = 1.0;
@@ -119,6 +120,24 @@ int main(int argc, char** argv)
 		cv::threshold(imgS, imgT, .5 * max, 1, cv::THRESH_BINARY);
 		imgT.convertTo(imgT, CV_8UC1, 255);
 
+		cv::Mat imgO = filter(image, ofilter);
+		float cmax = -1000000;
+		int cr = 0;
+		int cc = 0;
+		for (int r = 0; r < rows; r++)
+		{
+			for (int c = 0; c < cols; c++)
+			{
+				if (img.at<float>(r, c) > cmax)
+				{
+					cmax = img.at<float>(r, c);
+					cr = r;
+					cc = c;
+				}
+			}
+		}
+
+
 /*
 		auto imgPB = imgT;
 		cv::Mat imgP(imgPB.size(), CV_8UC3);
@@ -134,8 +153,29 @@ int main(int argc, char** argv)
 		image.copyTo(imgP);
 //		cv::cvtColor(imgT, imgP, CV_GRAY2BGR);
 		cv::circle(imgP, cv::Point(mc, mr), 3, cv::Scalar(0, 255, 255));
+		cv::circle(imgP, cv::Point(cc, cr), 3, cv::Scalar(0, 127, 255));
 
 		std::vector<Observation> observations;
+
+		// cover
+		observations.push_back(
+		{
+			M_TORP_C_H,
+			-1,
+			-3,
+			fhFOV * static_cast<float>(cc - img.cols/2) / img.cols,
+			0,
+			.1f
+		});
+		observations.push_back(
+		{
+			M_TORP_C_V,
+			-1,
+			-3,
+			fvFOV * static_cast<float>(cr - img.rows/2) / img.rows,
+			0,
+			.1f
+		});
 
 		auto yblobs = blob_detection(imgT);
 		// remove blobs not containing highest pixel

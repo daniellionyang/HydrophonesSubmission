@@ -16,6 +16,7 @@ enum
 	M_OBIN_X,      M_OBIN_Y,
 	M_CBIN_X,      M_CBIN_Y,
 	M_TORP_X,      M_TORP_Y,
+	M_TORP_C_H,    M_TORP_C_V,
 	M_TORP_SKEW,
 	M_TORP_D,
 	M_PINGER_X,    M_PINGER_Y,

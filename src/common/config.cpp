@@ -11,6 +11,7 @@ const Matrix initialModel =
 	18,    -10,
 	17.4,  -10.3,
 	19,    -11,
+	0,     0,
 	0,
 	3,
 	18,    -10,
@@ -27,6 +28,7 @@ const Matrix initialVariance =
 	9,     9,
 	9,     9,
 	9,     9,
+	.5,    .5,
 	1,
 	1,
 	400,   400,
@@ -43,6 +45,7 @@ const Matrix varianceGrowth =
 	.1,    .1,
 	.1,    .1,
 	.1,    .1,
+	.03,   .03,
 	.1,
 	.1,
 };
