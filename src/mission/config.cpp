@@ -42,7 +42,7 @@ const std::vector<Goal> initialGoals =
 		{ flag, F_BUOYS, 0 },
 		{ moveDir, State(1, 0, -.5, 0, 0, 0), .1 },
 		{ moveDir, State(0, 0, 1.2, 0, 0, 0), .1 },
-		{ moveDir, State(3, 1, 0, 0, 0, 0), 1 },
+		{ moveExt, 0, 3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
 
 		{ flag, F_PINGER, 1 }, // activate pinger early
 		{ flag, F_PVC, 1 },
@@ -50,7 +50,9 @@ const std::vector<Goal> initialGoals =
 		// pvc
 		{ lprintf, "pvc\n" },
 		{ setSpeed, .5f },
-		{ moveModel, M_PVC_X, M_PVC_Y, M_ZERO, 0, 0, 2.3, 2 },
+		{ wait, 3 },
+		{ turnTo, M_PVC_X, M_PVC_Y },
+		{ moveExt, 0, 0, M_PVC_X, 0, 0, 0, M_PVC_Y, 0, 2.3, 0, 0, 0, 0, 1, 0, 0, .1 },
 		{ setSpeed, .1f },
 		{ moveDir, State(5, 0, 0, 0, 0, 2), 1 }, // barrel roll
 		{ setSpeed, .3f },
@@ -73,19 +75,18 @@ const std::vector<Goal> initialGoals =
 		// droppers
 		{ lprintf, "dropper\n" },
 		{ setSpeed, .1f },
-		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 1, 1 }, // look around
-		{ wait, 3 },
+		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 1, 2 }, // look around
 		{ variance, M_CBIN_X, 4 },
 		{ variance, M_CBIN_Y, 4 },
 		{ wait, 3 },
-		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 4, .1 },
+		{ moveExt, 0, 0, M_CBIN_X, 0, 0, 0, M_CBIN_Y, 0, 3, 0, 0, 0, 0, 1, 0, 0, .1 },
 		{ variance, M_CBIN_X, 4 },
 		{ variance, M_CBIN_Y, 4 },
 		{ wait, 3 },
-		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 4, .03 },
+		{ moveExt, 0, 0, M_CBIN_X, 0, 0, 0, M_CBIN_Y, 0, 4, 0, 0, 0, 0, 1, 0, 0, .03 },
 		{ flag, F_BINS, 0 },
 		{ uncoverBin },
-		{ moveModel, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 3, .1 },
+		{ moveExt, 0, 0, M_CBIN_X, 0, 0, 0, M_CBIN_Y, 0, 3, 0, 0, 0, 0, 1, 0, 0, .1 },
 		{ dropInBin },
 		{ wait, 1 },
 		{ dropInBin },
