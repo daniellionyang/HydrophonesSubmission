@@ -18,10 +18,12 @@ const std::vector<Goal> initialGoals =
 		{ moveDir, State(3.5, 0, 0, 0, 0, 0), 1 },
 
 		{ flag, F_BUOYS, 1 },
+		{ wait, 3 },
 
 		// red buoy
 		{ lprintf, "rbuoy\n" },
 		{ setSpeed, .2f },
+		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
 		{ moveModel, M_RBUOY_X, M_RBUOY_Y, M_RBUOY_D, 0, 0, 0, 1 },
 		{ flag, F_BUOYS, 0 },
 		{ moveDir, State(2, 0, 0, 0, 0, 0), 1 },
@@ -30,6 +32,8 @@ const std::vector<Goal> initialGoals =
 
 		// green buoy
 		{ lprintf, "gbuoy\n" },
+		{ wait, 3 },
+		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
 		{ moveModel, M_GBUOY_X, M_GBUOY_Y, M_GBUOY_D, 0, 0, 0, 1 },
 		{ flag, F_BUOYS, 0 },
 		{ moveDir, State(2, 0, 0, 0, 0, 0), 1 },
@@ -38,6 +42,10 @@ const std::vector<Goal> initialGoals =
 
 		// yellow buoy
 		{ lprintf, "ybuoy\n" },
+		{ variance, M_YBUOY_X, 1 },
+		{ variance, M_YBUOY_Y, 1 },
+		{ wait, 3 },
+		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
 		{ moveModel, M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, 0, 0, 0, 1 },
 		{ flag, F_BUOYS, 0 },
 		{ moveDir, State(1, 0, -.5, 0, 0, 0), .1 },
