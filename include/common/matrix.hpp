@@ -11,6 +11,7 @@ public:
 	Matrix();
 	Matrix(const Matrix&);
 	Matrix(std::initializer_list<float>);
+	Matrix(std::initializer_list<Matrix>);
 	Matrix(size_t, size_t);
 
 	Matrix(FILE*);

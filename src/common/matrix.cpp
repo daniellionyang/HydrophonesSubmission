@@ -26,6 +26,21 @@ Matrix::Matrix(std::initializer_list<float> values) :
 
 }
 
+Matrix::Matrix(std::initializer_list<Matrix> rows) :
+	m_cols(0),
+	m_rows(0)
+{
+	for (auto r : rows) m_cols = std::max(m_cols, r.size());
+
+	for (auto r : rows)
+	{
+		for (size_t i = 0; i < r.size(); i++)
+			set(m_rows, i, r.get(i));
+
+		m_rows++;
+	}
+}
+
 // <size> <element 1> <element 2> ...
 Matrix::Matrix(FILE* in)
 {
