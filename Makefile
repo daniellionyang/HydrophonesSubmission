@@ -25,7 +25,7 @@ MODEL_CFLAGS =
 IMAGE = $(patsubst %,$(BUILD)/image/%.o,image)
 IMAGE_CFLAGS = $(OPENCV_CFLAGS)
 
-VISION = $(patsubst %,$(BUILD)/vision/%.o,vision blob blob_detection config)
+VISION = $(patsubst %,$(BUILD)/vision/%.o,vision blob blob_detection neural_network config)
 VISION_CFLAGS = $(OPENCV_CFLAGS)
 
 MODELING = $(patsubst %,$(BUILD)/modeling/%.o,main) $(MODEL) $(COMMON)
