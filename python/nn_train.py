@@ -20,6 +20,7 @@ nn = NeuralNetwork(numInputs, numFeatures, numOutputs)
 
 nn.load('/ram/weights.npz')
 
+i = 0
 while True:
 	nn.train(inputs, targets)
 
@@ -28,4 +29,5 @@ while True:
 	if i % (256**2) == 0:
 		nn.save(filename)
 		print("{}".format(nn.session().run(nn.weights())))
+	i += 1
 
