@@ -22,7 +22,7 @@ targets = np.array([[1]]*len(positive) + [[0]]*len(negative), dtype=np.float32)
 
 nn = NeuralNetwork(numInputs, numFeatures, numOutputs)
 
-nn.load('/ram/weights.npz')
+nn.load(filename)
 
 i = 0
 while True:
