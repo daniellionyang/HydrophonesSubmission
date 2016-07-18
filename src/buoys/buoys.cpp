@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 			cv::circle(imgL, cv::Point(mc, mr), 3, cv::Scalar(255*b.color[0], 255*b.color[1], 255*b.color[2]));
 		}
 
-		fprintf(out, "%u\n", found.size());
+		fprintf(out, "%zu\n", found.size());
 		for (auto f : found)
 			fprintf(out, "%zu %zu %zu\n%f %f %f\n",
 				f.x_idx, f.y_idx, f.d_idx,
