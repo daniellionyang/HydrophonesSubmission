@@ -6,6 +6,8 @@ const std::vector<Goal> initialGoals =
 {
 	// v       t  xi      yi      zi      xo yo zo mindist  actions
 	{  100000, 0, M_ZERO, M_ZERO, M_ZERO, 0, 0, 1, 400,     {
+		{ lprintf, "alive\n" },
+
 		{ setMaxThrust, 1.f },
 		{ setSpeed, .1f },
 
@@ -18,27 +20,49 @@ const std::vector<Goal> initialGoals =
 		{ moveDir, State(3.5, 0, 0, 0, 0, 0), 1 },
 
 		{ flag, F_BUOYS, 1 },
+		{ wait, 3 },
 
 		// red buoy
 		{ lprintf, "rbuoy\n" },
 		{ setSpeed, .2f },
-		{ moveModel, M_RBUOY_X, M_RBUOY_Y, M_RBUOY_D, 0, 0, 0, 1 },
+		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
+		{ moveExt, 0, 0, M_RBUOY_X, 0, 0, 0, M_RBUOY_Y, 0, 0, M_RBUOY_D, 0, 0, 0, 1, 0, 0, 3 },
+		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
+		{ moveExt, 0, 0, M_RBUOY_X, 0, 0, 0, M_RBUOY_Y, 0, 0, M_RBUOY_D, 0, 0, 0, 1, 0, 0, 2 },
+		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
+		{ lprintf, "ramming\n" },
 		{ flag, F_BUOYS, 0 },
-		{ moveDir, State(2, 0, 0, 0, 0, 0), 1 },
-		{ moveDir, State(-3, 0, 0, 0, 0, 0), 1 },
+		{ moveExt, 0, 3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
+		{ moveExt, 0, -3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
 		{ flag, F_BUOYS, 1 },
 
 		// green buoy
 		{ lprintf, "gbuoy\n" },
-		{ moveModel, M_GBUOY_X, M_GBUOY_Y, M_GBUOY_D, 0, 0, 0, 1 },
+		{ wait, 3 },
+		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
+		{ moveExt, 0, 0, M_GBUOY_X, 0, 0, 0, M_GBUOY_Y, 0, 0, M_GBUOY_D, 0, 0, 0, 1, 0, 0, 3 },
+		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
+		{ moveExt, 0, 0, M_GBUOY_X, 0, 0, 0, M_GBUOY_Y, 0, 0, M_GBUOY_D, 0, 0, 0, 1, 0, 0, 2 },
+		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
+		{ lprintf, "ramming\n" },
 		{ flag, F_BUOYS, 0 },
-		{ moveDir, State(2, 0, 0, 0, 0, 0), 1 },
-		{ moveDir, State(-3, 0, 0, 0, 0, 0), 1 },
+		{ moveExt, 0, 3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
+		{ moveExt, 0, -3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
 		{ flag, F_BUOYS, 1 },
 
 		// yellow buoy
 		{ lprintf, "ybuoy\n" },
+		{ variance, M_YBUOY_X, 1 },
+		{ variance, M_YBUOY_Y, 1 },
+		{ wait, 3 },
+		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
+		{ wait, 3 },
+		{ moveModel, M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, 0, 0, 0, 3 },
+		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
+		{ wait, 3 },
 		{ moveModel, M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, 0, 0, 0, 1 },
+		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
+		{ lprintf, "manipulating\n" },
 		{ flag, F_BUOYS, 0 },
 		{ moveDir, State(1, 0, -.5, 0, 0, 0), .1 },
 		{ moveDir, State(0, 0, 1.2, 0, 0, 0), .1 },
