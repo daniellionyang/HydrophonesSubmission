@@ -59,7 +59,7 @@ cv::Mat filter(const cv::Mat& img, std::function<float(float, float, float)> f)
 
 	for (size_t row = 0; row < img.rows; row++)
 		for (size_t col = 0; col < img.cols; col++)
-			res.at<float>(row, col) = f(img.at<cv::Vec3b>(row, col)[2], img.at<cv::Vec3b>(row, col)[1], img.at<cv::Vec3b>(row, col)[0]);
+			res.at<float>(row, col) = f(img.at<cv::Vec3b>(row, col)[2] / 256.f, img.at<cv::Vec3b>(row, col)[1] / 256.f, img.at<cv::Vec3b>(row, col)[0] / 256.f);
 
 	return res;
 }
