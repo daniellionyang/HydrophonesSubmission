@@ -120,7 +120,7 @@ Matrix Matrix::operator*(const Matrix& a) const
 		{
 			res.m_data[i * res.cols() + j] = 0;
 			for (int k = 0; k < cols(); k++)
-				res.m_data[i * res.cols() + j] += get(i, j) * a.get(k, j);
+				res.m_data[i * res.cols() + j] += get(i, k) * a.get(k, j);
 		}
 	}
 
