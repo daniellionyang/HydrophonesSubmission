@@ -124,19 +124,12 @@ const std::vector<Goal> initialGoals =
 
 		// torpedoes
 		{ lprintf, "torpedoes\n" },
-		{ moveDir, State(0, 0, 0, 0, 0, 0), .1 }, // scan
-		{ wait, .3 },
-		{ moveDir, State(0, 0, 0, .25, 0, 0), .1 },
-		{ wait, .3 },
-		{ moveDir, State(0, 0, 0, .5, 0, 0), .1 },
-		{ wait, .3 },
-		{ moveDir, State(0, 0, 0, .75, 0, 0), .1 },
-		{ wait, .3 },
-		{ moveModel, M_TORP_X, M_TORP_Y, M_TORP_D, 0, 0, 0, 2 }, // approach
-		{ moveExt, 0, -1, M_TORP_X, 0, 0, 0, M_TORP_Y, 0, 0, M_TORP_D, 0, .25, M_TORP_SKEW, 0, 0, 0, .1 }, // align
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1}, // turn to 0
 		{ flag, F_TORPS, 1 },
 		{ wait, 3 },
-		{ alignWith, M_TORP_C_H, M_TORP_C_V }, // center in front of cover
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_TORP_DIST, -1 }, // approach
 		{ moveDir, State(1, 0, 0, 0, 0, 0), .1 }, // approach cover
 		{ moveDir, State(0, .3, 0, 0, 0, 0), .1 }, // remove cover
 		{ moveDir, State(0, -.3, 0, 0, 0, 0), .1 },

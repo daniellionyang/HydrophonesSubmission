@@ -152,7 +152,6 @@ int main(int argc, char** argv)
 		cv::Mat imgP;
 		image.copyTo(imgP);
 //		cv::cvtColor(imgT, imgP, CV_GRAY2BGR);
-		cv::circle(imgP, cv::Point(mc, mr), 3, cv::Scalar(0, 255, 255));
 		cv::circle(imgP, cv::Point(cc, cr), 3, cv::Scalar(0, 127, 255));
 
 		std::vector<Observation> observations;
@@ -163,7 +162,7 @@ int main(int argc, char** argv)
 			M_TORP_C_H,
 			-1,
 			-3,
-			fhFOV * static_cast<float>(cc - img.cols/2) / img.cols,
+			static_cast<float>(cc - img.cols/2) / img.cols,
 			0,
 			.1f
 		});
@@ -172,20 +171,20 @@ int main(int argc, char** argv)
 			M_TORP_C_V,
 			-1,
 			-3,
-			fvFOV * static_cast<float>(cr - img.rows/2) / img.rows,
+			static_cast<float>(cr - img.rows/2) / img.rows,
 			0,
 			.1f
 		});
 
 		auto yblobs = blob_detection(imgT);
-		// remove blobs not containing highest pixel
+		// remove blobs not containing highest orange pixel
 		yblobs.erase(std::remove_if(yblobs.begin(), yblobs.end(), [=](const Blob b)
 		{
 			return
-				b.max_x < mc ||
-				b.min_x > mc ||
-				b.max_y < mr ||
-				b.min_y > mr ||
+				b.max_x < cc ||
+				b.min_x > cc ||
+				b.max_y < cr ||
+				b.min_y > cr ||
 
 				false;
 		}), yblobs.end());
@@ -226,16 +225,28 @@ int main(int argc, char** argv)
 
 			float theta = fhFOV * static_cast<float>(c.x - img.cols/2) / img.cols;
 			float phi = fvFOV * static_cast<float>(c.y - img.rows/2) / img.rows;
-			float dist = boardHeight/2 / std::tan((board.max_y - board.min_y)/img.rows * fvFOV / 2 * 2*M_PI);
+			float dist = boardHeight/2 / std::tan(static_cast<float>(board.max_y - board.min_y)/img.rows * fvFOV / 2 * 2*M_PI);
 
 			observations.push_back(
 			{
-				M_TORP_X,
-				M_TORP_Y,
-				-2,
-				theta,
-				phi,
+				M_TORP_DIST, 
+				-1,
+				-3,
 				dist,
+				0,
+				.5,
+			});
+		}
+		else
+		{
+			observations.push_back(
+			{
+				M_TORP_DIST, 
+				-1,
+				-3,
+				3,
+				0,
+				2,
 			});
 		}
 		imageWrite(log, imgP);

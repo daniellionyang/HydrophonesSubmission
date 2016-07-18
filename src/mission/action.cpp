@@ -176,7 +176,7 @@ bool turnTo(FILE* in, FILE* out, int xi, int yi)
 	return moveExt(in, out, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, theta, 0, 0, 0, 0, .1);
 }
 
-bool alignWith(FILE* in, FILE* out, int hi, int vi)
+bool alignWith(FILE* in, FILE* out, int hi, int vi, int di, int si)
 {
 	bool close = false;
 	while (!close)
@@ -186,13 +186,19 @@ bool alignWith(FILE* in, FILE* out, int hi, int vi)
 
 		float h = model.get(hi);
 		float v = model.get(vi);
+		float theta = si >= 0 ? model.get(si) - .25f : state.yaw();
 
-		if (std::abs(h) < .05 && std::abs(v) < .05)
+		if (
+			std::abs(theta - state.yaw()) < .05 &&
+			std::abs(h) < .05 &&
+			std::abs(v) < .05 &&
+			true
+		)
 		{
 			close = true;
 			setState(out, state);
 		}
-		else moveDir(in, out, State(0, h * 1, v * 1, 0, 0, 0), .03);
+		else moveExt(in, out, 0, 0, di, 1, 0, h * 1, 0, 1, v * 1, 0, 1, theta, 0, 0, 0, 0, .03);
 	}
 
 	return true;
