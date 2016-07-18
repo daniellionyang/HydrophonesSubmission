@@ -102,12 +102,15 @@ int floodFill(const cv::Mat& img, std::vector<std::vector<bool> >& visited, int 
 }
 
 // assume the NeuralNetwork object is set up correctly (3 inputs, 1 output)
-float nnFilter(const NeuralNetwork& nn, float r, float g, float b)
+std::function<float(float, float, float)> nnFilter(const NeuralNetwork& nn)
 {
-	const Matrix inputs = {{r}, {g}, {b}};
+	return [=](float r, float g, float b)
+	{
+		const Matrix inputs = {{r}, {g}, {b}};
 
-	auto outputs = nn.apply(inputs);
+		auto outputs = nn.apply(inputs);
 
-	return outputs.get(0);
+		return outputs.get(0);
+	};
 }
 
