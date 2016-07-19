@@ -48,6 +48,7 @@ int main()
 {
 	FILE* in = stdin;
 	FILE* out = stdout;
+	FILE* log = stderr;
 
 	bool quit = false;
 	while (!quit)
@@ -83,6 +84,8 @@ int main()
 							-static_cast<int16_t>(-v) :
 							static_cast<int16_t>(v)   ;
 					}(l, h);
+					fprintf(log, "%zu %i\n", i, toa[i]);
+					fflush(log);
 				}
 
 				// time between input i and input j
@@ -109,6 +112,8 @@ int main()
 				};
 				float theta = computeAngle(horizontal) + horizontal.angle;
 				float phi   = computeAngle(vertical)   + vertical.angle;
+				fprintf(log, "%f %f\n", theta, phi);
+				fflush(log);
 
 				if (
 					theta > -.5f &&
