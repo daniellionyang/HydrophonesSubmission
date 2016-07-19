@@ -108,7 +108,7 @@ int main()
 					return static_cast<float>(std::atan2(
 						- tdoa[t.leg1][t.base]  * t.dist2,
 						- t.dist1 * tdoa[t.leg2][t.base]
-					));
+					) / (2 * M_PI));
 				};
 				float theta = computeAngle(horizontal) + horizontal.angle;
 				float phi   = computeAngle(vertical)   + vertical.angle;
