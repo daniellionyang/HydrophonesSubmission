@@ -107,8 +107,8 @@ int main()
 						- t.dist1 * t.leg2
 					));
 				};
-				float theta = computeAngle(horizontal);
-				float phi   = computeAngle(vertical);
+				float theta = computeAngle(horizontal) + horizontal.angle;
+				float phi   = computeAngle(vertical)   + vertical.angle;
 
 				if (
 					theta > -.5f &&
