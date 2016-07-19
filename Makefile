@@ -60,6 +60,10 @@ DROPPER = $(patsubst %,$(BUILD)/dropper/%.o,main) $(IMAGE) $(VISION) $(MODEL) $(
 DROPPER_CFLAGS = $(OPENCV_CFLAGS)
 DROPPER_LFLAGS = $(OPENCV_LFLAGS)
 
+HYDROPHONES = $(patsubst %,$(BUILD)/hydrophones/%.o,main) $(COMMON)
+HYDROPHONES_CFLAGS =
+HYDROPHONES_LFLAGS =
+
 CAMERAPIPE = $(patsubst %,$(BUILD)/camera_pipe/%.o,main) $(IMAGE) $(COMMON)
 CAMERAPIPE_CFLAGS = $(OPENCV_CFLAGS)
 CAMERAPIPE_LFLAGS = $(OPENCV_LFLAGS)
@@ -81,7 +85,7 @@ SIM_STATE_CFLAGS = -pthread
 SIM_STATE_LFLAGS = -pthread -latomic
 
 
-EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc torpedoes dropper image_read image_show image_log sim_state
+EXE_NAMES = modeling interface mission camera camera_pipe buoys pvc torpedoes dropper hydrophones image_read image_show image_log sim_state
 
 EXE = $(patsubst %,$(BIN)/%,$(EXE_NAMES))
 
@@ -110,6 +114,9 @@ $(BIN)/torpedoes: $(TORPEDOES)
 
 $(BIN)/dropper: $(DROPPER) 
 	$(CC) $^ $(LFLAGS) $(DROPPER_LFLAGS) -o $@
+
+$(BIN)/hydrophones: $(HYDROPHONES) 
+	$(CC) $^ $(LFLAGS) $(HYDROPHONES_LFLAGS) -o $@
 
 $(BIN)/camera_pipe: $(CAMERAPIPE)
 	$(CC) $^ $(LFLAGS) $(CAMERAPIPE_LFLAGS) -o $@
@@ -161,6 +168,9 @@ $(BUILD)/pvc/%.o: $(SRC)/pvc/%.cpp
 
 $(BUILD)/dropper/%.o: $(SRC)/dropper/%.cpp
 	$(CC) $(CFLAGS) $(DROPPER_CFLAGS) $< -o $@
+
+$(BUILD)/hydrophones/%.o: $(SRC)/hydrophones/%.cpp
+	$(CC) $(CFLAGS) $(HYDROPHONES_CFLAGS) $< -o $@
 
 $(BUILD)/camera_pipe/%.o: $(SRC)/camera_pipe/%.cpp
 	$(CC) $(CFLAGS) $(CAMERAPIPE_CFLAGS) $< -o $@
