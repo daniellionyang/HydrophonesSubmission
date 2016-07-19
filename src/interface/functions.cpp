@@ -75,6 +75,7 @@ Evidence observation(FILE* in, const State& state)
 				{y, cy + rho*static_cast<float>(std::sin(theta)), 1},
 			}};
 		}
+		else return {};
 	} // otherwise we don't know how to use this observation
 	else return {};
 }
