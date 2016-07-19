@@ -75,13 +75,13 @@ int main()
 					if (l == -1 || h == -1) bad = true;
 
 					// convert to int
-					toa[i] = [](int l, int h)
+					toa[i] = [](int l, int h) -> int
 					{
 						uint16_t v = static_cast<uint16_t>(l);
-						v |= static_cast<uint16_t>(h << 8);
+						v |= static_cast<uint16_t>(h) << 8;
 						return (v & (1U << 15))     ?
-							-static_cast<int>(-v) :
-							static_cast<int>(v)   ;
+							-static_cast<int16_t>(-v) :
+							static_cast<int16_t>(v)   ;
 					}(l, h);
 				}
 
