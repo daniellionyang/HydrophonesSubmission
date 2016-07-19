@@ -103,8 +103,8 @@ int main()
 				auto computeAngle = [&](Triangle t)
 				{
 					return static_cast<float>(std::atan2(
-						- t.leg1  * t.dist2,
-						- t.dist1 * t.leg2
+						- tdoa[t.leg1][t.base]  * t.dist2,
+						- t.dist1 * tdoa[t.leg2][t.base]
 					));
 				};
 				float theta = computeAngle(horizontal) + horizontal.angle;
