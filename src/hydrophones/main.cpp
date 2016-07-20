@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <cmath>
 #include <cstdint>
+#include <thread>
+#include <chrono>
 
 #include "common/defs.hpp"
 #include "common/config.hpp"
@@ -136,6 +138,7 @@ int main()
 					}).write(out);
 			}
 		}
+		else if (c == EOF) std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
 	return 0;
