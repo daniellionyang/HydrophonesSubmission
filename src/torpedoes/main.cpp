@@ -266,8 +266,25 @@ int main(int argc, char** argv)
 			}
 
 			float ratio = static_cast<float>(maxR - minR) / (maxL - minL);
+			auto getDist = [=](int height_image, int rows, float height_actual)
+			{
+				return height_actual/2 / std::tan(static_cast<float>(height_image) / rows * fvFOV / 2 * 2*M_PI);
+			};
+			auto getAngle = [=](int col, int cols)
+			{
+				return static_cast<float>(col - cols/2) / cols * fhFOV;
+			};
+			float lt = getAngle(board.min_x, img.cols);
+			float rt = getAngle(board.max_x, img.cols);
+			float lr = getDist(maxL - minL, img.rows, boardHeight);
+			float rr = getDist(maxR - minR, img.rows, boardHeight);
 
-			float skew = 0;
+			float lx = lr * std::cos(lt * 2*M_PI);
+			float rx = rr * std::cos(rt * 2*M_PI);
+			float ly = lr * std::sin(lt * 2*M_PI);
+			float ry = rr * std::sin(rt * 2*M_PI);
+
+			float skew = std::atan2(ry - ly, rx - lx) / (2 * M_PI);
 
 			observations.push_back(
 			{
