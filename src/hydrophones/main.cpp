@@ -76,13 +76,13 @@ int main()
 					if (l == -1 || h == -1) bad = true;
 
 					// convert to int
-					toa[i] = [](int l, int h) -> int
+					toa[i] = [](int l, int h)
 					{
 						uint16_t v = static_cast<uint16_t>(l);
 						v |= static_cast<uint16_t>(h) << 8;
-						return (v & (1U << 15))     ?
-							-static_cast<int16_t>(-v) :
-							static_cast<int16_t>(v)   ;
+						return (v & (1U << 15))                 ?
+							-static_cast<int>(0xFFFFU - v + 1U) :
+							static_cast<int>(v)                 ;
 					}(l, h);
 					fprintf(log, "%zu %i\n", i, toa[i]);
 					fflush(log);
