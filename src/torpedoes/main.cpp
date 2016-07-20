@@ -124,9 +124,21 @@ int main(int argc, char** argv)
 		size_t cols = image.cols;
 		unsigned char* ptr = image.ptr();
 
-		cv::Mat imgF = filter(image, yfilter);
+		cv::Mat imgB;
+		cv::blur(image, imgB, cv::Size(6, 6));
 
-		cv::Mat imgS = scaleIntensity(imgF);
+		cv::Mat imgF = filter(imgB, yfilter);
+
+		// fill in gaps
+		cv::Mat imgD;
+		int dradius = 3;
+		cv::dilate(imgF, imgD, cv::getStructuringElement(
+			cv::MORPH_RECT,
+			cv::Size(2 * dradius + 1, 2 * dradius + 1),
+			cv::Point(dradius, dradius)
+		));
+
+		cv::Mat imgS = scaleIntensity(imgD);
 
 		auto img = imgS;
 
@@ -146,14 +158,20 @@ int main(int argc, char** argv)
 			}
 		}
 
-		cv::Mat imgB;
-		cv::blur(imgS, imgB, cv::Size(2, 2));
-
 		cv::Mat imgT;
 		cv::threshold(imgS, imgT, .5 * max, 1, cv::THRESH_BINARY);
 		imgT.convertTo(imgT, CV_8UC1, 255);
 
-		cv::Mat imgO = filter(image, ofilter);
+		cv::Mat imgO = filter(imgB, ofilter);
+		cv::Mat imgE;
+		int eradius = 2;
+		cv::erode(imgO, imgE, cv::getStructuringElement(
+			cv::MORPH_RECT,
+			cv::Size(2 * eradius + 1, 2 * eradius + 1),
+			cv::Point(eradius, eradius)
+		));
+		img = imgE;
+
 		float cmax = -1000000;
 		int cr = 0;
 		int cc = 0;
