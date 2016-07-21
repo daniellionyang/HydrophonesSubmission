@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 		observations.push_back(
 		{
 			M_TORP_C_H,
-			-1,
+			0,
 			-3,
 			static_cast<float>(cc - img.cols/2) / img.cols,
 			0,
@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 		observations.push_back(
 		{
 			M_TORP_C_V,
-			-1,
+			0,
 			-3,
 			static_cast<float>(cr - img.rows/2) / img.rows,
 			0,
@@ -292,7 +292,7 @@ int main(int argc, char** argv)
 
 			observations.push_back(
 			{
-				M_TORP_SKEW, -1, -3, skew, 0, .3,
+				M_TORP_SKEW, 0, -4, skew, 0, .3,
 			});
 
 			float theta = fhFOV * static_cast<float>(c.x - img.cols/2) / img.cols;
@@ -302,7 +302,7 @@ int main(int argc, char** argv)
 			observations.push_back(
 			{
 				M_TORP_C_H,
-				-1,
+				0,
 				-3,
 				static_cast<float>(c.x - img.cols/2) / img.cols,
 				0,
@@ -311,7 +311,7 @@ int main(int argc, char** argv)
 			observations.push_back(
 			{
 				M_TORP_C_V,
-				-1,
+				0,
 				-3,
 				static_cast<float>(c.y - img.rows/2) / img.rows,
 				0,
@@ -320,7 +320,7 @@ int main(int argc, char** argv)
 			observations.push_back(
 			{
 				M_TORP_DIST, 
-				-1,
+				0,
 				-3,
 				dist,
 				0,
@@ -332,7 +332,7 @@ int main(int argc, char** argv)
 			observations.push_back(
 			{
 				M_TORP_DIST, 
-				-1,
+				0,
 				-3,
 				3,
 				0,

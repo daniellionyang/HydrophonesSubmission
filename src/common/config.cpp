@@ -12,7 +12,7 @@ const Matrix initialModel =
 	17.4,  -10.3,
 	0,     0,
 	0,
-	1,
+	0,
 	3,
 	18,    -10,
 };

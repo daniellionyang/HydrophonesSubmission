@@ -77,7 +77,11 @@ Evidence observation(FILE* in, const State& state)
 		}
 		else if (d == -3) // straight evidence: theta = value, rho = variance, phi ignored
 		{
-			return {{{ x, theta, rho }}};
+			return {{{ x, theta/(2*M_PI) - state.yaw(), rho }}};
+		}
+		else if (d == -4) // straight evidence: theta = value, rho = variance, phi = add yaw
+		{
+			return {{{ x, theta/(2*M_PI), rho }}};
 		}
 	} // otherwise we don't know how to use this observation
 	else return {};

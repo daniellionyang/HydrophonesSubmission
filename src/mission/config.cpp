@@ -115,6 +115,7 @@ const std::vector<Goal> initialGoals =
 		{ wait, 1 },
 		{ dropInBin },
 		{ wait, 1 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1}, // turn to 0
 
 		{ variance, M_PINGER_X, 400 },
 		{ variance, M_PINGER_Y, 400 },
@@ -124,7 +125,6 @@ const std::vector<Goal> initialGoals =
 
 		// torpedoes
 		{ lprintf, "torpedoes\n" },
-		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1}, // turn to 0
 		{ flag, F_TORPS, 1 },
 		{ wait, 3 },
 		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
