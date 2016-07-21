@@ -52,8 +52,8 @@ auto ofilter = nnFilter(
 	{{78.57619476}},
 });
 
-const float cropx = 1.0;
-const float cropy = 1.0;
+const float cropx = .8;
+const float cropy = .8;
 const float offset = 0.9 * (1 - cropy);
 const float scalex = 256;
 const float scaley = 192;
@@ -208,6 +208,7 @@ int main(int argc, char** argv)
 		std::vector<Observation> observations;
 
 		// cover
+/*
 		observations.push_back(
 		{
 			M_TORP_C_H,
@@ -226,9 +227,11 @@ int main(int argc, char** argv)
 			0,
 			.1f
 		});
+*/
 
 		auto yblobs = blob_detection(imgT);
 		// remove blobs not containing highest orange pixel
+/*
 		yblobs.erase(std::remove_if(yblobs.begin(), yblobs.end(), [=](const Blob b)
 		{
 			return
@@ -239,6 +242,7 @@ int main(int argc, char** argv)
 
 				false;
 		}), yblobs.end());
+*/
 		if (yblobs.size() > 0)
 		{
 			auto board = yblobs.at(0);
@@ -295,6 +299,24 @@ int main(int argc, char** argv)
 			float phi = fvFOV * static_cast<float>(c.y - img.rows/2) / img.rows;
 			float dist = boardHeight/2 / std::tan(static_cast<float>(board.max_y - board.min_y)/img.rows * fvFOV / 2 * 2*M_PI);
 
+			observations.push_back(
+			{
+				M_TORP_C_H,
+				-1,
+				-3,
+				static_cast<float>(c.x - img.cols/2) / img.cols,
+				0,
+				.1f
+			});
+			observations.push_back(
+			{
+				M_TORP_C_V,
+				-1,
+				-3,
+				static_cast<float>(c.y - img.rows/2) / img.rows,
+				0,
+				.1f
+			});
 			observations.push_back(
 			{
 				M_TORP_DIST, 
