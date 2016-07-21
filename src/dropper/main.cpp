@@ -138,14 +138,14 @@ int main(int argc, char** argv)
 		auto imgF = filter(imgB, nn);
 
 		cv::Mat imgE;
-		int radius = 5;
+		int radius = 2;
 		cv::erode(imgF, imgE, cv::getStructuringElement(
 			cv::MORPH_ELLIPSE,
 			cv::Size(2 * radius + 1, 2 * radius + 1),
 			cv::Point(radius, radius)
 		));
 
-		cv::Mat imgS = scaleIntensity(imgE);
+		cv::Mat imgS = scaleIntensity(imgF);
 
 		auto img = imgS;
 
