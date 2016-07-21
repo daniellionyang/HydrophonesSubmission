@@ -80,9 +80,8 @@ Evidence observation(FILE* in, const State& state)
 	else return {};
 }
 
-bool hydrophones(Data* data, const std::string in_name, const std::string out_name)
+bool hydrophones(Data* data, const std::string in_name)
 {
-	FILE* out = openStream(out_name, "w");
 	FILE* in = openStream(in_name, "r");
 
 	bool quit = false;
@@ -94,10 +93,6 @@ bool hydrophones(Data* data, const std::string in_name, const std::string out_na
 		data->unlock();
 
 		Evidence evidence = observation(in, state);
-
-		data->lock();
-			data->evidence.push(evidence);
-		data->unlock();
 
 		data->lock();
 			data->evidence.push(evidence);
