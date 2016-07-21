@@ -124,32 +124,20 @@ const std::vector<Goal> initialGoals =
 
 		// torpedoes
 		{ lprintf, "torpedoes\n" },
-		{ moveDir, State(0, 0, 0, 0, 0, 0), .1 }, // scan
-		{ wait, .3 },
-		{ moveDir, State(0, 0, 0, .25, 0, 0), .1 },
-		{ wait, .3 },
-		{ moveDir, State(0, 0, 0, .5, 0, 0), .1 },
-		{ wait, .3 },
-		{ moveDir, State(0, 0, 0, .75, 0, 0), .1 },
-		{ wait, .3 },
-		{ moveModel, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 0, 0, 0, 2 }, // approach
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1}, // turn to 0
+		{ flag, F_TORPS, 1 },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
-		{ moveDir, State(.3, 0, 0, 0, 0, 0), .1 }, // remove cover
-		{ moveDir, State(0, .5, 0, 0, 0, 0), .1 },
-		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, 1, .1 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
 		{ wait, 3 },
-		{ moveToHole, M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, .5, .1 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_TORP_DIST, -1 }, // approach
+		{ moveDir, State(1, 0, 0, 0, 0, 0), .1 }, // approach cover
+		{ moveDir, State(0, .3, 0, 0, 0, 0), .1 }, // remove cover
+		{ moveDir, State(0, -.3, 0, 0, 0, 0), .1 },
 		{ shootInHole, 'r' },
 		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, 1, .1 },
-		{ wait, 3 },
-		{ moveToHole, M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, .5, .1 },
 		{ shootInHole, 'l' },
 		{ wait, 3 },
 
-		{ flag, F_TORPS, 0 },
 		{ wait, 10 },
 	}},
 

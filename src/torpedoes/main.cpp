@@ -16,16 +16,52 @@
 #include "vision/blob_detection.hpp"
 #include "image/image.hpp"
 
-auto yfilter = [](float r, float g, float b){ return r + g - b; };
+auto yfilter = nnFilter(
+{
+	{
+		{  3.19680882,  -9.49447346,   6.77733231},
+		{ 4.54791403, -11.92699718,  19.73151016},
+		{ 0.87113887,  -4.119452  ,   2.81521511},
+		{1.90076995,  -8.18187428,   5.09570837},
+	},
+	{
+		{1.45655107},
+		{-1.45245194},
+		{-0.43105814},
+		{1.44027102},
+	},
+	{{-9.55435658, -19.15372086,  -3.094522  ,  -7.54101038}},
+	{{13.05424595}},
+});
 
-const float cropx = 1.0;
-const float cropy = 1.0;
+auto ofilter = nnFilter(
+{
+	{
+		{-122.57562256,  -34.30429459,  -58.89888382},
+		{8.42154789,  119.62509155,  -31.02238846},
+		{-127.1678009 ,  217.79257202, -116.3327179},
+		{ 7.98526287,  -99.36182404,   97.6957016 },
+	},
+	{
+		{50.17668533},
+		{-58.20920563},
+		{-43.98231506},
+		{9.47482681},
+	},
+	{{ -84.03649139,  -51.35709381,  -73.33837128, -110.05463409}},
+	{{78.57619476}},
+});
+
+const float cropx = .8;
+const float cropy = .8;
 const float offset = 0.9 * (1 - cropy);
 const float scalex = 256;
 const float scaley = 192;
 //const float scalex = 0.2;
 //const float scaley = 0.2;
 const int diffDist = 8;
+
+const float boardHeight = 1;
 
 const float smallHoleHeight = .1778f;
 const float largeHoleHeight = .3048f;
@@ -88,9 +124,21 @@ int main(int argc, char** argv)
 		size_t cols = image.cols;
 		unsigned char* ptr = image.ptr();
 
-		cv::Mat imgF = filter(image, yfilter);
+		cv::Mat imgB;
+		cv::blur(image, imgB, cv::Size(6, 6));
 
-		cv::Mat imgS = scaleIntensity(imgF);
+		cv::Mat imgF = filter(imgB, yfilter);
+
+		// fill in gaps
+		cv::Mat imgD;
+		int dradius = 3;
+		cv::dilate(imgF, imgD, cv::getStructuringElement(
+			cv::MORPH_RECT,
+			cv::Size(2 * dradius + 1, 2 * dradius + 1),
+			cv::Point(dradius, dradius)
+		));
+
+		cv::Mat imgS = scaleIntensity(imgD);
 
 		auto img = imgS;
 
@@ -110,12 +158,36 @@ int main(int argc, char** argv)
 			}
 		}
 
-		cv::Mat imgB;
-		cv::blur(imgS, imgB, cv::Size(2, 2));
-
 		cv::Mat imgT;
 		cv::threshold(imgS, imgT, .5 * max, 1, cv::THRESH_BINARY);
 		imgT.convertTo(imgT, CV_8UC1, 255);
+
+		cv::Mat imgO = filter(imgB, ofilter);
+		cv::Mat imgE;
+		int eradius = 2;
+		cv::erode(imgO, imgE, cv::getStructuringElement(
+			cv::MORPH_RECT,
+			cv::Size(2 * eradius + 1, 2 * eradius + 1),
+			cv::Point(eradius, eradius)
+		));
+		img = imgE;
+
+		float cmax = -1000000;
+		int cr = 0;
+		int cc = 0;
+		for (int r = 0; r < rows; r++)
+		{
+			for (int c = 0; c < cols; c++)
+			{
+				if (img.at<float>(r, c) > cmax)
+				{
+					cmax = img.at<float>(r, c);
+					cr = r;
+					cc = c;
+				}
+			}
+		}
+
 
 /*
 		auto imgPB = imgT;
@@ -131,90 +203,141 @@ int main(int argc, char** argv)
 		cv::Mat imgP;
 		image.copyTo(imgP);
 //		cv::cvtColor(imgT, imgP, CV_GRAY2BGR);
-		cv::circle(imgP, cv::Point(mc, mr), 3, cv::Scalar(0, 255, 255));
+		cv::circle(imgP, cv::Point(cc, cr), 3, cv::Scalar(0, 127, 255));
 
 		std::vector<Observation> observations;
 
+		// cover
+/*
+		observations.push_back(
+		{
+			M_TORP_C_H,
+			-1,
+			-3,
+			static_cast<float>(cc - img.cols/2) / img.cols,
+			0,
+			.1f
+		});
+		observations.push_back(
+		{
+			M_TORP_C_V,
+			-1,
+			-3,
+			static_cast<float>(cr - img.rows/2) / img.rows,
+			0,
+			.1f
+		});
+*/
+
 		auto yblobs = blob_detection(imgT);
-		// remove blobs not containing highest pixel
+		// remove blobs not containing highest orange pixel
+/*
 		yblobs.erase(std::remove_if(yblobs.begin(), yblobs.end(), [=](const Blob b)
 		{
 			return
-				b.max_x < mc ||
-				b.min_x > mc ||
-				b.max_y < mr ||
-				b.min_y > mr ||
+				b.max_x < cc ||
+				b.min_x > cc ||
+				b.max_y < cr ||
+				b.min_y > cr ||
 
 				false;
 		}), yblobs.end());
+*/
 		if (yblobs.size() > 0)
 		{
 			auto board = yblobs.at(0);
 
 			board.drawBlob(imgP, cv::Scalar(0, 255, 255));
 
-			cv::Mat imgI;
-			cv::bitwise_not(imgT, imgI);
-			auto nyblobs = blob_detection(imgI);
-
-			nyblobs.erase(std::remove_if(nyblobs.begin(), nyblobs.end(), [=](const Blob b)
+			auto points = board.convexHull;
+			auto c = board.getCentroid();
+			int maxL = board.min_y;
+			int maxR = board.min_y;
+			int minL = board.max_y;
+			int minR = board.max_y;
+			for (auto p : points)
 			{
-				// remove blobs not completely inside board
-				return
-					b.min_x < board.min_x ||
-					b.max_x > board.max_x ||
-					b.min_y < board.min_y ||
-					b.max_y > board.max_y ||
-
-					b.area < 5 ||
-					static_cast<float>(b.max_x - b.min_x + 1) / (b.max_y - b.min_y + 1) > 1.5f ||
-					static_cast<float>(b.max_x - b.min_x + 1) / (b.max_y - b.min_y + 1) < 1/1.5f ||
-
-					false;
-			}), nyblobs.end());
-
-			auto mkObservation = [&](int x_idx, int y_idx, int d_idx, Blob hole, float objHeight)
-			{
-				const cv::Mat& img = imgT;
-				float imgHeight = hole.max_y - hole.min_y + 3;
-				return Observation
+				if (p.x > c.x) // right
 				{
-					x_idx, y_idx, d_idx,
-					hAngle(img, hole.getCentroid().x - img.cols/2),
-					vAngle(img, hole.getCentroid().y - img.cols/2),
-					static_cast<float>(std::max(.2, objHeight/2 / std::max(.001, std::tan(vAngle(img, imgHeight)/2 * 2*M_PI)))),
-				};
+					if (p.y > maxR) maxR = p.y;
+					if (p.y < minR) minR = p.y;
+				}
+				else // left
+				{
+					if (p.y > maxL) maxL = p.y;
+					if (p.y < minL) minL = p.y;
+				}
+			}
+
+			float ratio = static_cast<float>(maxR - minR) / (maxL - minL);
+			auto getDist = [=](int height_image, int rows, float height_actual)
+			{
+				return height_actual/2 / std::tan(static_cast<float>(height_image) / rows * fvFOV / 2 * 2*M_PI);
 			};
-
-			if (nyblobs.size() == 4)
+			auto getAngle = [=](int col, int cols)
 			{
-				std::sort(nyblobs.begin(), nyblobs.end(), [](Blob a, Blob b){ return a.getCentroid().x < b.getCentroid().x; });
+				return static_cast<float>(col - cols/2) / cols * fhFOV;
+			};
+			float lt = getAngle(board.min_x, img.cols);
+			float rt = getAngle(board.max_x, img.cols);
+			float lr = getDist(maxL - minL, img.rows, boardHeight);
+			float rr = getDist(maxR - minR, img.rows, boardHeight);
 
-				bool top = nyblobs.at(0).getCentroid().y < nyblobs.at(1).getCentroid().y;
-				auto tl = nyblobs.at(top ? 0 : 1);
-				auto bl = nyblobs.at(top ? 1 : 0);
-				top = nyblobs.at(2).getCentroid().y < nyblobs.at(3).getCentroid().y;
-				auto tr = nyblobs.at(top ? 2 : 3);
-				auto br = nyblobs.at(top ? 3 : 2);
+			float lx = lr * std::cos(lt * 2*M_PI);
+			float rx = rr * std::cos(rt * 2*M_PI);
+			float ly = lr * std::sin(lt * 2*M_PI);
+			float ry = rr * std::sin(rt * 2*M_PI);
 
-				tl.drawBlob(imgP, cv::Scalar(255, 0, 0));
-				bl.drawBlob(imgP, cv::Scalar(0, 255, 0));
-				tr.drawBlob(imgP, cv::Scalar(0, 0, 255));
-				br.drawBlob(imgP, cv::Scalar(255, 255, 0));
+			float skew = std::atan2(ry - ly, rx - lx) / (2 * M_PI);
 
-				observations.push_back(mkObservation(M_TORP_L_X, M_TORP_L_Y, M_TORP_T_D, tl, tlHeight));
-				observations.push_back(mkObservation(M_TORP_L_X, M_TORP_L_Y, M_TORP_B_D, bl, blHeight));
-				observations.push_back(mkObservation(M_TORP_R_X, M_TORP_R_Y, M_TORP_T_D, tr, trHeight));
-				observations.push_back(mkObservation(M_TORP_R_X, M_TORP_R_Y, M_TORP_B_D, br, brHeight));
-			}
-			else
+			observations.push_back(
 			{
-				for (auto b : nyblobs)
-					b.drawBlob(imgP, cv::Scalar(255, 0, 0));
-				// the holes are probably somewhere near the board
-				// TODO: add high variance low certainty observations
-				// don't implement this until variance can be passed through an observation object
-			}
+				M_TORP_SKEW, -1, -3, skew, 0, .3,
+			});
+
+			float theta = fhFOV * static_cast<float>(c.x - img.cols/2) / img.cols;
+			float phi = fvFOV * static_cast<float>(c.y - img.rows/2) / img.rows;
+			float dist = boardHeight/2 / std::tan(static_cast<float>(board.max_y - board.min_y)/img.rows * fvFOV / 2 * 2*M_PI);
+
+			observations.push_back(
+			{
+				M_TORP_C_H,
+				-1,
+				-3,
+				static_cast<float>(c.x - img.cols/2) / img.cols,
+				0,
+				.1f
+			});
+			observations.push_back(
+			{
+				M_TORP_C_V,
+				-1,
+				-3,
+				static_cast<float>(c.y - img.rows/2) / img.rows,
+				0,
+				.1f
+			});
+			observations.push_back(
+			{
+				M_TORP_DIST, 
+				-1,
+				-3,
+				dist,
+				0,
+				.5,
+			});
+		}
+		else
+		{
+			observations.push_back(
+			{
+				M_TORP_DIST, 
+				-1,
+				-3,
+				3,
+				0,
+				2,
+			});
 		}
 		imageWrite(log, imgP);
 

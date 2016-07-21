@@ -47,7 +47,11 @@ bool moveAbsolute(FILE* in, FILE* out, const State& target, float minDistance)
 	{
 		State state = getState(in, out);
 
-		if (state.distanceTo(target) < minDistance)
+		if (
+			state.distanceTo(target) < minDistance     &&
+			std::abs(state.yaw() - target.yaw()) < .02 &&
+			true
+		)
 			close = true;
 		else if (!alive(in, out)) return false;
 		else std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -172,6 +176,34 @@ bool turnTo(FILE* in, FILE* out, int xi, int yi)
 	return moveExt(in, out, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, theta, 0, 0, 0, 0, .1);
 }
 
+bool alignWith(FILE* in, FILE* out, int hi, int vi, int di, int si)
+{
+	bool close = false;
+	while (!close)
+	{
+		auto state = getState(in, out);
+		auto model = getModel(in, out);
+
+		float h = model.get(hi);
+		float v = model.get(vi);
+		float theta = si >= 0 ? model.get(si) - .25f : state.yaw();
+
+		if (
+			std::abs(theta - state.yaw()) < .05 &&
+			std::abs(h) < .05 &&
+			std::abs(v) < .05 &&
+			true
+		)
+		{
+			close = true;
+			setState(out, state);
+		}
+		else moveExt(in, out, 0, 0, di, 1, 0, h * 1, 0, 1, v * 1, 0, 1, theta, 0, 0, 0, 0, .03);
+	}
+
+	return true;
+}
+
 bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float yo, float zo, float minDistance)
 {
 	auto target = State(xo, yo, zo, 0, 0, 0);
@@ -231,13 +263,13 @@ bool moveToHole(FILE* in, FILE* out, size_t xi, size_t yi, size_t di, float offs
 		float ty = model.get(yi);
 		float td = model.get(di);
 
-		float theta = std::atan2(model.get(M_TORP_L_Y) - model.get(M_TORP_R_Y), model.get(M_TORP_L_X) - model.get(M_TORP_R_X)) + M_PI/2;
+		float theta = model.get(M_TORP_SKEW);
 
 		auto target = State(
-			model.get(xi) - offset*std::cos(theta),
-			model.get(yi) - offset*std::sin(theta),
+			model.get(xi) - offset*std::cos(theta * 2*M_PI),
+			model.get(yi) - offset*std::sin(theta * 2*M_PI),
 			model.get(di),
-			theta / (2*M_PI),
+			theta,
 			0,
 			0
 		);

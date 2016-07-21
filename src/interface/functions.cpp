@@ -75,6 +75,10 @@ Evidence observation(FILE* in, const State& state)
 				{y, cy + rho*static_cast<float>(std::sin(theta)), 1},
 			}};
 		}
+		else if (d == -3) // straight evidence: theta = value, rho = variance, phi ignored
+		{
+			return {{{ x, theta, rho }}};
+		}
 	} // otherwise we don't know how to use this observation
 	else return {};
 }
