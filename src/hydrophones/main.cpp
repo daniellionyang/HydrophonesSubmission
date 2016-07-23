@@ -25,10 +25,10 @@ struct Triangle
 Triangle horizontal =
 {
 	0,
-	1,
+	3,
 	2,
 
-	1.f,
+	.8f,
 	1.f,
 
 	.0f,
@@ -36,14 +36,14 @@ Triangle horizontal =
 
 Triangle vertical =
 {
-	0,
 	2,
-	3,
+	1,
+	0,
 
-	1.f,
+	.28f,
 	1.f,
 
-	.0f,
+	.5f,
 };
 
 int main()
@@ -98,7 +98,7 @@ int main()
 					{
 						tdoa[i][j] = toa[i] - toa[j];
 
-						if (std::abs(tdoa[i][j]) > 333) bad = true;
+						if (std::abs(tdoa[i][j]) > 500) bad = true;
 					}
 				}
 
