@@ -19,19 +19,19 @@
 auto yfilter = nnFilter(
 {
 	{
-		{  3.19680882,  -9.49447346,   6.77733231},
-		{ 4.54791403, -11.92699718,  19.73151016},
-		{ 0.87113887,  -4.119452  ,   2.81521511},
-		{1.90076995,  -8.18187428,   5.09570837},
+		{-6.38772640e-03,  -3.78002548e+00,   3.99126935e+00},
+		{ -1.77165282e+00,  -2.19997425e+01,   3.45455627e+01},
+		{ 7.82506514e+00,  -1.33561554e+01,  -5.29454184e+00},
+		{ 1.91624129e+00,  -2.55934963e+01,  -7.05454230e-01},
 	},
 	{
-		{1.45655107},
-		{-1.45245194},
-		{-0.43105814},
-		{1.44027102},
+		{-3.34416962},
+		{-1.65786171},
+		{7.93236494},
+		{8.20481205},
 	},
-	{{-9.55435658, -19.15372086,  -3.094522  ,  -7.54101038}},
-	{{13.05424595}},
+	{{ -2.30254245, -17.72804451, -15.3492012 ,  14.54854965}},
+	{{6.69232321}},
 });
 
 auto ofilter = nnFilter(
@@ -53,8 +53,8 @@ auto ofilter = nnFilter(
 });
 
 const float cropx = .8;
-const float cropy = .8;
-const float offset = 0.9 * (1 - cropy);
+const float cropy = .4;
+const float offset = 0;
 const float scalex = 256;
 const float scaley = 192;
 //const float scalex = 0.2;
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 		unsigned char* ptr = image.ptr();
 
 		cv::Mat imgB;
-		cv::blur(image, imgB, cv::Size(6, 6));
+		cv::blur(image, imgB, cv::Size(2, 2));
 
 		cv::Mat imgF = filter(imgB, yfilter);
 
@@ -231,6 +231,16 @@ int main(int argc, char** argv)
 
 		auto yblobs = blob_detection(imgT);
 		// remove blobs not containing highest orange pixel
+		yblobs.erase(std::remove_if(yblobs.begin(), yblobs.end(), [=](const Blob b)
+		{
+			return
+				b.max_x < mc ||
+				b.min_x > mc ||
+				b.max_y < mr ||
+				b.min_y > mr ||
+
+				false;
+		}), yblobs.end());
 /*
 		yblobs.erase(std::remove_if(yblobs.begin(), yblobs.end(), [=](const Blob b)
 		{
