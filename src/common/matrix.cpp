@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 
 Matrix::Matrix() :
 	m_rows(0),

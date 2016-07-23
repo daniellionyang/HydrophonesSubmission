@@ -83,6 +83,7 @@ Evidence observation(FILE* in, const State& state)
 		{
 			return {{{ x, theta/(2*M_PI), rho }}};
 		}
+		else return {};
 	} // otherwise we don't know how to use this observation
 	else return {};
 }

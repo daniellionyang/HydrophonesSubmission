@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <utility>
+#include <initializer_list>
 
 class Matrix
 {
