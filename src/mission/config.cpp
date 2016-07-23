@@ -129,6 +129,24 @@ const std::vector<Goal> initialGoals =
 		{ wait, 3 },
 		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
 		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
+		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_ZERO, M_TORP_SKEW }, // center in front of cover
+		{ wait, 3 },
 		{ alignWith, M_TORP_C_H, M_TORP_C_V, M_TORP_DIST, -1 }, // approach
 		{ moveDir, State(1, 0, 0, 0, 0, 0), .1 }, // approach cover
 		{ moveDir, State(0, .3, 0, 0, 0, 0), .1 }, // remove cover

@@ -23,4 +23,5 @@ while True:
 	imgO = (np.concatenate([outputs]*3, 1).reshape(img_shape) * 255).astype(np.uint8)
 
 	im.write(sys.stdout.buffer.raw, imgO)
+#	im.write(sys.stdout.buffer.raw, np.concatenate([imgI[:,:,[2,1,0]], imgO]))
 

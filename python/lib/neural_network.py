@@ -18,9 +18,9 @@ class NeuralNetwork(object):
 		self._features = features = tf.sigmoid(tf.transpose(tf.matmul(W1, tf.transpose(inputs)))   + tf.reshape(b1, [1, numFeatures]))
 		self._outputs  = outputs  = tf.sigmoid(tf.transpose(tf.matmul(W2, tf.transpose(features))) + tf.reshape(b2, [1, numOutputs]))
 
-		self._loss = loss = -tf.reduce_sum(targets*tf.log(outputs + 1e-9) + (1-targets)*tf.log(1-outputs + 1e-9))
+		self._loss = loss = -tf.reduce_sum(targets*tf.log(outputs + 1e-9) + (1-targets)*tf.log(1-outputs + 1e-9)) / tf.to_float(tf.shape(self._inputs)[0])
 
-		opt = tf.train.GradientDescentOptimizer(learning_rate=.01)
+		opt = tf.train.GradientDescentOptimizer(learning_rate=1)
 		grads = opt.compute_gradients(loss, self.weights())
 
 		self._train_op = train_op = opt.apply_gradients(grads)

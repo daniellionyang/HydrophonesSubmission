@@ -288,6 +288,11 @@ int main(int argc, char** argv)
 			float ly = lr * std::sin(lt * 2*M_PI);
 			float ry = rr * std::sin(rt * 2*M_PI);
 
+			lx = lr;
+			rx = ry;
+			ly = 0;
+			ry = 1;
+
 			float skew = std::atan2(ry - ly, rx - lx) / (2 * M_PI);
 
 			observations.push_back(
