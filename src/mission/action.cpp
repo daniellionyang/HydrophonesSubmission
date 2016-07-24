@@ -211,6 +211,28 @@ bool moveModelDir(FILE* in, FILE* out, int xi, int yi, int zi, float xo, float y
 		&& moveDir(in, out, target, minDistance));
 }
 
+bool moveUntil(FILE* in, FILE* out, int yaw, int condition, float min, float max)
+{
+	bool close = false;
+	while (!close)
+	{
+		auto state = getState(in, out);
+		auto model = getModel(in, out);
+
+		auto theta = model.get(yaw);
+		auto value = model.get(condition);
+
+		float r = 1.f;
+
+		if (value > min && value < max)
+			close = true;
+		else
+			setState(out, State(state.x() + r * std::cos(theta), state.y() + r * std::sin(theta), state.depth(), theta, 0, 0));
+	}
+
+	return true;
+}
+
 bool dropInBin(FILE* in, FILE* out)
 {
 	if (!alive(in, out)) return false;

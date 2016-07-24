@@ -86,12 +86,12 @@ const std::vector<Goal> initialGoals =
 
 		// pinger
 		{ lprintf, "pinger\n" },
-		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 3, 1 },
+		{ moveUntil, M_PINGER_THETA, M_PINGER_PHI, .2, .3 },
 	}},
 
 	{  1, 0, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 1, 400, {
 		{ setSpeed, .1f },
-		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 3, 1 }, // approach area
+		{ moveUntil, M_PINGER_THETA, M_PINGER_PHI, .22, .28 },
 
 		{ flag, F_PINGER, 0 },
 		{ flag, F_BINS, 1 },
@@ -99,7 +99,7 @@ const std::vector<Goal> initialGoals =
 		// droppers
 		{ lprintf, "dropper\n" },
 		{ setSpeed, .1f },
-		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 1, 2 }, // look around
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 0, .1 },
 		{ variance, M_CBIN_X, 4 },
 		{ variance, M_CBIN_Y, 4 },
 		{ wait, 3 },
@@ -117,8 +117,8 @@ const std::vector<Goal> initialGoals =
 		{ wait, 1 },
 		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1}, // turn to 0
 
-		{ variance, M_PINGER_X, 400 },
-		{ variance, M_PINGER_Y, 400 },
+		{ variance, M_PINGER_THETA, 400 },
+		{ variance, M_PINGER_PHI, 400 },
 		{ flag, F_PINGER, 1 },
 
 		{ flag, F_TORPS, 1 },
@@ -163,13 +163,13 @@ const std::vector<Goal> initialGoals =
 		// octagon
 		{ lprintf, "octagon\n" },
 		{ setSpeed, .5f },
-		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, 3, .1 },
+		{ moveUntil, M_PINGER_THETA, M_PINGER_PHI, .24, .26 },
 		{ setSpeed, .1f },
-		{ moveModel, M_PINGER_X, M_PINGER_Y, M_ZERO, 0, 0, -10, 20 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 0, 0, 0, 1, 0, 0, 30 },
 		{ wait, 10 },
 		{ moveDir, State(0, 0, 3, 0, 0, 0), 1 },
-		{ variance, M_PINGER_X, 400 },
-		{ variance, M_PINGER_Y, 400 },
+		{ variance, M_PINGER_THETA, 400 },
+		{ variance, M_PINGER_PHI, 400 },
 		{ wait, 10 },
 	}},
 };

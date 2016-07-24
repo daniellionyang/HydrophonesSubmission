@@ -127,15 +127,26 @@ int main()
 
 					true
 				)
+				{
 					Observation(
 					{
-						M_PINGER_X,
-						M_PINGER_Y,
-						-1,
+						M_PINGER_THETA,
+						0,
+						-3,
 						theta,
-						phi,
-						constants.get(C_POOL_D),
+						0,
+						.1f
 					}).write(out);
+					Observation(
+					{
+						M_PINGER_PHI,
+						0,
+						-3,
+						phi,
+						0,
+						.1f
+					}).write(out);
+				}
 			}
 		}
 		else if (c == EOF) std::this_thread::sleep_for(std::chrono::milliseconds(100));

@@ -19,7 +19,7 @@ enum
 	M_TORP_DIST,
 	M_TORP_SKEW,
 	M_TORP_D,
-	M_PINGER_X,    M_PINGER_Y,
+	M_PINGER_THETA,               M_PINGER_PHI,
 	NUM_VARS
 };
 

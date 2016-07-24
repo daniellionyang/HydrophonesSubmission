@@ -36,6 +36,8 @@ bool moveDir(FILE*, FILE*, const State&, float);
 bool moveModel(FILE*, FILE*, int, int, int, float, float, float, float);
 bool moveModelDir(FILE*, FILE*, int, int, int, float, float, float, float);
 
+bool moveUntil(FILE*, FILE*, int, int, float, float);
+
 bool dropInBin(FILE*, FILE*);
 bool uncoverBin(FILE*, FILE*);
 
