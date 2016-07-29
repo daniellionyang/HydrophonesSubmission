@@ -39,13 +39,10 @@ const std::vector<Goal> initialGoals =
 
 		// pvc
 		{ lprintf, "pvc\n" },
-		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0, 0, 0, 1, 0, 0, .1 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0, 0.05, 0, 0, 0, 0, .1 },
 		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, .1 },
-		{ turnTo, M_PVC_X, M_PVC_Y },
 		{ flag, F_PVC, 1 },
 		{ wait, 5 },
-		{ turnTo, M_PVC_X, M_PVC_Y },
-		{ wait, 3 },
 		{ turnTo, M_PVC_X, M_PVC_Y },
 		{ flag, F_PVC, 0 },
 		{ setSpeed, .8f },
