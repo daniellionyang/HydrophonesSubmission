@@ -37,21 +37,31 @@ const std::vector<Goal> initialGoals =
 		{ moveExt, -1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1 },
 		{ moveExt, 8, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1 },
 
-		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0, 0, 0, 1, 0, 0, .1 },
-		{ flag, F_PVC, 1 },
-
 		// pvc
 		{ lprintf, "pvc\n" },
-		{ setSpeed, .5f },
-		{ wait, 8 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0, 0, 0, 1, 0, 0, .1 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, .1 },
 		{ turnTo, M_PVC_X, M_PVC_Y },
-		{ moveExt, 0, 0, M_PVC_X, 0, 0, 0, M_PVC_Y, 0, 4, 0, 0, 0, 0, 1, 0, 0, 3 },
-		{ setSpeed, .1f },
-		{ moveDir, State(5, 0, 0, 0, 0, 2), 1 }, // barrel roll
-		{ setSpeed, .3f },
-		{ moveDir, State(3, 0, 0, 0, 0, 0), 1 },
+		{ flag, F_PVC, 1 },
+		{ wait, 5 },
+		{ turnTo, M_PVC_X, M_PVC_Y },
+		{ wait, 3 },
+		{ turnTo, M_PVC_X, M_PVC_Y },
+		{ flag, F_PVC, 0 },
+		{ setSpeed, .8f },
+		{ moveDir, State(3, 0, 0, 0, 0, 0), .1 },
+		{ moveDir, State(0, 0, 0, 0, 0, 2), .1 }, // barrel roll
+		{ moveDir, State(3, 0, 0, 0, 0, 2), .1 },
+		{ moveDir, State(0, 0, 0, 0, 0, 0), .1 }, // barrel roll
+		{ moveDir, State(3, 0, 0, 0, 0, 0), .1 },
+		{ moveDir, State(0, 0, 0, 0, 0, 2), .1 }, // barrel roll
+		{ moveDir, State(3, 0, 0, 0, 0, 2), .1 },
+		{ moveDir, State(0, 0, 0, 0, 0, 0), .1 }, // barrel roll
+		{ moveDir, State(3, 0, 0, 0, 0, 0), .1 },
 
-		{ moveExt, 0, 0, M_CBIN_X, 0, 0, 0, M_CBIN_Y, 0, 4, 0, 0, 0, 0, 1, 0, 0, .1 },
+		{ moveDir, State(0, 0, 0, -.3, 0, 0), 1 },
+		{ moveDir, State(16, 0, 0, 0, 0, 0), 1 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0, 0, 0, 1, 0, 0, .1 },
 		{ flag, F_BINS, 1 },
 		{ wait, 5 },
 
@@ -103,91 +113,21 @@ const std::vector<Goal> initialGoals =
 		{ moveDir, State(0, 0, -.2, 0, 0, 0), .1 },
 		{ moveDir, State(0, 0, 0, 0, 0, .2), .1 },
 		{ moveDir, State(0, 0, 0, 0, 0, 0), .1 },
-		{ moveDir, State(2, 0, 0, 1, 0, 0), .1 },
-		{ moveDir, State(0, 0, -2, 0, 0, 0), .1 },
-		{ wait, 50 },
-		{ moveExt, 0, 0, M_CBIN_X, 0, 0, 0, M_CBIN_Y, 0, 3, 0, 0, 0, 0, 1, 0, 0, .1 },
+		{ moveDir, State(0, 0, 0, 1, 0, 0), .1 },
 		{ dropInBin },
 		{ wait, 1 },
 		{ dropInBin },
 		{ wait, 1 },
-		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, .1}, // turn to 0
-		// gate
-		{ lprintf, "gate\n" },
-		{ setSpeed, .1f },
-		{ moveAbsolute, State(0, 0, 3, 0, 0, 0), .2 },
 		{ setSpeed, .8f },
-		{ moveModel, M_GATE_X, M_GATE_Y, M_ZERO, 0, 0, 1, 1 },
-		{ moveDir, State(3.5, 0, 3, 0, 0, 0), 1 },
-
-		{ flag, F_BUOYS, 1 },
-		{ wait, 3 },
-
-		// red buoy
-		{ lprintf, "rbuoy\n" },
-		{ setSpeed, .2f },
-		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
-		{ moveExt, 0, 0, M_RBUOY_X, 0, 0, 0, M_RBUOY_Y, 0, 0, M_RBUOY_D, 0, 0, 0, 1, 0, 0, 3 },
-		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
-		{ moveExt, 0, 0, M_RBUOY_X, 0, 0, 0, M_RBUOY_Y, 0, 0, M_RBUOY_D, 0, 0, 0, 1, 0, 0, 2 },
-		{ turnTo, M_RBUOY_X, M_RBUOY_Y },
-		{ lprintf, "ramming\n" },
-		{ flag, F_BUOYS, 0 },
-		{ moveExt, 0, 3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
-		{ moveExt, 0, -3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
-		{ flag, F_BUOYS, 1 },
-
-		// green buoy
-		{ lprintf, "gbuoy\n" },
-		{ wait, 3 },
-		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
-		{ moveExt, 0, 0, M_GBUOY_X, 0, 0, 0, M_GBUOY_Y, 0, 0, M_GBUOY_D, 0, 0, 0, 1, 0, 0, 3 },
-		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
-		{ moveExt, 0, 0, M_GBUOY_X, 0, 0, 0, M_GBUOY_Y, 0, 0, M_GBUOY_D, 0, 0, 0, 1, 0, 0, 2 },
-		{ turnTo, M_GBUOY_X, M_GBUOY_Y },
-		{ lprintf, "ramming\n" },
-		{ flag, F_BUOYS, 0 },
-		{ moveExt, 0, 3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
-		{ moveExt, 0, -3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1 },
-		{ flag, F_BUOYS, 1 },
-
-		// yellow buoy
-		{ lprintf, "ybuoy\n" },
-		{ variance, M_YBUOY_X, 1 },
-		{ variance, M_YBUOY_Y, 1 },
-		{ wait, 3 },
-		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
-		{ wait, 3 },
-		{ moveModel, M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, 0, 0, 0, 3 },
-		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
-		{ wait, 3 },
-		{ moveModel, M_YBUOY_X, M_YBUOY_Y, M_YBUOY_D, 0, 0, 0, 1 },
-		{ turnTo, M_YBUOY_X, M_YBUOY_Y },
-		{ lprintf, "manipulating\n" },
-		{ flag, F_BUOYS, 0 },
-		{ moveDir, State(1, 0, -.5, 0, 0, 0), .1 },
-		{ moveDir, State(0, 0, 1.2, 0, 0, 0), .1 },
-		{ moveExt, 0, 3, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1 },
-
-		{ flag, F_PINGER, 1 }, // activate pinger early
-		{ flag, F_PVC, 1 },
-
-		// pvc
-		{ lprintf, "pvc\n" },
-		{ setSpeed, .5f },
-		{ wait, 3 },
-		{ turnTo, M_PVC_X, M_PVC_Y },
-		{ moveExt, 0, 0, M_PVC_X, 0, 0, 0, M_PVC_Y, 0, 2.3, 0, 0, 0, 0, 1, 0, 0, .1 },
+		{ moveDir, State(2, 0, 0, 0, 0, 0), .1 },
 		{ setSpeed, .1f },
-		{ moveDir, State(5, 0, 0, 0, 0, 2), 1 }, // barrel roll
-		{ setSpeed, .3f },
-		{ moveDir, State(3, 0, 0, 0, 0, 0), 1 },
-
-		{ flag, F_PVC, 0 },
-
-		// pinger
-		{ lprintf, "pinger\n" },
-		{ moveUntil, M_PINGER_THETA, M_PINGER_PHI, .2, .3 },
+		{ moveExt, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, .1 },
+		{ moveExt, 0, 5, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, .1 },
+		{ shootInHole, 'r' },
+		{ wait, 3 },
+		{ moveExt, 0, 0, 0, 1, 0, .3, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, .1 },
+		{ shootInHole, 'l' },
+		{ wait, 3 },
 	}},
 
 	{  1, 0, M_CBIN_X, M_CBIN_Y, M_ZERO, 0, 0, 1, 400, {
