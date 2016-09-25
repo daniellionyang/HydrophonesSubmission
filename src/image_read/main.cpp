@@ -1,8 +1,21 @@
+/**
+* An image handling class. Writes from an image to a file stream.
+*/
+
+
 #include "image/image.hpp"
 
 #include <iostream>
 
 #include <opencv2/highgui/highgui.hpp>
+
+/**
+* Method that writes to a file from an input. Prints error message if the input stream is not found.
+* @param in the stream to read from
+* @param out the file stream to write to
+* @param the stream to write user output to
+* @return 0 upon finishing
+*/
 
 int process(std::istream& in, FILE* out, std::ostream& err)
 {
